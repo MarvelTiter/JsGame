@@ -5,8 +5,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="base_sence.js"></script>
+    <script src="element.js"></script>
     <script src="game.js"></script>
     <script src="mine_sence.js"></script>
+    <script src="cell.js"></script>
+    <!-- <script src="grid.js"></script> -->
     <title>扫雷</title>
 </head>
 
@@ -15,10 +19,30 @@
         <canvas id="canvas" width="700" height="700"></canvas>
     </div>
     <script>
+        let images = {
+            n1: './sprites/n1.gif',
+            n2: './sprites/n2.gif',
+            n3: './sprites/n3.gif',
+            n4: './sprites/n4.gif',
+            n5: './sprites/n5.gif',
+            n6: './sprites/n6.gif',
+            n7: './sprites/n7.gif',
+            n8: './sprites/n8.gif',
+            normal: './sprites/normal.gif',
+            flag: './sprites/flag.gif',
+            unknow: './sprites/unknow.gif',
+            over: './sprites/over.gif',
+            mine: './sprites/mine.gif',
+            mine_b: './sprites/mine_b.gif',
+            bg: './sprites/bg.jpg',
+        }
+
         let g = new Game()
-        let ms = new MineSence(g)
-        g.setSence(ms)
-        g.run()
+        g.loadSources(images).then(game => {
+            let ms = new MineSence(game)
+            game.setSence(ms)
+            game.run()
+        })
     </script>
 </body>
 

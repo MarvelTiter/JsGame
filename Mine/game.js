@@ -3,7 +3,11 @@ class Game {
     this.actions = {};
     this.cavnas = document.querySelector("#canvas");
     this.context = this.cavnas.getContext("2d");
-    this.moveActions = [];
+    this.images = {};
+    this.mouseAction = {
+      mouseArgs: null,
+      clickHandled: true,
+    };
     this.moveArgs = null;
     this.sence = null;
     this.setup();
@@ -11,19 +15,37 @@ class Game {
 
   setup() {
     this.cavnas.addEventListener("mousemove", (e) => {
-      this.moveArgs = e;
+      this.mouseAction.mouseArgs = e;
     });
     this.cavnas.addEventListener("click", (e) => {
-      this.moveArgs = e;
-    });
-  }
-  registerMouseAction(callbackObject, funcName) {
-    this.moveActions.push({
-      obj: callbackObject,
-      func: funcName,
+      this.mouseAction.mouseArgs = e;
+      this.mouseAction.clickHandled = false;
     });
   }
   registerAction(key, callback) {}
+
+  loadSources(sources) {
+    let game = this;
+    let count = 0;
+    return new Promise((resolve, reject) => {
+      let keys = Object.keys(sources);
+      for (const i of keys) {
+        let img = new Image();
+        img.src = sources[i];
+        img.onload = () => {
+          this.images[i] = img
+          count++;
+          if (count == keys.length) {
+            resolve(game);
+          }
+        };
+      }
+    });
+  }
+
+  getTextureByName(name) {
+    return this.images[name]
+  }
 
   setSence(sence) {
     this.sence = sence;
@@ -32,13 +54,6 @@ class Game {
   run() {
     if (!this.sence) return;
     window.setInterval(() => {
-      for (const action of this.moveActions) {
-        if (!this.moveArgs) continue
-        let {obj,func} = action
-        let { offsetX, offsetY } = this.moveArgs;
-        // action({ offsetX, offsetY });
-        obj[func]({ offsetX, offsetY })
-      }
       this.sence.update();
       this.context.clearRect(0, 0, this.cavnas.width, this.cavnas.height);
       this.sence.draw();
