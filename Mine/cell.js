@@ -59,32 +59,32 @@ class Cell extends Element {
       }
     }
 
-    if (!this.game.mouseAction.enable) return;
-    let { offsetX, offsetY } = this.game.mouseAction.mouseArgs;
-    this.checkFocu(offsetX, offsetY);
+    // if (!this.game.mouseAction.enable) return;
+    // let { offsetX, offsetY } = this.game.mouseAction.mouseArgs;
+    // this.checkFocu(offsetX, offsetY);
 
-    let ma = this.game.mouseAction;
-    // if (ma.type != "move") {
+    // let ma = this.game.mouseAction;
+    // // if (ma.type != "move") {
+    // // }
+    // if (!ma.handled && this.focus) {
+    //   let { button, buttons } = ma.mouseArgs;
+    //   if (ma.status == MOUSE_PRESS) {
+    //     // 0,1 left
+    //     if (button == 0 && buttons == 1) {
+    //       this.grid.open(this);
+    //     }
+    //     // 2,2 right
+    //     if (button == 2 && buttons == 2) {
+    //       this.updateState();
+    //     }
+    //     // 0,3 double
+    //     if (button == 0 && buttons == 3) {
+    //       this.grid.scan(this);
+    //     }
+    //     ma.handled = true;
+    //   } else if (ma.status == MOUSE_RELEASE) {
+    //     this.grid.release(this);
+    //   }
     // }
-    if (!ma.handled && this.focus) {
-      let { button, buttons } = ma.mouseArgs;
-      if (ma.status == MOUSE_PRESS) {
-        // 0,1 left
-        if (button == 0 && buttons == 1) {
-          this.grid.open(this);
-        }
-        // 2,2 right
-        if (button == 2 && buttons == 2) {
-          this.updateState();
-        }
-        // 0,3 double
-        if (button == 0 && buttons == 3) {
-          this.grid.scan(this);
-        }
-        ma.handled = true;
-      } else if (ma.status == MOUSE_RELEASE) {
-        this.grid.release(this);
-      }
-    }
   }
 }

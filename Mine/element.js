@@ -1,6 +1,7 @@
 class Element {
   constructor(game, name) {
     this.game = game;
+    this.texture = null;
     if (name) {
       this.texture = game.getTextureByName(name);
       this.x = 0;
@@ -12,6 +13,7 @@ class Element {
   update() {}
 
   draw() {
-    this.game.context.drawImage(this.texture, this.x, this.y, this.w, this.h);
+    if (this.texture)
+      this.game.context.drawImage(this.texture, this.x, this.y, this.w, this.h);
   }
 }

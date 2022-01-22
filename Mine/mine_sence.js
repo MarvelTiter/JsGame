@@ -12,7 +12,7 @@ class MineSence extends BaseSence {
     this.addElement(bg);
     // this.addElement(this.grid);
     // this.data = [];
-    this.grid = new Grid(this.row, this.column);
+    this.grid = new Grid(this.game, this.row, this.column);
     for (let r = 0; r < this.row; r++) {
       // let row = [];
       for (let c = 0; c < this.column; c++) {
@@ -23,12 +23,14 @@ class MineSence extends BaseSence {
       }
       // this.data.push(row);
     }
+    this.addElement(this.grid);
     this.grid.initMine(this.maxCount);
   }
 }
 
-class Grid {
-  constructor(row, column) {
+class Grid extends Element {
+  constructor(game, row, column) {
+    super(game);
     this.data = [];
     this.row = row;
     this.column = column;
@@ -86,6 +88,7 @@ class Grid {
       }
     }
   }
+
   scan(target) {
     let flagCount = 0;
     let rowIndex = target.row;
@@ -130,6 +133,47 @@ class Grid {
             temp.scaning = false;
           }
         }
+      }
+    }
+  }
+
+  update() {
+    if (!this.game.mouseAction.enable) return;
+    let { offsetX, offsetY } = this.game.mouseAction.mouseArgs;
+    // for (let r = 0; r < this.row; r++) {
+    //   for (let c = 0; c < this.column; c++) {
+    //     let temp = this.data[r][c];
+    //     if (!temp.isOpen) temp.scaning = false;
+    //   }
+    // }
+    let rowIndex = Math.floor(offsetY / 50);
+    let colIndex = Math.floor(offsetX / 50);
+    let temp = this.data[rowIndex][colIndex];
+    if (temp && !temp.isOpen && temp.flag == 0) {
+      temp.setTexture("over");
+    }
+
+    let ma = this.game.mouseAction;
+    // if (ma.type != "move") {
+    // }
+    if (!ma.handled) {
+      let { button, buttons } = ma.mouseArgs;
+      if (ma.status == MOUSE_PRESS) {
+        // 0,1 left
+        if (button == 0 && buttons == 1) {
+          this.open(temp);
+        }
+        // 2,2 right
+        if (button == 2 && buttons == 2) {
+          temp.updateState();
+        }
+        // 0,3 double
+        if (button == 0 && buttons == 3) {
+          this.scan(this);
+        }
+        ma.handled = true;
+      } else if (ma.status == MOUSE_RELEASE) {
+        this.release(this);
       }
     }
   }
