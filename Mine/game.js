@@ -5,6 +5,7 @@ const MOUSE_RB_CLICK = 0x0100;
 const MOUSE_MOVING = "MOVE";
 const MOUSE_PRESS = "PRESS";
 const MOUSE_RELEASE = "RELEASE";
+
 class Game {
   constructor() {
     this.actions = {};
@@ -54,7 +55,7 @@ class Game {
         self.mouseAction.status = MOUSE_PRESS;
         self.mouseAction.mouseArgs = e;
         self.mouseAction.handled = false;
-      }, 100);
+      }, 50);
     });
     this.cavnas.addEventListener("mouseup", (e) => {
       this.mouseAction.status = MOUSE_RELEASE;

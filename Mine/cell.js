@@ -1,12 +1,11 @@
 class Cell extends Element {
   constructor(game, grid, rowIndex, columnIndex) {
-    super(game);
+    super(game, "normal");
     this.gutter = 0;
     this.grid = grid;
     this.row = rowIndex;
     this.column = columnIndex;
     this.flag = 0;
-    this.texture = this.game.getTextureByName("normal");
     this.w = 50;
     this.h = 50;
     this.x = this.column * this.w + (this.column + 1) * this.gutter;
@@ -14,13 +13,17 @@ class Cell extends Element {
     this.isOpen = false;
     this.focus = false;
     this.isMine = false;
-    // this.scaning = false;
+    this.scaning = false;
     this.count = 0;
   }
 
   checkFocu(x, y) {
     this.focus =
-      x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h;
+      x - this.offsetX > this.x &&
+      x - this.offsetX < this.x + this.w &&
+      y - this.offsetY > this.y &&
+      y - this.offsetY < this.y + this.h;
+    return { success: this.focus, data: this };
   }
 
   setTexture(name) {
@@ -31,17 +34,18 @@ class Cell extends Element {
     this.flag = (this.flag + 1) % 3;
   }
 
-  update() {
+  elementUpdate() {
+    if (!this.hasChanged) return;
     // 设置材质
+    let name = "";
     if (!this.isOpen) {
       if (this.flag == 0) {
-        // if (this.scaning) {
-        //   this.setTexture("n0");
-        // } else {
-        // }
-        this.focus ? this.setTexture("over") : this.setTexture("normal");
+        if (this.scaning) {
+          name = "n0";
+        } else {
+          name = this.focus ? "over" : "normal";
+        }
       } else {
-        let name = "";
         if (this.flag == 1) {
           name = "flag";
         } else if (this.flag == 2) {
@@ -49,16 +53,16 @@ class Cell extends Element {
         } else {
           name = "normal";
         }
-        this.setTexture(name);
       }
     } else {
       if (this.isMine) {
-        this.setTexture("mineFail");
+        name = "mineFail";
       } else {
-        this.setTexture("n" + this.count);
+        name = "n" + this.count;
       }
     }
-
+    this.setTexture(name);
+    this.scaning = false;
     // if (!this.game.mouseAction.enable) return;
     // let { offsetX, offsetY } = this.game.mouseAction.mouseArgs;
     // this.checkFocu(offsetX, offsetY);
