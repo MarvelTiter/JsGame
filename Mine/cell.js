@@ -85,7 +85,6 @@ class Cell extends Element {
       } else {
         name = "n" + this.count;
       }
-      this.canDraw = false;
     }
     this.setTexture(name);
   }

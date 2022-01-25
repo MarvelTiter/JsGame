@@ -16,7 +16,7 @@ class BaseSence {
 
   draw() {
     for (const e of this.elements) {
-      e.elementUpdate();
+      e.elementDraw();
     }
   }
 }

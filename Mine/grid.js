@@ -17,7 +17,7 @@ class Grid extends Element {
       }
       this.data.push(row);
     }
-    this.initMine()
+    this.initMine();
     this.setupEvent();
   }
   setupEvent() {
@@ -34,6 +34,14 @@ class Grid extends Element {
       "a",
       (e) => {
         this.randomOpen();
+      },
+      true,
+    );
+    this.game.registerKeyAction(
+      "f",
+      (e) => {
+        let i = Item.new(this.game, this.sence);
+        this.sence.addElement(i);
       },
       true,
     );

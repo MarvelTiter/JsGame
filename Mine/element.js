@@ -25,13 +25,9 @@ class Element {
     return new Proxy(i, {
       set(tar, prop, value, reciver) {
         if (prop == "hasChanged") {
-          return (
-            Reflect.set(tar, "hasChanged", false, reciver) &&
-            Reflect.set(tar, "canDraw", false, reciver)
-          );
+          return Reflect.set(tar, "hasChanged", false, reciver);
         }
         Reflect.set(tar, "hasChanged", true, reciver);
-        Reflect.set(tar, "canDraw", true, reciver);
         return Reflect.set(tar, prop, value, reciver);
       },
     });
@@ -57,32 +53,16 @@ class Element {
     return { success: isfocus, data: this };
   }
 
+  updateRequest() {
+    return this.hasChanged;
+  }
+
+  // 子类复写
   update() {}
 
-  elementUpdate() {
-    if (!this.hasChanged) return;
-    if (!this.canDraw) return;
-
-    this.update();
-    if (this.hasChanged) {
-      this.elementDraw();
-    }
-    this.hasChanged = false;
-  }
-
-  elementDraw() {
-    if (!this.canDraw) return;
-    this.draw();
-  }
-
+  // 子类复写
   draw() {
     if (this.texture) {
-      this.game.context.clearRect(
-        this.x + this.offsetX,
-        this.y + this.offsetY,
-        this.w,
-        this.h,
-      );
       this.game.context.drawImage(
         this.texture,
         this.x + this.offsetX,
@@ -91,5 +71,22 @@ class Element {
         this.h,
       );
     }
+  }
+
+  // sence调用
+  elementUpdate() {
+    if (!this.updateRequest()) return;
+    this.update();
+    console.log('update');
+    if (this.hasChanged) {
+      this.elementDraw();
+    }
+    this.hasChanged = false;
+  }
+
+  // sence调用
+  elementDraw() {
+    if (!this.canDraw) return;
+    this.draw();
   }
 }
