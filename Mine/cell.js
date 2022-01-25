@@ -1,29 +1,18 @@
 class Cell extends Element {
-  constructor(game, grid, rowIndex, columnIndex) {
-    super(game, "normal");
+  constructor(game, sence, grid, rowIndex, columnIndex) {
+    super(game, sence, "flag0");
     this.gutter = 0;
     this.grid = grid;
     this.row = rowIndex;
     this.column = columnIndex;
     this.flag = 0;
-    this.w = 50;
-    this.h = 50;
+    this.w = 25;
+    this.h = 25;
     this.x = this.column * this.w + (this.column + 1) * this.gutter;
     this.y = this.row * this.h + (this.row + 1) * this.gutter;
     this.isOpen = false;
-    this.focus = false;
     this.isMine = false;
-    this.scaning = false;
     this.count = 0;
-  }
-
-  checkFocu(x, y) {
-    this.focus =
-      x - this.offsetX > this.x &&
-      x - this.offsetX < this.x + this.w &&
-      y - this.offsetY > this.y &&
-      y - this.offsetY < this.y + this.h;
-    return { success: this.focus, data: this };
   }
 
   setTexture(name) {
@@ -34,25 +23,61 @@ class Cell extends Element {
     this.flag = (this.flag + 1) % 3;
   }
 
-  elementUpdate() {
-    if (!this.hasChanged) return;
+  open() {
+    if (this.isOpen) return;
+    this.isOpen = true;
+    if (this.isMine) {
+      alert("游戏结束");
+    }
+    // 连锁开
+    if (this.count == 0) {
+      let rowIndex = this.row;
+      let colIndex = this.column;
+      for (let i = rowIndex - 1; i < rowIndex + 2; i++) {
+        for (let j = colIndex - 1; j < colIndex + 2; j++) {
+          // 判断坐标防越界
+          if (i > -1 && j > -1 && i < this.grid.row && j < this.grid.column) {
+            // 递归
+            let temp = this.grid.data[i][j];
+            if (!temp.isMine) temp.open();
+          }
+        }
+      }
+    }
+  }
+
+  scan() {
+    let flagCount = 0;
+    let rowIndex = this.row;
+    let colIndex = this.column;
+
+    let around = [];
+    for (let i = rowIndex - 1; i < rowIndex + 2; i++) {
+      for (let j = colIndex - 1; j < colIndex + 2; j++) {
+        //判断坐标防越界
+        if (i > -1 && j > -1 && i < this.grid.row && j < this.grid.column) {
+          let temp = this.grid.data[i][j];
+          if (temp.flag == 1) flagCount++;
+          else if (!temp.isOpen) {
+            around.push(temp);
+          }
+        }
+      }
+    }
+    if (flagCount == this.count) {
+      for (const t of around) {
+        t.open();
+      }
+    }
+  }
+
+  update() {
     // 设置材质
     let name = "";
     if (!this.isOpen) {
-      if (this.flag == 0) {
-        if (this.scaning) {
-          name = "n0";
-        } else {
-          name = this.focus ? "over" : "normal";
-        }
-      } else {
-        if (this.flag == 1) {
-          name = "flag";
-        } else if (this.flag == 2) {
-          name = "unknow";
-        } else {
-          name = "normal";
-        }
+      name = "flag" + this.flag;
+      if (this.focus && this.flag == 0) {
+        name = "over";
       }
     } else {
       if (this.isMine) {
@@ -60,35 +85,8 @@ class Cell extends Element {
       } else {
         name = "n" + this.count;
       }
+      this.canDraw = false;
     }
     this.setTexture(name);
-    this.scaning = false;
-    // if (!this.game.mouseAction.enable) return;
-    // let { offsetX, offsetY } = this.game.mouseAction.mouseArgs;
-    // this.checkFocu(offsetX, offsetY);
-
-    // let ma = this.game.mouseAction;
-    // // if (ma.type != "move") {
-    // // }
-    // if (!ma.handled && this.focus) {
-    //   let { button, buttons } = ma.mouseArgs;
-    //   if (ma.status == MOUSE_PRESS) {
-    //     // 0,1 left
-    //     if (button == 0 && buttons == 1) {
-    //       this.grid.open(this);
-    //     }
-    //     // 2,2 right
-    //     if (button == 2 && buttons == 2) {
-    //       this.updateState();
-    //     }
-    //     // 0,3 double
-    //     if (button == 0 && buttons == 3) {
-    //       this.grid.scan(this);
-    //     }
-    //     ma.handled = true;
-    //   } else if (ma.status == MOUSE_RELEASE) {
-    //     this.grid.release(this);
-    //   }
-    // }
   }
 }

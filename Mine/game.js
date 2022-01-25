@@ -8,68 +8,81 @@ const MOUSE_RELEASE = "RELEASE";
 
 class Game {
   constructor() {
+    this.keys = {};
     this.actions = {};
-    this.cavnas = document.querySelector("#canvas");
-    this.context = this.cavnas.getContext("2d");
+    this.onceAction = {};
+    this.canvas = document.querySelector("#canvas");
+    this.context = this.canvas.getContext("2d");
     this.images = {};
-    this.mouseAction = {
-      // buttons: 0x000,
-      enable: false,
-      mouseArgs: null,
-      handled: true,
-    };
-    this.moveArgs = null;
+    this.enableMouseAction = false;
+    this.mousedownEvents = [];
+    this.mousemoveEvents = [];
+    this.mouseupEvents = [];
     this.sence = null;
     this.setup();
-    this.timerId = null;
   }
 
   setup() {
-    this.cavnas.addEventListener("mouseover", (e) => {
-      this.mouseAction.enable = true;
+    this.canvas.addEventListener("mouseover", (e) => {
+      e.preventDefault();
+      this.enableMouseAction = true;
     });
-    this.cavnas.addEventListener("mousemove", (e) => {
-      if (this.mouseAction.enable) {
-        // if (Math.abs(e.movementX) < 2 && Math.abs(e.movementY) < 2) {
-        //   return;
-        // }
-        this.mouseAction.status = MOUSE_MOVING;
-        this.mouseAction.mouseArgs = e;
-        this.mouseAction.handled = false;
-      } else {
-        this.mouseAction.mouseArgs = null;
+    this.canvas.addEventListener("mousemove", (e) => {
+      e.preventDefault();
+      if (this.enableMouseAction) {
+        for (const event of this.mousemoveEvents) {
+          if (this.enableMouseAction) {
+            event(e);
+          }
+        }
       }
     });
-    this.cavnas.addEventListener("mouseout", (e) => {
-      this.mouseAction.enable = false;
-    });
-    this.cavnas.addEventListener("mousedown", (e) => {
-      let self = this;
-      // let { button, buttons } = e;
-      // console.log({ button, buttons });
+    this.canvas.addEventListener("mouseout", (e) => {
       e.preventDefault();
-      if (this.timerId) {
-        clearTimeout(this.timerId);
+      this.enableMouseAction = false;
+    });
+    this.canvas.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      for (const event of this.mouseupEvents) {
+        event(e);
       }
-      this.timerId = setTimeout(function () {
-        self.mouseAction.status = MOUSE_PRESS;
-        self.mouseAction.mouseArgs = e;
-        self.mouseAction.handled = false;
-      }, 50);
     });
-    this.cavnas.addEventListener("mouseup", (e) => {
-      this.mouseAction.status = MOUSE_RELEASE;
+    this.canvas.addEventListener("mouseup", (e) => {
+      e.preventDefault();
+      for (const event of this.mousedownEvents) {
+        event(e);
+      }
+    });
+    this.canvas.addEventListener("contextmenu", (e) => {
+      e.stopPropagation();
       e.preventDefault();
     });
-    this.cavnas.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      // // console.log(e);
-      // this.mouseAction.buttons = this.mouseAction.buttons | MOUSE_RB_CLICK;
-      // this.mouseAction.mouseArgs = e;
+    window.addEventListener("keydown", (e) => {
+      this.keys[e.key] = true;
+      if (this.onceAction[e.key]) this.onceAction[e.key]();
+    });
+    window.addEventListener("keyup", (e) => {
+      this.keys[e.key] = false;
     });
   }
 
-  registerAction(key, callback) {}
+  registerKeyAction(key, callback, once) {
+    if (once) {
+      this.onceAction[key] = callback;
+    } else {
+      this.actions[key] = callback;
+    }
+  }
+
+  registerMouseAction(actionType, callback) {
+    if (actionType == MOUSE_PRESS) {
+      this.mousedownEvents.push(callback);
+    } else if (actionType == MOUSE_MOVING) {
+      this.mousemoveEvents.push(callback);
+    } else if (actionType == MOUSE_RELEASE) {
+      this.mouseupEvents.push(callback);
+    }
+  }
 
   loadSources(sources) {
     let game = this;
@@ -101,9 +114,13 @@ class Game {
   run() {
     if (!this.sence) return;
     window.setInterval(() => {
+      for (const actionKey of Object.keys(this.actions)) {
+        if (this.keys[actionKey]) {
+          this.actions[actionKey]();
+        }
+      }
+
       this.sence.update();
-      this.context.clearRect(0, 0, this.cavnas.width, this.cavnas.height);
-      this.sence.draw();
-    }, 1000 / 60);
+    }, 1000 / 30);
   }
 }

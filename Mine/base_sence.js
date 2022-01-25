@@ -10,13 +10,13 @@ class BaseSence {
 
   update() {
     for (const e of this.elements) {
-      e.update();
+      e.elementUpdate();
     }
   }
 
   draw() {
     for (const e of this.elements) {
-      e.draw();
+      e.elementUpdate();
     }
   }
 }
