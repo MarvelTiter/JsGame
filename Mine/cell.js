@@ -27,7 +27,7 @@ class Cell extends Element {
     if (this.isOpen) return;
     this.isOpen = true;
     if (this.isMine) {
-      this.grid.openAll()
+      this.grid.openAll();
       alert("游戏结束");
     }
     // 连锁开
@@ -89,4 +89,29 @@ class Cell extends Element {
     }
     this.setTexture(name);
   }
+
+  // onClick(e) {
+  //   let { button, buttons } = e;
+  //   if (!this.isOpen) {
+  //     // 0,1 left
+  //     if (button == 0) {
+  //       this.open();
+  //     }
+  //     // 2,2 right
+  //     if (button == 2) {
+  //       let oldState = this.flag;
+  //       this.updateState();
+  //       if (this.flag == 1 && oldState == 0) {
+  //         this.mineCount--;
+  //       } else if (this.flag == 2 && oldState == 1) {
+  //         this.grid.mineCount++;
+  //       }
+  //       this.grid.invokeCallback();
+  //     }
+  //   }
+  //   // 0,3 double
+  //   else if (buttons == 2) {
+  //     this.scan();
+  //   }
+  // }
 }

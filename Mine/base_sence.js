@@ -1,6 +1,6 @@
 class BaseSence {
   constructor(game) {
-    this.game = game
+    this.game = game;
     this.elements = [];
     this.keys = {};
     this.actions = {};
@@ -27,14 +27,19 @@ class BaseSence {
   }
 
   handleMousedown(e) {
-    for (const event of this.mousedownEvents) {
-      event(e);
+    let { offsetX, offsetY } = e;
+    for (let index = this.elements.length - 1; index > -1; index--) {
+      const element = this.elements[index];
+      if (element.checkFocu(offsetX, offsetY)) {
+        element.onClick(e);
+        break;
+      }
     }
   }
 
   handleKeydown(e) {
     if (this.keys[e.key] == undefined) {
-      return
+      return;
     }
     this.keys[e.key] = true;
     if (this.onceAction[e.key]) this.onceAction[e.key]();
@@ -42,14 +47,13 @@ class BaseSence {
 
   handleKeyup(e) {
     if (this.keys[e.key] == undefined) {
-      return
+      return;
     }
     this.keys[e.key] = false;
   }
 
-
   registerKeyAction(key, callback, once) {
-    this.keys[key] = false
+    this.keys[key] = false;
     if (once) {
       this.onceAction[key] = callback;
     } else {

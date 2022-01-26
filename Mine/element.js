@@ -50,14 +50,14 @@ class Element {
     if (isfocus !== this.focus) {
       this.focus = isfocus;
     }
-    return { success: isfocus, data: this };
+    return this.focus
   }
 
   updateRequest() {
     return this.hasChanged;
   }
 
-  onClick() {
+  onClick(e) {
     
   }
 
