@@ -4,13 +4,14 @@ class Grid extends Element {
     this.data = [];
     this.row = row;
     this.column = column;
-    this.offsetX = 0;
-    this.offsetY = 50;
+    this.offsetX = (1200 - column * 25) / 2;
+    this.offsetY = (800 - row * 25) / 2;
     this.mineCount = maxCount;
     for (let r = 0; r < row; r++) {
       let row = [];
       for (let c = 0; c < column; c++) {
         let cell = Cell.new(game, this.sence, this, r, c);
+        cell.offsetX = this.offsetX;
         cell.offsetY = this.offsetY;
         row.push(cell);
         this.sence.addElement(cell);
@@ -21,23 +22,23 @@ class Grid extends Element {
     this.setupEvent();
   }
   setupEvent() {
-    this.game.registerMouseAction(MOUSE_MOVING, (e) => {
+    this.sence.registerMouseAction(MOUSE_MOVING, (e) => {
       this.handleMousemove(e);
     });
-    this.game.registerMouseAction(MOUSE_PRESS, (e) => {
+    this.sence.registerMouseAction(MOUSE_PRESS, (e) => {
       this.handleMousedown(e);
     });
-    this.game.registerMouseAction(MOUSE_RELEASE, (e) => {
+    this.sence.registerMouseAction(MOUSE_RELEASE, (e) => {
       this.handleMouseup(e);
     });
-    this.game.registerKeyAction(
+    this.sence.registerKeyAction(
       "a",
       (e) => {
         this.randomOpen();
       },
       true,
     );
-    this.game.registerKeyAction(
+    this.sence.registerKeyAction(
       "f",
       (e) => {
         let i = Item.new(this.game, this.sence);
@@ -82,6 +83,15 @@ class Grid extends Element {
     }
   }
 
+  openAll() {
+    for (let r = 0; r < this.row; r++) {
+      for (let c = 0; c < this.column; c++) {
+        let cell = this.data[r][c]
+        cell.isOpen = true
+      }
+    }
+  }
+
   handleMousemove(e) {
     let { offsetX, offsetY } = e;
     for (let r = 0; r < this.row; r++) {
@@ -92,7 +102,7 @@ class Grid extends Element {
     }
   }
 
-  handleMouseup(e) {}
+  handleMouseup(e) { }
 
   handleMousedown(e) {
     let { offsetX, offsetY, button, buttons } = e;

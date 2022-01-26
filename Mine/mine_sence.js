@@ -2,8 +2,8 @@ class MineSence extends BaseSence {
   constructor(game) {
     super(game);
     this.row = 24;
-    this.column = 28;
-    this.maxCount = 90;
+    this.column = 40;
+    this.maxCount = 99;
     this.setup();
   }
   setup() {

@@ -57,6 +57,10 @@ class Element {
     return this.hasChanged;
   }
 
+  onClick() {
+    
+  }
+
   // 子类复写
   update() {}
 
@@ -77,10 +81,7 @@ class Element {
   elementUpdate() {
     if (!this.updateRequest()) return;
     this.update();
-    console.log('update');
-    if (this.hasChanged) {
-      this.elementDraw();
-    }
+    
     this.hasChanged = false;
   }
 

@@ -27,6 +27,7 @@ class Cell extends Element {
     if (this.isOpen) return;
     this.isOpen = true;
     if (this.isMine) {
+      this.grid.openAll()
       alert("游戏结束");
     }
     // 连锁开

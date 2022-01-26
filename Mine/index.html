@@ -10,6 +10,7 @@
     <script src="game.js"></script>
     <script src="grid.js"></script>
     <script src="mine_sence.js"></script>
+    <script src="start_sence.js"></script>
     <script src="cell.js"></script>
     <script src="head.js"></script>
     <!-- <script src="grid.js"></script> -->
@@ -18,7 +19,7 @@
 
 <body>
     <div style="text-align: center;">
-        <canvas id="canvas" width="700" height="700"></canvas>
+        <canvas id="canvas" width="1200" height="800"></canvas>
     </div>
     <!-- <img id="view" style="width:100px;height:100px;" /> -->
     <script>
@@ -39,11 +40,12 @@
             mine: './sprites/mine.gif',
             mineFail: './sprites/mine_b.gif',
             bg: './sprites/bg.jpg',
+            button: './sprites/button.png',
         }
 
         let g = new Game()
         g.loadSources(images).then(game => {
-            let ms = new MineSence(game)
+            let ms = new StartSence(game)
             game.setSence(ms)
             game.run()
         })

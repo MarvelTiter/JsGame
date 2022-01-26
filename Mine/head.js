@@ -1,30 +1,45 @@
-class Head extends Element {
+class TextElement extends Element {
   constructor(game, sence) {
-    super(game, sence);
+    super(game, sence)
+    this.background = "#FFA500"
+    this.font = null
+    this.color = "black"
+    this.text = null
   }
+
   draw() {
     let ctx = this.game.context;
-    ctx.fillStyle = "#FFA500";
-    ctx.fillRect(0, 0, 700, 50);
-    ctx.font = "40px serif";
-    ctx.fillStyle = "black";
-    ctx.fillText("是兄弟就来扫雷！", 200, 40);
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = this.background;
+    ctx.fillRect(this.x, this.y, this.w, this.h);
+    if (this.font)
+      ctx.font = this.font;
+    ctx.fillStyle = this.color;
+    ctx.fillText(this.text, this.w / 2, this.y + this.h / 2);
+  }
+}
+class Head extends TextElement {
+  constructor(game, sence) {
+    super(game, sence);
+    this.w = 1200
+    this.h = 50
+    this.y = 0
+    this.text = "是兄弟就来扫雷！"
+    this.font = "40px serif"
   }
 }
 
-class Footer extends Element {
+class Footer extends TextElement {
   constructor(game, sence) {
     super(game, sence);
     this.mineCount = 0;
+    this.w = 1200
+    this.h = 50
+    this.y = 750
   }
-
-  draw() {
-    let ctx = this.game.context;
-    ctx.fillStyle = "#FFA500";
-    ctx.fillRect(0, 650, 700, 50);
-    ctx.font = "40px serif";
-    ctx.fillStyle = "black";
-    ctx.fillText(`雷:${this.mineCount}`, 300, 685);
+  update() {
+    this.text = `雷: ${this.mineCount}`
   }
 }
 
