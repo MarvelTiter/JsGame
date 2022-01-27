@@ -1,3 +1,28 @@
+function observe(data) {
+  if (!data || typeof data !== "object") {
+    return;
+  }
+  // 取出所有属性遍历
+  Object.keys(data).forEach((key) => {
+    if (key == "hasChanged") return;
+    defineProp(data, key, data[key]);
+  });
+}
+function defineProp(data, key, childVal) {
+  // observe(childVal); //监听子属性
+  Object.defineProperty(data, key, {
+    set: (newVal) => {
+      data.hasChanged = true;
+      childVal = newVal;
+    },
+    get: () => {
+      return childVal;
+    },
+    enumerable: true, // 可枚举
+    configurable: false, // 不能再define
+  });
+}
+
 class Element {
   constructor(game, sence, name) {
     this.game = game;
@@ -12,7 +37,7 @@ class Element {
     this.offsetY = 0;
     this.hasChanged = true;
     this.canDraw = true;
-    this.callBack = null;
+    this.onTick = null;
 
     if (name) {
       this.texture = game.getTextureByName(name);
@@ -23,24 +48,8 @@ class Element {
 
   static new(...args) {
     let i = new this(...args);
-    // return i;
-    return new Proxy(i, {
-      set(tar, prop, value, reciver) {
-        if (prop == "hasChanged") {
-          return Reflect.set(tar, "hasChanged", false, reciver);
-        }
-        Reflect.set(tar, "hasChanged", true, reciver);
-        return Reflect.set(tar, prop, value, reciver);
-      },
-    });
-  }
-
-  invokeCallback() {
-    if (this.callBack) this.callBack(this);
-  }
-
-  registerAction(action) {
-    this.callBack = action;
+    observe(i);
+    return i;
   }
 
   checkFocu(x, y) {
@@ -60,7 +69,7 @@ class Element {
   }
 
   onClick(e) {}
-
+  onMouseOver(e) {}
   // 子类复写
   update() {}
 

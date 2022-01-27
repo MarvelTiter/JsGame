@@ -1,3 +1,9 @@
+function PadLeft(v, len, char) {
+  if ((v + "").length < len) {
+    return PadLeft(`${char}${v}`, len, char);
+  }
+  return v;
+}
 class Grid extends Element {
   constructor(game, sence, row, column, maxCount) {
     super(game, sence);
@@ -9,6 +15,10 @@ class Grid extends Element {
     this.offsetX = (1200 - column * 25) / 2;
     this.offsetY = (800 - row * 25) / 2;
     this.mineCount = maxCount;
+    this.onFlagChanged = null;
+    this.time = "00:00:00";
+    this.timer = null;
+
     for (let r = 0; r < row; r++) {
       let row = [];
       for (let c = 0; c < column; c++) {
@@ -24,12 +34,6 @@ class Grid extends Element {
     this.setupEvent();
   }
   setupEvent() {
-    this.sence.registerMouseAction(MOUSE_MOVING, (e) => {
-      this.handleMousemove(e);
-    });
-    this.sence.registerMouseAction(MOUSE_RELEASE, (e) => {
-      this.handleMouseup(e);
-    });
     this.sence.registerKeyAction(
       "a",
       (e) => {
@@ -45,6 +49,28 @@ class Grid extends Element {
       },
       true,
     );
+  }
+
+  start() {
+    let sec = 0;
+    let min = 0;
+    let hour = 0;
+    this.timer = setInterval(() => {
+      sec++;
+      if (sec > 59) {
+        sec = 0;
+        min++;
+      }
+      if (min > 59) {
+        min = 0;
+        hour++;
+      }
+      this.time = `${PadLeft(hour, 2, "0")}:${PadLeft(min, 2, "0")}:${PadLeft(
+        sec,
+        2,
+        "0",
+      )}`;
+    }, 1000);
   }
 
   initMine() {
@@ -91,7 +117,7 @@ class Grid extends Element {
     }
   }
 
-  handleMousemove(e) {
+  onMouseOver(e) {
     let { offsetX, offsetY } = e;
     for (let r = 0; r < this.row; r++) {
       for (let c = 0; c < this.column; c++) {
@@ -100,8 +126,6 @@ class Grid extends Element {
       }
     }
   }
-
-  handleMouseup(e) {}
 
   onClick(e) {
     let { offsetX, offsetY, button, buttons } = e;
@@ -124,7 +148,7 @@ class Grid extends Element {
           } else if (temp.flag == 2 && oldState == 1) {
             this.mineCount++;
           }
-          this.invokeCallback();
+          this.onFlagChanged(this);
         }
       }
       // 0,3 double
@@ -132,6 +156,10 @@ class Grid extends Element {
         temp.scan();
       }
     }
+  }
+
+  update() {
+    this.onTick(this);
   }
 
   draw() {

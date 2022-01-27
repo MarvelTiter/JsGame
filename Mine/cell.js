@@ -40,7 +40,11 @@ class Cell extends Element {
           if (i > -1 && j > -1 && i < this.grid.row && j < this.grid.column) {
             // 递归
             let temp = this.grid.data[i][j];
-            if (!temp.isMine) temp.open();
+            if (!temp.isMine) {
+              // setTimeout(() => {
+              // }, 50);
+              temp.open();
+            }
           }
         }
       }

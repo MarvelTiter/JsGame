@@ -13,11 +13,20 @@ class MineSence extends BaseSence {
     this.addElement(bg);
     this.addElement(head);
     this.addElement(footer);
-    let grid = new Grid(this.game, this, this.row, this.column, this.maxCount);
+    let grid = Grid.new(this.game, this, this.row, this.column, this.maxCount);
     footer.mineCount = this.maxCount;
-    grid.registerAction((g) => {
+    grid.onFlagChanged = (g) => {
       footer.mineCount = g.mineCount;
-    });
+    };
+    grid.onTick = (g) => {
+      footer.time = g.time;
+    };
     this.addElement(grid);
+
+    let button = StartButton.new(this.game, this, "开始游戏", "button");
+    button.click = () => {
+      grid.start();
+    };
+    this.addElement(button);
   }
 }

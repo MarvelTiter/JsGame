@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="gamebase/base_sence.js"></script>
     <script src="gamebase/element.js"></script>
+    <script src="gamebase/text_element.js"></script>
     <script src="gamebase/game.js"></script>
     <script src="mine/grid.js"></script>
     <script src="mine/mine_sence.js"></script>
@@ -45,7 +46,7 @@
 
         let g = new Game()
         g.loadSources(images).then(game => {
-            let ms = new StartSence(game)
+            let ms = new MineSence(game)
             game.setSence(ms)
             game.run()
         })

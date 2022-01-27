@@ -5,8 +5,8 @@ class BaseSence {
     this.keys = {};
     this.actions = {};
     this.onceAction = {};
-    this.mousedownEvents = [];
-    this.mousemoveEvents = [];
+    // this.mousedownEvents = [];
+    // this.mousemoveEvents = [];
     this.mouseupEvents = [];
   }
 
@@ -14,9 +14,22 @@ class BaseSence {
     this.elements.push(e);
   }
 
+  removeElement(e) {
+    let i = this.elements.indexOf(e);
+    this.elements.splice(i, 1);
+  }
+
   handleMousevove(e) {
-    for (const event of this.mousemoveEvents) {
-      event(e);
+    // for (const event of this.mousemoveEvents) {
+    //   event(e);
+    // }
+    let { offsetX, offsetY } = e;
+    for (let index = this.elements.length - 1; index > -1; index--) {
+      const element = this.elements[index];
+      if (element.checkFocu(offsetX, offsetY)) {
+        element.onMouseOver(e);
+        break;
+      }
     }
   }
 
