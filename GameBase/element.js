@@ -13,6 +13,7 @@ class Element {
     this.hasChanged = true;
     this.canDraw = true;
     this.callBack = null;
+
     if (name) {
       this.texture = game.getTextureByName(name);
       this.w = this.texture.width;
@@ -22,6 +23,7 @@ class Element {
 
   static new(...args) {
     let i = new this(...args);
+    // return i;
     return new Proxy(i, {
       set(tar, prop, value, reciver) {
         if (prop == "hasChanged") {
@@ -50,16 +52,14 @@ class Element {
     if (isfocus !== this.focus) {
       this.focus = isfocus;
     }
-    return this.focus
+    return this.focus;
   }
 
   updateRequest() {
     return this.hasChanged;
   }
 
-  onClick(e) {
-    
-  }
+  onClick(e) {}
 
   // 子类复写
   update() {}
@@ -81,7 +81,7 @@ class Element {
   elementUpdate() {
     if (!this.updateRequest()) return;
     this.update();
-    
+
     this.hasChanged = false;
   }
 

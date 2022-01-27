@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="gamebase/base_sence.js"></script>
+    <script src="gamebase/element.js"></script>
+    <script src="gamebase/game.js"></script>
+    <script src="mine/grid.js"></script>
+    <script src="mine/mine_sence.js"></script>
+    <script src="mine/start_sence.js"></script>
+    <script src="mine/cell.js"></script>
+    <script src="mine/head.js"></script>
+    <!-- <script src="grid.js"></script> -->
+    <title>扫雷</title>
+</head>
+
+<body>
+    <div style="text-align: center;">
+        <canvas id="canvas" width="1200" height="800"></canvas>
+    </div>
+    <!-- <img id="view" style="width:100px;height:100px;" /> -->
+    <script>
+        let images = {
+            n0: './mine/sprites/n0.gif',
+            n1: './mine/sprites/n1.gif',
+            n2: './mine/sprites/n2.gif',
+            n3: './mine/sprites/n3.gif',
+            n4: './mine/sprites/n4.gif',
+            n5: './mine/sprites/n5.gif',
+            n6: './mine/sprites/n6.gif',
+            n7: './mine/sprites/n7.gif',
+            n8: './mine/sprites/n8.gif',
+            flag0: './mine/sprites/normal.gif',
+            flag1: './mine/sprites/flag.gif',
+            flag2: './mine/sprites/unknow.gif',
+            over: './mine/sprites/over.gif',
+            mine: './mine/sprites/mine.gif',
+            mineFail: './mine/sprites/mine_b.gif',
+            bg: './mine/sprites/bg.jpg',
+            button: './mine/sprites/button.png',
+        }
+
+        let g = new Game()
+        g.loadSources(images).then(game => {
+            let ms = new StartSence(game)
+            game.setSence(ms)
+            game.run()
+        })
+    </script>
+</body>
+
+</html>

@@ -128,7 +128,7 @@ class Grid extends Element {
         }
       }
       // 0,3 double
-      else if (buttons == 2) {
+      else if (buttons >= 2) {
         temp.scan();
       }
     }
@@ -136,7 +136,6 @@ class Grid extends Element {
 
   draw() {
     this.game.context.fillStyle = "rgba(0,0,0,0)";
-    console.log("grid");
     this.game.context.fillRect(
       this.x + this.offsetX,
       this.y + this.offsetY,
