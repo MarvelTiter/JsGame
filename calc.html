@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记账器</title>
+    <link rel="stylesheet" href="//unpkg.com/element-plus/dist/index.css" />
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <style>
+        .head {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .head .el-badge {
+            margin: 5px 20px;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+        
+        .records {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .records .el-card {
+            margin-bottom: 10px;
+        }
+        
+        .add {
+            position: fixed;
+            bottom: 3vh;
+            width: 100vw;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="head">
+            <el-badge :value="calcTotal(m)" v-for="(m,i) of members">
+                <el-tag class="btn" size="large">
+                    {{m}}
+                </el-tag>
+            </el-badge>
+            <el-badge>
+                <el-button type="primary" @click="addMember">
+                    +
+                </el-button>
+            </el-badge>
+            <el-badge>
+                <el-button type="danger" @click="reset">
+                    重置
+                </el-button>
+            </el-badge>
+        </div>
+        <el-divider></el-divider>
+        <div class="records">
+            <el-card v-for="r of records">
+                <el-space spacer="|">
+                    <div>
+                        {{r.sequence}}
+                    </div>
+                    <div v-for="i of r.members">
+                        <el-tag :type="calcType(i.value)">
+                            {{i.name}} | {{i.value}}
+                        </el-tag>
+                    </div>
+                </el-space>
+            </el-card>
+        </div>
+        <el-dialog v-model="memberDialog.visible">
+            <el-form>
+                <el-form-item label="名字">
+                    <el-input v-model="temp"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button style="width:100%" type="primary" @click="handleMemberAdd">添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <el-dialog v-model="recordDialog.visible" width="90%">
+            <el-form label-position="top">
+                <el-form-item v-for="m of newRecord" :label="`${m.name} : ${m.value}`">
+                    <!-- <el-button type="danger" @click="m.value -= 3">-3</el-button> -->
+                    <el-button type="danger" @click="m.value -= 2">-2</el-button>
+                    <el-button type="danger" @click="m.value -= 1">-1</el-button>
+                    <el-button type="success" @click="m.value += 1">+1</el-button>
+                    <el-button type="success" @click="m.value += 2">+2</el-button>
+                    <!-- <el-button type="success" @click="m.value += 3">+3</el-button> -->
+                </el-form-item>
+                <el-form-item>
+                    <el-button style="width:100%" type="primary" @click="handleRecordAdd">添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <div class="add">
+            <el-button type="primary" @click="addRecord" @click="addRecord">记录</el-button>
+        </div>
+    </div>
+</body>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                members: [],
+                records: [],
+                newRecord: [],
+                memberDialog: {
+                    visible: false
+                },
+                recordDialog: {
+                    visible: false
+                },
+                temp: ""
+            }
+        },
+        mounted() {
+            try {
+                let mems = localStorage.getItem('members')
+                this.members = JSON.parse(mems)
+                let recs = localStorage.getItem('records')
+                this.records = JSON.parse(recs)
+            } catch (error) {
+
+            }
+        },
+        methods: {
+            calcType(v) {
+                if (v > 0) {
+                    return 'success'
+                } else if (v < 0) {
+                    return 'danger'
+                } else {
+                    return 'info'
+                }
+            },
+            addMember() {
+                this.memberDialog.visible = true
+            },
+            addRecord() {
+                this.newRecord = []
+                for (const e of this.members) {
+                    this.newRecord.push({
+                        name: e,
+                        value: 0
+                    })
+                }
+                this.recordDialog.visible = true
+            },
+            reset() {
+                if (!confirm('将清空所有记录！')) {
+                    return
+                }
+                this.members = []
+                this.records = []
+                localStorage.setItem('members', '')
+                localStorage.setItem('records', '')
+
+            },
+            handleMemberAdd() {
+                if (this.members.indexOf(this.temp) > -1) {
+                    this.$message.error('重复')
+                    return
+                }
+                this.members.push(this.temp)
+                this.memberDialog.visible = false
+                this.temp = ''
+                localStorage.setItem('members', JSON.stringify(this.members))
+            },
+            handleRecordAdd() {
+                let total = 0
+                for (const m of this.newRecord) {
+                    total += m.value
+                }
+                if (total == 0) {
+                    let nr = {
+                        sequence: this.records.length + 1,
+                        members: this.newRecord
+                    }
+                    this.records.unshift(nr)
+                    this.recordDialog.visible = false
+                    localStorage.setItem('records', JSON.stringify(this.records))
+                } else {
+                    this.$message.error('总数异常')
+                }
+            },
+            calcTotal(m) {
+                let total = 0
+                for (const r of this.records) {
+                    for (const mem of r.members) {
+                        if (mem.name == m) {
+                            total += mem.value
+                        }
+                    }
+                }
+                return total
+            }
+        }
+    })
+    app.use(ElementPlus)
+    app.mount('#app')
+</script>
+
+</html>
+
+<!-- {
+    sequence: 0,
+    members: [{
+        name: "林",
+        value: 2
+    }, {
+        name: "林",
+        value: 0
+    }, {
+        name: "林",
+        value: -2
+    }]
+}, {
+    sequence: 1,
+    members: [{
+        name: "林",
+        value: 2
+    }, {
+        name: "林",
+        value: 0
+    }, {
+        name: "林",
+        value: -2
+    }]
+} -->
