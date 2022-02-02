@@ -149,11 +149,13 @@
             }
         },
         mounted() {
+            console.log('mounted');
             try {
                 let mems = localStorage.getItem('members')
-                this.members = JSON.parse(mems)
+                this.members = JSON.parse(mems) || []
                 let recs = localStorage.getItem('records')
-                this.records = JSON.parse(recs)
+                this.records = JSON.parse(recs) || []
+                console.log(this.members, this.records);
             } catch (error) {
                 this.members = []
                 this.records = []
