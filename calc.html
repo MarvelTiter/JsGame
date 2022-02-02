@@ -155,7 +155,8 @@
                 let recs = localStorage.getItem('records')
                 this.records = JSON.parse(recs)
             } catch (error) {
-
+                this.members = []
+                this.records = []
             }
         },
         methods: {
@@ -192,7 +193,7 @@
 
             },
             handleMemberAdd() {
-                if (this.members.indexOf(this.temp) > -1) {
+                if (this.members.length > 0 && this.members.indexOf(this.temp) > -1) {
                     this.$message.error('重复')
                     return
                 }
@@ -244,8 +245,9 @@
             setBanker(m) {
                 if (this.banker == m) {
                     this.banker = ''
-                } else
+                } else {
                     this.banker = m
+                }
             },
             allKill() {
                 let b = this.newRecord.filter(m => m.name == this.banker)[0]
