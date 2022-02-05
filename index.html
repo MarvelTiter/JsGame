@@ -2,40 +2,15 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>主页</title>
-    <style>
-        .nav {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        
-        .nav a {
-            border: 1px solid black;
-            width: 20vw;
-            text-align: center;
-            padding: 20px;
-            margin: 10px;
-            text-decoration: none;
-        }
-        
-        .nav a:active,
-        .nav a:visited {
-            color: #333;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MtPage</title>
 </head>
 
 <body>
-    <div class="nav">
-        <a href="calc.html">记账器</a>
-        <a href="mine.html">扫雷</a>
-    </div>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

@@ -1,4 +1,7 @@
-function observe(data) {
+import { BaseSence } from "./BaseSence";
+import { Game } from "./Game";
+
+function observe(data: any) {
   if (!data || typeof data !== "object") {
     return;
   }
@@ -8,7 +11,7 @@ function observe(data) {
     defineProp(data, key, data[key]);
   });
 }
-function defineProp(data, key, childVal) {
+function defineProp(data: any, key: string, childVal: any) {
   // observe(childVal); //监听子属性
   Object.defineProperty(data, key, {
     set: (newVal) => {
@@ -23,11 +26,23 @@ function defineProp(data, key, childVal) {
   });
 }
 
-class Element {
-  constructor(game, sence, name) {
+export class GameObject {
+  game: Game;
+  sence: BaseSence;
+  texture: HTMLImageElement | undefined;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  focus: boolean;
+  offsetX: number;
+  offsetY: number;
+  hasChanged: boolean;
+  canDraw: boolean;
+  onTick: Function | undefined;
+  constructor(game: Game, sence: BaseSence, name?: string) {
     this.game = game;
     this.sence = sence;
-    this.texture = null;
     this.x = 0;
     this.y = 0;
     this.w = 0;
@@ -37,22 +52,21 @@ class Element {
     this.offsetY = 0;
     this.hasChanged = true;
     this.canDraw = true;
-    this.onTick = null;
 
-    if (name) {
+    if (name !== undefined) {
       this.texture = game.getTextureByName(name);
       this.w = this.texture.width;
       this.h = this.texture.height;
     }
   }
 
-  static new(...args) {
-    let i = new this(...args);
+  static new<T extends GameObject>(...args: any[]): T {
+    let i = Reflect.construct(this, args)
     observe(i);
-    return i;
+    return i
   }
 
-  checkFocu(x, y) {
+  checkFocu(x: number, y: number) {
     let isfocus =
       x - this.offsetX > this.x &&
       x - this.offsetX < this.x + this.w &&
@@ -68,14 +82,14 @@ class Element {
     return this.hasChanged;
   }
 
-  onClick(e) {}
-  onMouseOver(e) {}
+  onClick(e: MouseEvent) { }
+  onMouseOver(e: MouseEvent) { }
   // 子类复写
-  update() {}
+  update() { }
 
   // 子类复写
   draw() {
-    if (this.texture) {
+    if (this.texture !== undefined) {
       this.game.context.drawImage(
         this.texture,
         this.x + this.offsetX,

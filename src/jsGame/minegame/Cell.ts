@@ -1,5 +1,18 @@
-class Cell extends Element {
-  constructor(game, sence, grid, rowIndex, columnIndex) {
+import { BaseSence } from "../gamebase/BaseSence";
+import { GameObject } from "../gamebase/GameObject";
+import { Game } from "../gamebase/Game";
+import { Grid } from "./Grid";
+
+export class Cell extends GameObject {
+  gutter: number;
+  grid: Grid;
+  row: number;
+  column: number;
+  flag: number;
+  isOpen: boolean;
+  isMine: boolean;
+  count: number;
+  constructor(game: Game, sence: BaseSence, grid: Grid, rowIndex: number, columnIndex: number) {
     super(game, sence, "flag0");
     this.gutter = 0;
     this.grid = grid;
@@ -15,7 +28,7 @@ class Cell extends Element {
     this.count = 0;
   }
 
-  setTexture(name) {
+  setTexture(name: string) {
     this.texture = this.game.getTextureByName(name);
   }
 

@@ -1,13 +1,25 @@
-function PadLeft(v, len, char) {
-  if ((v + "").length < len) {
+import { BaseSence } from "../gamebase/BaseSence";
+import { GameObject } from "../gamebase/GameObject";
+import { Game } from "../gamebase/Game";
+import { Cell } from "./Cell";
+
+function PadLeft(v: string, len: number, char: string): string {
+  if (v.length < len) {
     return PadLeft(`${char}${v}`, len, char);
   }
-  return v;
+  return v.toString();
 }
-class Grid extends Element {
-  constructor(game, sence, row, column, maxCount) {
+export class Grid extends GameObject {
+  data: Array<Array<Cell>>;
+  row: number;
+  column: number;
+  mineCount: number;
+  onFlagChanged: Function | undefined;
+  time: string;
+  timer: number;
+  constructor(game: Game, sence: BaseSence, row: number, column: number, maxCount: number) {
     super(game, sence);
-    this.data = [];
+    this.data = new Array<Cell[]>();
     this.row = row;
     this.column = column;
     this.w = column * 25;
@@ -15,43 +27,44 @@ class Grid extends Element {
     this.offsetX = (1200 - column * 25) / 2;
     this.offsetY = (800 - row * 25) / 2;
     this.mineCount = maxCount;
-    this.onFlagChanged = null;
     this.time = "00:00:00";
-    this.timer = null;
+    this.timer = -1;
 
     for (let r = 0; r < row; r++) {
-      let row = [];
+      let row = new Array<Cell>();
       for (let c = 0; c < column; c++) {
-        let cell = Cell.new(game, this.sence, this, r, c);
+        let cell = Cell.new<Cell>(game, this.sence, this, r, c);
         cell.offsetX = this.offsetX;
         cell.offsetY = this.offsetY;
         row.push(cell);
+        
         this.sence.addElement(cell);
-      }
+      }      
       this.data.push(row);
     }
+    
     this.initMine();
     this.setupEvent();
   }
   setupEvent() {
     this.sence.registerKeyAction(
       "a",
-      (e) => {
+      (e: MouseEvent) => {
         this.randomOpen();
       },
       true,
     );
-    this.sence.registerKeyAction(
-      "f",
-      (e) => {
-        let i = Item.new(this.game, this.sence);
-        this.sence.addElement(i);
-      },
-      true,
-    );
+    // this.sence.registerKeyAction(
+    //   "f",
+    //   (e) => {
+    //     let i = Item.new(this.game, this.sence);
+    //     this.sence.addElement(i);
+    //   },
+    //   true,
+    // );
   }
 
-  start() {
+  public start(): void {
     let sec = 0;
     let min = 0;
     let hour = 0;
@@ -65,8 +78,8 @@ class Grid extends Element {
         min = 0;
         hour++;
       }
-      this.time = `${PadLeft(hour, 2, "0")}:${PadLeft(min, 2, "0")}:${PadLeft(
-        sec,
+      this.time = `${PadLeft(hour.toString(), 2, "0")}:${PadLeft(min.toString(), 2, "0")}:${PadLeft(
+        sec.toString(),
         2,
         "0",
       )}`;
@@ -108,7 +121,7 @@ class Grid extends Element {
     }
   }
 
-  openAll() {
+  public openAll(): void {
     for (let r = 0; r < this.row; r++) {
       for (let c = 0; c < this.column; c++) {
         let cell = this.data[r][c];
@@ -117,7 +130,7 @@ class Grid extends Element {
     }
   }
 
-  onMouseOver(e) {
+  public onMouseOver(e: MouseEvent): void {
     let { offsetX, offsetY } = e;
     for (let r = 0; r < this.row; r++) {
       for (let c = 0; c < this.column; c++) {
@@ -127,7 +140,7 @@ class Grid extends Element {
     }
   }
 
-  onClick(e) {
+  public onClick(e: MouseEvent): void {
     let { offsetX, offsetY, button, buttons } = e;
     let c = Math.floor((offsetX - this.offsetX) / 25);
     let r = Math.floor((offsetY - this.offsetY) / 25);
@@ -148,7 +161,8 @@ class Grid extends Element {
           } else if (temp.flag == 2 && oldState == 1) {
             this.mineCount++;
           }
-          this.onFlagChanged(this);
+          if (this.onFlagChanged !== undefined)
+            this.onFlagChanged(this);
         }
       }
       // 0,3 double
@@ -159,7 +173,8 @@ class Grid extends Element {
   }
 
   update() {
-    this.onTick(this);
+    if (this.onTick !== undefined)
+      this.onTick(this);
   }
 
   draw() {
