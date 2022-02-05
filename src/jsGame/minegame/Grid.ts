@@ -37,12 +37,12 @@ export class Grid extends GameObject {
         cell.offsetX = this.offsetX;
         cell.offsetY = this.offsetY;
         row.push(cell);
-        
+
         this.sence.addElement(cell);
-      }      
+      }
       this.data.push(row);
     }
-    
+
     this.initMine();
     this.setupEvent();
   }
@@ -68,7 +68,7 @@ export class Grid extends GameObject {
     let sec = 0;
     let min = 0;
     let hour = 0;
-    this.timer = setInterval(() => {
+    this.timer = window.setInterval(() => {
       sec++;
       if (sec > 59) {
         sec = 0;
