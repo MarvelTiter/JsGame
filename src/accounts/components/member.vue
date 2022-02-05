@@ -2,16 +2,33 @@
   <div class="head">
     <el-collapse v-model="activeName">
       <el-collapse-item title="参赛选手" name="1">
-        <div v-for="(m, i) of members" class="collapse-row member-row">
+        <div
+          v-for="(m, i) of members"
+          class="collapse-row member-row"
+          :class="!m.exit ? 'leave' : ''"
+        >
+          <!-- 人名部分 -->
           <span>
-            <el-tag class="btn" size="large">
+            <el-tag size="large" :type="m.value > -1 ? '' : 'danger'">
               <span class="member-name">{{ m.name }}</span>
             </el-tag>
           </span>
+          <!-- 积分部分 -->
           <span>{{ m.value }}</span>
+          <!-- 离场入场按钮 -->
+          <span
+            ><el-tag
+              @click="m.exit = !m.exit"
+              size="large"
+              :type="m.exit ? '' : 'danger'"
+              >{{ m.exit ? "离场" : "重新加入" }}</el-tag
+            ></span
+          >
         </div>
         <div class="collapse-row">
-          <el-button type="primary" @click="addMember"> + </el-button>
+          <el-button type="primary" @click="addMember">
+            添加一个倒霉蛋
+          </el-button>
         </div>
       </el-collapse-item>
     </el-collapse>
@@ -33,16 +50,12 @@
 // import { Trophy } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { PropType, reactive, ref } from "vue";
-import { member, record } from "../../models/record";
+import { member } from "../../models/record";
 
 const prop = defineProps({
   members: {
     type: Array as PropType<Array<member>>,
-    require: true,
-  },
-  records: {
-    type: Array as PropType<Array<record>>,
-    require: true,
+    required: true,
   },
 });
 const emits = defineEmits(["update:members", "update:records"]);
@@ -56,7 +69,7 @@ const addMember = () => {
 };
 
 const handleMemberAdd = () => {
-  if (!temp.value){
+  if (!temp.value) {
     ElMessage.error("不能为空");
     return;
   }
@@ -70,35 +83,29 @@ const handleMemberAdd = () => {
   mems.push({
     name: temp.value,
     value: 0,
+    exit: true,
   });
   memberDialog.visible = false;
   temp.value = "";
   localStorage.setItem("members", JSON.stringify(mems));
   emits("update:members", mems);
 };
-
-const calcTotal = (m: any) => {
-  let total = 0;
-  let records = prop.records;
-  if (records === undefined) return;
-  for (const r of records) {
-    for (const mem of r.members) {
-      if (mem.name == m) {
-        total += mem.value;
-      }
-    }
-  }
-  return total;
-};
 </script>
 <style>
 .collapse-row {
   padding: 5px 10px;
+  text-align: center;
 }
 .member-row {
   display: flex;
 }
 .member-row * {
   flex: 1;
+}
+.member-row span {
+  text-align: center;
+}
+.member-row.leave {
+  filter: opacity(0.5);
 }
 </style>

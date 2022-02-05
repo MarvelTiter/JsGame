@@ -7,8 +7,11 @@
             >庄家 |
           </span>
           <span>{{ m.name }} : {{ m.value }}</span>
-          <el-tag @click="banker = m.name" style="margin-left: 10px"
-            >获胜</el-tag
+          <el-tag
+            v-if="banker !== m.name"
+            @click="banker = m.name"
+            style="margin-left: 10px"
+            >坐庄</el-tag
           >
           <el-tag
             @click="allKill"
@@ -35,23 +38,23 @@
 </template>
 <script setup lang="ts">
 import { ElMessage } from "element-plus";
-import { PropType, reactive, onMounted, ref } from "vue";
+import { PropType, reactive, ref } from "vue";
 import { member, memberRecord, record } from "../../models/record";
 
 const prop = defineProps({
   visible: Boolean,
   records: {
     type: Array as PropType<Array<record>>,
-    require: true,
+    required: true,
   },
   members: {
     type: Array as PropType<Array<member>>,
-    require: true,
+    required: true,
   },
 });
 const emits = defineEmits(["update:visible", "update:records"]);
-
 const newRecord: memberRecord[] = reactive([]);
+
 const banker = ref("");
 
 const allKill = () => {
@@ -87,7 +90,7 @@ const handleRecordAdd = () => {
     total += m.value;
   }
   let records = prop.records;
-  if (total == 0 && records !== undefined) {
+  if (total == 0) {
     const nr = {
       winner: banker.value,
       sequence: records.length + 1,
@@ -98,10 +101,11 @@ const handleRecordAdd = () => {
     localStorage.setItem("records", JSON.stringify(records));
     // 更新参与者总分
     let members = prop.members;
-    for (const m of members ?? []) {
+    for (const m of members) {
       let rm = newRecord.filter((nr) => nr.name === m.name);
       if (rm.length === 1) m.value += rm[0].value;
     }
+    localStorage.setItem("members", JSON.stringify(members));
     close();
   } else {
     ElMessage.error("总数异常");
@@ -110,9 +114,9 @@ const handleRecordAdd = () => {
 
 let onDialogOpen = () => {
   let mems = prop.members;
-  if (mems === undefined) return;
   newRecord.splice(0);
   for (const e of mems) {
+    if (!e.exit) continue;
     newRecord.push({
       name: e.name,
       value: 0,

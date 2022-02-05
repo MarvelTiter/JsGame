@@ -1,15 +1,23 @@
 <template>
-  <Member v-model:members="members" v-model:records="records"></Member>
+  <!-- 管理参赛人员 -->
+  <Member v-model:members="members"></Member>
   <div style="margin-top: 25px; text-align: center">
     <span>游戏</span>
     &nbsp;
-    <el-select v-model="game">
+    <el-select v-model="game" placeholder="选择一个游戏">
       <el-option value="douniu" label="斗牛"></el-option>
       <el-option value="runfaster" label="走得快"></el-option>
     </el-select>
   </div>
   <el-divider></el-divider>
+  <!-- 游戏日志记录 -->
   <Records :records="records"></Records>
+  <div class="add">
+    <el-button type="primary" @click="addRecord">记录</el-button>
+    <el-button type="danger" @click="reset" style="margin-left: 10vw">
+      重置
+    </el-button>
+  </div>
   <Runfaster
     v-if="game == 'runfaster'"
     v-model:visible="recordDialogVisible"
@@ -22,12 +30,6 @@
     v-model:members="members"
     v-model:records="records"
   ></Douniu>
-  <div class="add">
-    <el-button type="primary" @click="addRecord">记录</el-button>
-    <el-button type="danger" @click="reset" style="margin-left: 10vw">
-      重置
-    </el-button>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -39,9 +41,9 @@ import Runfaster from "./components/runfaster.vue";
 import Douniu from "./components/douniu.vue";
 import { ElMessage } from "element-plus";
 
-const mems = localStorage.getItem("members") || "[]";
+let mems = localStorage.getItem("members") || "[]";
+let recs = localStorage.getItem("records") || "[]";
 const members: member[] = reactive(JSON.parse(mems));
-const recs = localStorage.getItem("records") || "[]";
 const records: record[] = reactive(JSON.parse(recs));
 const game = ref("");
 const recordDialogVisible = ref(false);
@@ -64,20 +66,6 @@ const reset = () => {
 };
 </script>
 <style>
-/* .head {
-  display: flex;
-  flex-wrap: wrap;
-} */
-
-/* .head .el-badge {
-  margin: 5px 20px;
-  text-align: center;
-} */
-
-/* .btn {
-  width: 100%;
-} */
-
 .records {
   display: flex;
   flex-direction: column;

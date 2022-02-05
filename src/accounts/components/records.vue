@@ -21,10 +21,10 @@
 import { PropType } from "vue";
 import { record } from "../../models/record";
 
-const prop = defineProps({
+defineProps({
   records: {
     type: Array as PropType<Array<record>>,
-    require: true,
+    required: true,
   },
 });
 

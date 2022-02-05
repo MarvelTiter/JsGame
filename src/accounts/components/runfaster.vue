@@ -2,8 +2,8 @@
   <el-dialog v-model="visible" width="95%" @close="close" @open="onDialogOpen">
     <el-form label-position="top">
       <el-form-item :label="`倍数: ${times}`">
-        <el-button type="success" @click="times--">-1</el-button>
-        <el-button type="success" @click="times++">+1</el-button>
+        <el-button type="success" @click="times /= 2">÷2</el-button>
+        <el-button type="success" @click="times *= 2">×2</el-button>
       </el-form-item>
       <el-form-item v-for="m of newRecord" class="record-item">
         <template v-slot:label>
@@ -11,7 +11,12 @@
             >Winner |
           </span>
           <span>{{ m.name }} : {{ m.value }}</span>
-          <el-tag @click="winner = m.name">获胜</el-tag>
+          <el-tag
+            v-if="winner !== m.name"
+            @click="winner = m.name"
+            style="margin-left: 10px"
+            >获胜</el-tag
+          >
         </template>
         <div v-if="m.name !== winner">
           <el-button type="danger" @click="updateValue(m, -5)">5</el-button>
@@ -31,25 +36,26 @@
 </template>
 <script setup lang="ts">
 import { ElMessage } from "element-plus";
-import { PropType, reactive, ref } from "vue";
+import { PropType, reactive, ref, watch } from "vue";
 import { member, memberRecord, record } from "../../models/record";
 
 const prop = defineProps({
   visible: Boolean,
   records: {
     type: Array as PropType<Array<record>>,
-    require: true,
+    required: true,
   },
   members: {
     type: Array as PropType<Array<member>>,
-    require: true,
+    required: true,
   },
 });
 const emits = defineEmits(["update:visible", "update:records"]);
+const newRecord: memberRecord[] = reactive([]);
 
+// 倍数
 const times = ref(1);
 const winner = ref("");
-const newRecord: memberRecord[] = reactive([]);
 
 const updateValue = (mem: memberRecord, v: number) => {
   if (!winner.value) {
@@ -67,13 +73,15 @@ const updateValue = (mem: memberRecord, v: number) => {
   }
   b.value = 0 - lost;
 };
+
 const handleRecordAdd = () => {
   let total = 0;
   for (const m of newRecord) {
     total += m.value;
   }
   let records = prop.records;
-  if (total == 0 && records !== undefined) {
+  let members = prop.members;
+  if (total == 0) {
     const nr = {
       winner: winner.value,
       sequence: records.length + 1,
@@ -83,11 +91,11 @@ const handleRecordAdd = () => {
     emits("update:records", records);
     localStorage.setItem("records", JSON.stringify(records));
     // 更新参与者总分
-    let members = prop.members;
-    for (const m of members ?? []) {
+    for (const m of members) {
       let rm = newRecord.filter((nr) => nr.name === m.name);
       if (rm.length === 1) m.value += rm[0].value;
     }
+    localStorage.setItem("members", JSON.stringify(members));
     close();
   } else {
     ElMessage.error("总数异常");
@@ -97,11 +105,23 @@ const close = () => {
   emits("update:visible", false);
 };
 
+watch(times, (nv, ov) => {
+  for (const m of newRecord) {
+    if (nv > ov) {
+      m.value *= 2;
+    } else {
+      m.value /= 2;
+    }
+  }
+});
+
 let onDialogOpen = () => {
   let mems = prop.members;
-  if (mems === undefined) return;
   newRecord.splice(0);
+  winner.value = "";
+  times.value = 1;
   for (const e of mems) {
+    if (!e.exit) continue;
     newRecord.push({
       name: e.name,
       value: 0,

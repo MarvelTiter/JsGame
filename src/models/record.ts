@@ -1,6 +1,7 @@
 export interface member {
     name: string,
     value: number,
+    exit: boolean
 }
 export interface memberRecord {
     name: string,
