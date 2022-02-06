@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { Game } from "../gamebase/Game";
 import { onMounted } from "vue";
-import { StartSence } from "./script/StartSence"
+import { MineSence } from "./script/MineSence"
 onMounted(() => {
   let images = {
     n0: "sprites/mine/n0.gif",
@@ -19,9 +19,9 @@ onMounted(() => {
     n6: "sprites/mine/n6.gif",
     n7: "sprites/mine/n7.gif",
     n8: "sprites/mine/n8.gif",
-    flag0: "sprites/mine/normal.gif",
-    flag1: "sprites/mine/flag.gif",
-    flag2: "sprites/mine/unknow.gif",
+    normal: "sprites/mine/normal.gif",
+    flag: "sprites/mine/flag.gif",
+    unknow: "sprites/mine/unknow.gif",
     over: "sprites/mine/over.gif",
     mine: "sprites/mine/mine.gif",
     mineFail: "sprites/mine/mine_b.gif",
@@ -30,7 +30,7 @@ onMounted(() => {
   };
   let g = new Game()
   g.loadSources(images).then((game) => {
-    let ms = new StartSence(game);
+    let ms = new MineSence(game);
     game.setSence(ms);
     game.run();
   });

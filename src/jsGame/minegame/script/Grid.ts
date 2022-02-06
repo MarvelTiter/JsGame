@@ -10,16 +10,22 @@ function PadLeft(v: string, len: number, char: string): string {
   return v.toString();
 }
 export class Grid extends GameObject {
-  data: Array<Array<Cell>>;
+  data!: Array<Array<Cell>>;
   row: number;
   column: number;
   mineCount: number;
   onFlagChanged: Function | undefined;
   time: string;
   timer: number;
-  constructor(game: Game, sence: BaseSence, row: number, column: number, maxCount: number) {
+  gameOver: boolean = false;
+  constructor(
+    game: Game,
+    sence: BaseSence,
+    row: number,
+    column: number,
+    maxCount: number,
+  ) {
     super(game, sence);
-    this.data = new Array<Cell[]>();
     this.row = row;
     this.column = column;
     this.w = column * 25;
@@ -30,20 +36,7 @@ export class Grid extends GameObject {
     this.time = "00:00:00";
     this.timer = -1;
 
-    for (let r = 0; r < row; r++) {
-      let row = new Array<Cell>();
-      for (let c = 0; c < column; c++) {
-        let cell = Cell.new<Cell>(game, this.sence, this, r, c);
-        cell.offsetX = this.offsetX;
-        cell.offsetY = this.offsetY;
-        row.push(cell);
-
-        this.sence.addElement(cell);
-      }
-      this.data.push(row);
-    }
-
-    this.initMine();
+    this.init();
     this.setupEvent();
   }
   setupEvent() {
@@ -68,7 +61,12 @@ export class Grid extends GameObject {
     let sec = 0;
     let min = 0;
     let hour = 0;
+    window.clearInterval(this.timer);
     this.timer = window.setInterval(() => {
+      if (this.gameOver) {
+        window.clearInterval(this.timer);
+        return;
+      }
       sec++;
       if (sec > 59) {
         sec = 0;
@@ -78,15 +76,30 @@ export class Grid extends GameObject {
         min = 0;
         hour++;
       }
-      this.time = `${PadLeft(hour.toString(), 2, "0")}:${PadLeft(min.toString(), 2, "0")}:${PadLeft(
-        sec.toString(),
+      this.time = `${PadLeft(hour.toString(), 2, "0")}:${PadLeft(
+        min.toString(),
         2,
         "0",
-      )}`;
+      )}:${PadLeft(sec.toString(), 2, "0")}`;
     }, 1000);
   }
 
-  initMine() {
+  init() {
+    // 初始化 data
+    this.data = new Array<Cell[]>();
+    for (let r = 0; r < this.row; r++) {
+      let row = new Array<Cell>();
+      for (let c = 0; c < this.column; c++) {
+        let cell = Cell.new<Cell>(this.game, this.sence, this, r, c);
+        cell.offsetX = this.offsetX;
+        cell.offsetY = this.offsetY;
+        row.push(cell);
+
+        this.sence.addElement(cell);
+      }
+      this.data.push(row);
+    }
+    // 设置地雷
     let c = 0;
     while (c < this.mineCount) {
       let rowIndex = Math.floor(Math.random() * this.row);
@@ -107,6 +120,7 @@ export class Grid extends GameObject {
         }
       }
     }
+    this.start();
   }
 
   randomOpen() {
@@ -128,6 +142,8 @@ export class Grid extends GameObject {
         cell.isOpen = true;
       }
     }
+    // let overDialog = GameOverDialog.new(this.game, this.sence);
+    // this.sence.addElement(overDialog);
   }
 
   public onMouseOver(e: MouseEvent): void {
@@ -161,8 +177,7 @@ export class Grid extends GameObject {
           } else if (temp.flag == 2 && oldState == 1) {
             this.mineCount++;
           }
-          if (this.onFlagChanged !== undefined)
-            this.onFlagChanged(this);
+          if (this.onFlagChanged !== undefined) this.onFlagChanged(this);
         }
       }
       // 0,3 double
@@ -172,10 +187,9 @@ export class Grid extends GameObject {
     }
   }
 
-  update() {
-    if (this.onTick !== undefined)
-      this.onTick(this);
-  }
+  // update() {
+  //   if (this.onTick !== undefined) this.onTick(this);
+  // }
 
   draw() {
     this.game.context.fillStyle = "rgba(0,0,0,0)";

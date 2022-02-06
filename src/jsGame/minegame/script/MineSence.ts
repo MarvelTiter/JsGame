@@ -4,7 +4,7 @@ import { Game } from "../../gamebase/Game";
 import { Head } from "./Head";
 import { Footer } from "./Footer";
 import { Grid } from "./Grid";
-import { StartButton } from "./StartButton";
+import { Button } from "./Button";
 
 export class MineSence extends BaseSence {
   row: number;
@@ -24,7 +24,13 @@ export class MineSence extends BaseSence {
     this.addElement(bg);
     this.addElement(head);
     this.addElement(footer);
-    let grid = Grid.new<Grid>(this.game, this, this.row, this.column, this.maxCount);
+    let grid = Grid.new<Grid>(
+      this.game,
+      this,
+      this.row,
+      this.column,
+      this.maxCount,
+    );
     footer.mineCount = this.maxCount;
     grid.onFlagChanged = (g: Grid) => {
       footer.mineCount = g.mineCount;
@@ -33,11 +39,17 @@ export class MineSence extends BaseSence {
       footer.time = g.time;
     };
     this.addElement(grid);
-
-    let button = new StartButton(this.game, this, "开始游戏", "button");
-    button.click = () => {
-      grid.start();
+    // let over = GameOverDialog.new(this.game, this);
+    // this.addElement(over);
+    let restartButton = Button.new(this.game, this, "重新开始");
+    restartButton.x = 1200 - restartButton.w - 20;
+    restartButton.y = 800 - restartButton.h - 20;
+    restartButton.canDraw = () => {
+      return grid.gameOver;
     };
-    this.addElement(button);
+    restartButton.onClick = () => {
+      this.game.setSence(new MineSence(this.game));
+    };
+    this.addElement(restartButton);
   }
 }

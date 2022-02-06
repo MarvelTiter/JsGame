@@ -8,20 +8,27 @@ export const MOUSE_RB_CLICK = 0x0100;
 export const MOUSE_MOVING = "MOVE";
 export const MOUSE_PRESS = "PRESS";
 export const MOUSE_RELEASE = "RELEASE";
-
+export interface Area {
+  width: number;
+  height: number;
+}
 export class Game {
   canvas: any;
   context: any;
   enableMouseAction: boolean;
   images: Map<string, HTMLImageElement>;
   sence!: BaseSence;
-  constructor() {
+  area: Area;
+  constructor() {    
     this.canvas = document.querySelector("#canvas");
     this.context = this.canvas.getContext("2d");
     this.enableMouseAction = false;
     this.images = new Map<string, HTMLImageElement>();
+    this.area = {
+      width: 1200,
+      height: 800,
+    };
     this.eventSetup();
-
   }
 
   eventSetup() {
@@ -36,47 +43,46 @@ export class Game {
     this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
       e.preventDefault();
       if (this.enableMouseAction && this.sence) {
-        this.sence.handleMousevove(e)
+        this.sence.handleMousevove(e);
       }
     });
     this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
       e.preventDefault();
       if (this.sence) {
-        this.sence.handleMousedown(e)
+        this.sence.handleMousedown(e);
       }
     });
     this.canvas.addEventListener("mouseup", (e: MouseEvent) => {
       e.preventDefault();
       if (this.sence) {
-        this.sence.handleMouseup(e)
+        this.sence.handleMouseup(e);
       }
     });
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       if (this.sence) {
-        this.sence.handleKeydown(e)
+        this.sence.handleKeydown(e);
       }
     });
     window.addEventListener("keyup", (e: KeyboardEvent) => {
       if (this.sence) {
-        this.sence.handleKeyup(e)
+        this.sence.handleKeyup(e);
       }
     });
     window.addEventListener("contextmenu", (e: MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
     });
-
   }
 
   loadSources(sources: any): Promise<Game> {
     let game = this;
     let count = 0;
     return new Promise((resolve, reject) => {
-      let keys = Object.keys(sources)
+      let keys = Object.keys(sources);
       for (const k of keys) {
-        let img = new Image()
-        let url = sources[k]
-        img.src = url
+        let img = new Image();
+        let url = sources[k];
+        img.src = url;
         img.onload = () => {
           this.images.set(k, img);
           count++;
@@ -84,15 +90,15 @@ export class Game {
           if (count == keys.length) {
             resolve(game);
           }
-        }
+        };
       }
     });
   }
 
   public getTextureByName(name: string): HTMLImageElement {
-    let i = this.images.get(name)
-    if (i === undefined) throw new Error(`image named ${name} is not found`)
-    return i
+    let i = this.images.get(name);
+    if (i === undefined) throw new Error(`image named ${name} is not found`);
+    return i;
   }
 
   public setSence(sence: BaseSence): void {

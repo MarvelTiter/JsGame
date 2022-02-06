@@ -38,7 +38,6 @@ export class GameObject {
   offsetX: number;
   offsetY: number;
   hasChanged: boolean;
-  canDraw: boolean;
   onTick: Function | undefined;
   constructor(game: Game, sence: BaseSence, name?: string) {
     this.game = game;
@@ -51,7 +50,6 @@ export class GameObject {
     this.offsetX = 0;
     this.offsetY = 0;
     this.hasChanged = true;
-    this.canDraw = true;
 
     if (name !== undefined) {
       this.texture = game.getTextureByName(name);
@@ -61,9 +59,9 @@ export class GameObject {
   }
 
   static new<T extends GameObject>(...args: any[]): T {
-    let i = Reflect.construct(this, args)
+    let i = Reflect.construct(this, args);
     observe(i);
-    return i
+    return i;
   }
 
   checkFocu(x: number, y: number) {
@@ -77,15 +75,17 @@ export class GameObject {
     }
     return this.focus;
   }
-
+  canDraw(): boolean {
+    return true;
+  }
   updateRequest() {
     return this.hasChanged;
   }
 
-  onClick(e: MouseEvent) { }
-  onMouseOver(e: MouseEvent) { }
+  onClick(e: MouseEvent) {}
+  onMouseOver(e: MouseEvent) {}
   // 子类复写
-  update() { }
+  update() {}
 
   // 子类复写
   draw() {
@@ -104,13 +104,13 @@ export class GameObject {
   elementUpdate() {
     if (!this.updateRequest()) return;
     this.update();
-
+    if (this.onTick) this.onTick(this);
     this.hasChanged = false;
   }
 
   // sence调用
   elementDraw() {
-    if (!this.canDraw) return;
+    if (!this.canDraw()) return;
     this.draw();
   }
 }

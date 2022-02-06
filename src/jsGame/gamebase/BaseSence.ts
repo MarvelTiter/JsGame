@@ -50,7 +50,7 @@ export class BaseSence {
     let { offsetX, offsetY } = e;
     for (let index = this.elements.length - 1; index > -1; index--) {
       const element = this.elements[index];
-      if (element.checkFocu(offsetX, offsetY)) {
+      if (element.checkFocu(offsetX, offsetY)) {        
         element.onClick(e);
         break;
       }

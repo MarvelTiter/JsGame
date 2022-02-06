@@ -2,6 +2,7 @@ import { BaseSence } from "../../gamebase/BaseSence";
 import { GameObject } from "../../gamebase/GameObject";
 import { Game } from "../../gamebase/Game";
 import { Grid } from "./Grid";
+import { MineSence } from "./MineSence";
 
 export class Cell extends GameObject {
   gutter: number;
@@ -12,8 +13,16 @@ export class Cell extends GameObject {
   isOpen: boolean;
   isMine: boolean;
   count: number;
-  constructor(game: Game, sence: BaseSence, grid: Grid, rowIndex: number, columnIndex: number) {
-    super(game, sence, "flag0");
+  explode: boolean;
+  // explode: boolean;
+  constructor(
+    game: Game,
+    sence: BaseSence,
+    grid: Grid,
+    rowIndex: number,
+    columnIndex: number,
+  ) {
+    super(game, sence, "normal");
     this.gutter = 0;
     this.grid = grid;
     this.row = rowIndex;
@@ -26,6 +35,7 @@ export class Cell extends GameObject {
     this.isOpen = false;
     this.isMine = false;
     this.count = 0;
+    this.explode = false;
   }
 
   setTexture(name: string) {
@@ -40,8 +50,9 @@ export class Cell extends GameObject {
     if (this.isOpen) return;
     this.isOpen = true;
     if (this.isMine) {
+      this.explode = true;
       this.grid.openAll();
-      alert("游戏结束");
+      this.grid.gameOver = true
     }
     // 连锁开
     if (this.count == 0) {
@@ -91,15 +102,16 @@ export class Cell extends GameObject {
 
   update() {
     // 设置材质
-    let name = "";
+    let name = "normal";
     if (!this.isOpen) {
-      name = "flag" + this.flag;
-      if (this.focus && this.flag == 0) {
+      if (this.flag === 2) name = "unknow";
+      // name = "flag" + this.flag;
+      else if (this.focus && this.flag == 0) {
         name = "over";
       }
     } else {
       if (this.isMine) {
-        name = "mineFail";
+        name = this.explode ? "mineFail" : "mine";
       } else {
         name = "n" + this.count;
       }
@@ -107,28 +119,25 @@ export class Cell extends GameObject {
     this.setTexture(name);
   }
 
-  // onClick(e) {
-  //   let { button, buttons } = e;
-  //   if (!this.isOpen) {
-  //     // 0,1 left
-  //     if (button == 0) {
-  //       this.open();
-  //     }
-  //     // 2,2 right
-  //     if (button == 2) {
-  //       let oldState = this.flag;
-  //       this.updateState();
-  //       if (this.flag == 1 && oldState == 0) {
-  //         this.mineCount--;
-  //       } else if (this.flag == 2 && oldState == 1) {
-  //         this.grid.mineCount++;
-  //       }
-  //       this.grid.invokeCallback();
-  //     }
-  //   }
-  //   // 0,3 double
-  //   else if (buttons == 2) {
-  //     this.scan();
-  //   }
-  // }
+  draw(): void {
+    if (this.texture !== undefined) {
+      this.game.context.drawImage(
+        this.texture,
+        this.x + this.offsetX,
+        this.y + this.offsetY,
+        this.w,
+        this.h,
+      );
+    }
+    if (this.flag == 1) {
+      let texture = this.game.getTextureByName("flag");
+      this.game.context.drawImage(
+        texture,
+        this.x + this.offsetX,
+        this.y + this.offsetY,
+        this.w,
+        this.h,
+      );
+    }
+  }
 }
