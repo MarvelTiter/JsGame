@@ -1,6 +1,6 @@
-import { BaseSence } from "../gamebase/BaseSence";
-import { GameObject } from "../gamebase/GameObject";
-import { Game } from "../gamebase/Game";
+import { BaseSence } from "../../gamebase/BaseSence";
+import { GameObject } from "../../gamebase/GameObject";
+import { Game } from "../../gamebase/Game";
 import { Cell } from "./Cell";
 
 function PadLeft(v: string, len: number, char: string): string {

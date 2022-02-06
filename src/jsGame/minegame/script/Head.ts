@@ -1,6 +1,6 @@
-import { BaseSence } from "../gamebase/BaseSence";
-import { Game } from "../gamebase/Game";
-import { TextElement } from "../gamebase/TextElement";
+import { BaseSence } from "../../gamebase/BaseSence";
+import { Game } from "../../gamebase/Game";
+import { TextElement } from "../../gamebase/TextElement";
 
 export class Head extends TextElement {
   constructor(game: Game, sence: BaseSence) {

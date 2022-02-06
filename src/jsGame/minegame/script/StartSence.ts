@@ -1,6 +1,6 @@
-import { BaseSence } from "../gamebase/BaseSence";
-import { GameObject } from "../gamebase/GameObject";
-import { Game } from "../gamebase/Game";
+import { BaseSence } from "../../gamebase/BaseSence";
+import { GameObject } from "../../gamebase/GameObject";
+import { Game } from "../../gamebase/Game";
 import { StartButton } from "./StartButton";
 import { Head } from "./Head";
 

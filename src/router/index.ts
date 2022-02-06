@@ -2,15 +2,15 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
     {
         path: '/',
-        component: () => import('../layout/index.vue'),
+        component: () => import('@/layout/index.vue'),
     },
     {
         path: '/calc',
-        component: () => import('../accounts/index.vue')
+        component: () => import('@/accounts/index.vue')
     },
     {
         path: '/mine',
-        component: () => import("../jsGame/minegame/Mine.vue")
+        component: () => import("@/jsGame/minegame/index.vue")
     }
 ]
 const router = createRouter({

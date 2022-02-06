@@ -6,9 +6,8 @@
 
 <script setup lang="ts">
 import { Game } from "../gamebase/Game";
-import { MineSence } from "./MineSence";
 import { onMounted } from "vue";
-
+import { StartSence } from "./script/StartSence"
 onMounted(() => {
   let images = {
     n0: "sprites/mine/n0.gif",
@@ -31,7 +30,7 @@ onMounted(() => {
   };
   let g = new Game()
   g.loadSources(images).then((game) => {
-    let ms = new MineSence(game);
+    let ms = new StartSence(game);
     game.setSence(ms);
     game.run();
   });

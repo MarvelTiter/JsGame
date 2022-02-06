@@ -1,6 +1,6 @@
 <template>
   <div class="records">
-    <el-card v-for="r of records">
+    <el-card v-for="r of records" :key="r.sequence">
       <el-space spacer="|" wrap>
         <div>
           <span>第{{ r.sequence }}局</span>
@@ -8,7 +8,7 @@
         <div v-if="r.winner != ''">
           <span>Winner:{{ r.winner }}</span>
         </div>
-        <div v-for="i of r.members">
+        <div v-for="i of r.members" :key="i.name">
           <el-tag :type="calcType(i.value)">
             {{ i.name }} | {{ i.value }}
           </el-tag>

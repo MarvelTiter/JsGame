@@ -1,6 +1,6 @@
-import { BaseSence } from "../gamebase/BaseSence";
-import { Game } from "../gamebase/game";
-import { GameObject } from "../gamebase/GameObject";
+import { BaseSence } from "../../gamebase/BaseSence";
+import { Game } from "../../gamebase/game";
+import { GameObject } from "../../gamebase/GameObject";
 
 
 export class StartButton extends GameObject {
