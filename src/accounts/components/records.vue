@@ -19,7 +19,7 @@
 </template>
 <script setup lang="ts">
 import { PropType } from "vue";
-import { record } from "../../models/record";
+import { record } from "../models";
 
 defineProps({
   records: {

@@ -18,16 +18,16 @@ export class Game {
   enableMouseAction: boolean;
   images: Map<string, HTMLImageElement>;
   sence!: BaseSence;
-  area: Area;
+  // area: Area;
   constructor() {    
     this.canvas = document.querySelector("#canvas");
     this.context = this.canvas.getContext("2d");
     this.enableMouseAction = false;
     this.images = new Map<string, HTMLImageElement>();
-    this.area = {
-      width: 1200,
-      height: 800,
-    };
+    // this.area = {
+    //   width: 1200,
+    //   height: 800,
+    // };
     this.eventSetup();
   }
 

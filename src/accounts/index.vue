@@ -14,9 +14,7 @@
   <Records :records="records"></Records>
   <div class="add">
     <el-button type="primary" @click="addRecord">记录</el-button>
-    <el-button type="danger" @click="reset" style="margin-left: 10vw">
-      重置
-    </el-button>
+    <el-button type="danger" @click="reset" style="margin-left: 10vw">重置</el-button>
   </div>
   <Runfaster
     v-if="game == 'runfaster'"
@@ -34,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import { member, record } from "../models/record";
+import { member, record, runRecord } from "./models";
 import Member from "./components/member.vue";
 import Records from "./components/records.vue";
 import Runfaster from "./components/runfaster.vue";
@@ -64,6 +62,13 @@ const reset = () => {
   localStorage.setItem("members", "[]");
   localStorage.setItem("records", "[]");
 };
+
+// let rr = new runRecord("测试", 10);
+// let json = JSON.stringify(rr)
+// console.log(json);
+// let rtds  = <runRecord>JSON.parse(json)
+// console.log(rtds);
+
 </script>
 <style>
 .records {

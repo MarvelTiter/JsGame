@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { ElMessage } from "element-plus";
 import { PropType, reactive, ref } from "vue";
-import { member, memberRecord, record } from "../../models/record";
+import { member, memberRecord, record } from "../models";
 
 const prop = defineProps({
   visible: Boolean,

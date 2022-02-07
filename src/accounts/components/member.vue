@@ -39,7 +39,7 @@
 // import { Trophy } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { PropType, reactive, ref } from "vue";
-import { member } from "../../models/record";
+import { member } from "../models";
 
 const prop = defineProps({
 	members: {
