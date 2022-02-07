@@ -28,6 +28,8 @@ onMounted(() => {
     mineFail: `${SPRITES_URL}/mine/mine_b.gif`,
     bg: `${SPRITES_URL}/mine/bg.jpg`,
     button: `${SPRITES_URL}/mine/button.png`,
+    fireworks_g:`${SPRITES_URL}/mine/yanhua.green.png`,
+    fireworks_r:`${SPRITES_URL}/mine/yanhua_red.png`,
   };
   let g = new Game()
   g.loadSources(images).then((game) => {

@@ -114,3 +114,56 @@ export class GameObject {
     this.draw();
   }
 }
+export interface FrameDefinition {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  texture?: HTMLImageElement;
+}
+export class AnimaObject extends GameObject {
+  frames: FrameDefinition[];
+  frameIndex: number = 0;
+  frameInterval: number = 5;
+  private frameCooldown: number = 0;
+  constructor(
+    game: Game,
+    sence: BaseSence,
+    name: string,
+    frames: FrameDefinition[],
+  ) {
+    super(game, sence, name);
+    this.frames = frames;
+    this.x = 500;
+    this.y = 500;
+    this.w = 100;
+    this.h = 100;
+  }
+  updateRequest(): boolean {
+    return true;
+  }
+
+  update(): void {
+    if (this.frameCooldown !== 0) {
+      this.frameCooldown--;
+      return;
+    }
+    this.frameIndex = (this.frameIndex + 1) % this.frames.length;
+    this.frameCooldown = this.frameInterval;
+  }
+
+  draw(): void {
+    let f = this.frames[this.frameIndex];
+    this.game.context.drawImage(
+      this.texture,
+      f.x,
+      f.y,
+      f.w,
+      f.h,
+      this.x + this.offsetX,
+      this.y + this.offsetY,
+      this.w,
+      this.h,
+    );
+  }
+}

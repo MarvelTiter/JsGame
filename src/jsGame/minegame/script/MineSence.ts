@@ -1,5 +1,9 @@
 import { BaseSence } from "../../gamebase/BaseSence";
-import { GameObject } from "../../gamebase/GameObject";
+import {
+  AnimaObject,
+  FrameDefinition,
+  GameObject,
+} from "../../gamebase/GameObject";
 import { Game } from "../../gamebase/Game";
 import { Head } from "./Head";
 import { Footer } from "./Footer";
@@ -51,5 +55,31 @@ export class MineSence extends BaseSence {
       this.game.setSence(new MineSence(this.game));
     };
     this.addElement(restartButton);
+
+    let frames: FrameDefinition[] = [];
+    for (let index = 0; index < 10; index++) {
+      frames.push({
+        x: index * 95,
+        y: 0,
+        w: 95,
+        h: 95,
+      });
+    }
+    let ao = AnimaObject.new<AnimaObject>(
+      this.game,
+      this,
+      "fireworks_g",
+      frames,
+    );
+    let ao2 = AnimaObject.new<AnimaObject>(
+      this.game,
+      this,
+      "fireworks_r",
+      frames,
+    );
+    ao.frameInterval = 5;
+    ao2.frameInterval = 2;
+    this.addElement(ao);
+    this.addElement(ao2);
   }
 }
