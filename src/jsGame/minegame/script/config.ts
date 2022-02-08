@@ -1,5 +1,12 @@
 export const config = {
     CellSize: {
-        len: 30
+        len: 20
     }
+}
+
+export interface MineMapSize {
+    row: number
+    column: number
+    mineCount: number
+    len: number
 }

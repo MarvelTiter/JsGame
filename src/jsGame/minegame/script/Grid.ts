@@ -1,9 +1,10 @@
 import { BaseSence } from "../../gamebase/BaseSence";
 import { GameObject } from "../../gamebase/GameObject";
-import { Game } from "../../gamebase/Game";
+import { DEVICE_MOBILE, Game } from "../../gamebase/Game";
 import { Cell } from "./Cell";
-import { config } from "./config";
 import { Firework } from "./Firework";
+import { MineMapSize } from "./config";
+import { MouseArgs } from "../../gamebase/MouseArgs";
 
 function PadLeft(v: string, len: number, char: string): string {
   if (v.length < len) {
@@ -23,22 +24,23 @@ export class Grid extends GameObject {
   success: number = 0
   openCount: number = 0
   mineCount: number
+  cellLen: number
+  touchTimer: number | undefined
+  temp: Cell | undefined
   constructor(
     game: Game,
     sence: BaseSence,
-    row: number,
-    column: number,
-    maxCount: number,
+    level: MineMapSize
   ) {
     super(game, sence);
-    let len = config.CellSize.len
-    this.row = row;
-    this.column = column;
-    this.w = column * len;
-    this.h = row * len;
-    this.offsetX = (this.game.area.width - column * len) / 2;
-    this.offsetY = (this.game.area.height - row * len) / 2;
-    this.mineCount = maxCount
+    this.cellLen = level.len
+    this.row = level.row;
+    this.column = level.column;
+    this.w = this.column * level.len;
+    this.h = this.row * level.len;
+    this.offsetX = (this.game.area.width - this.column * this.cellLen) / 2;
+    this.offsetY = (this.game.area.height - this.row * this.cellLen) / 2;
+    this.mineCount = level.mineCount
     this.time = "00:00:00";
     this.timer = -1;
 
@@ -88,7 +90,7 @@ export class Grid extends GameObject {
     for (let r = 0; r < this.row; r++) {
       let row = new Array<Cell>();
       for (let c = 0; c < this.column; c++) {
-        let cell = Cell.new<Cell>(this.game, this.sence, this, r, c);
+        let cell = Cell.new<Cell>(this.game, this.sence, this, r, c, this.cellLen);
         cell.offsetX = this.offsetX;
         cell.offsetY = this.offsetY;
         row.push(cell);
@@ -144,57 +146,105 @@ export class Grid extends GameObject {
     // this.sence.addElement(overDialog);
   }
 
-  public onMouseOver(e: MouseEvent): void {
-    let { offsetX, offsetY } = e;
+  private openCell(temp: Cell) {
+    if (temp.flag === 0)
+      temp.open();
+  }
+
+  private makeFlag(temp: Cell) {
+    let oldState = temp.flag;
+    temp.updateState();
+    if (temp.flag == 1 && oldState == 0) {
+      if (temp.isMine)
+        this.success++
+      this.flagCount++;
+    } else if (temp.flag == 2 && oldState == 1) {
+      if (temp.isMine)
+        this.success--
+      this.flagCount--;
+    }
+    if (this.onFlagChanged !== undefined) this.onFlagChanged(this);
+  }
+
+  private checkWin() {
+    if (((this.row * this.column - this.openCount) === this.mineCount) // 没打开的数量等于雷的数量
+      || (this.flagCount === this.mineCount && this.success === this.flagCount)) {
+      this.gameOver = true
+      let fw1 = new Firework(this.game, this.sence, "fireworks_g")
+      let fw2 = new Firework(this.game, this.sence, "fireworks_r")
+      this.sence.addElement(fw1)
+      this.sence.addElement(fw2)
+    }
+  }
+
+  private findCell(x: number, y: number): Cell | undefined {
+    let c = Math.floor((x - this.offsetX) / this.cellLen);
+    let r = Math.floor((y - this.offsetY) / this.cellLen);
+    if (c > -1 && c < this.column && r > -1 && r < this.row) {
+      return this.data[r][c];
+    }
+    return undefined
+  }
+
+  public onMouseOver(e: MouseArgs): void {
+    let { x, y } = e;
     for (let r = 0; r < this.row; r++) {
       for (let c = 0; c < this.column; c++) {
         let temp = this.data[r][c];
-        temp.checkFocu(offsetX, offsetY);
+        temp.checkFocu(x, y);
       }
     }
   }
 
-  public onClick(e: MouseEvent): void {
-    let { offsetX, offsetY, button, buttons } = e;
-    let len = config.CellSize.len
-    let c = Math.floor((offsetX - this.offsetX) / len);
-    let r = Math.floor((offsetY - this.offsetY) / len);
-    if (c > -1 && c < this.column && r > -1 && r < this.row) {
-      let temp = this.data[r][c];
-      if (!temp) return;
+  public onClick(e: MouseArgs): void {
+    let { x, y, button, buttons } = e;
+    let temp = this.findCell(x, y)
+    if (!temp) return;
+    if (this.game.device === DEVICE_MOBILE) {
+      return
+    } else {
       if (!temp.isOpen) {
-        // 0,1 left
+        // 0 left
         if (button == 0) {
-          temp.open();
+          this.openCell(temp)
         }
-        // 2,2 right
+        // 2 right
         if (button == 2) {
-          let oldState = temp.flag;
-          temp.updateState();
-          if (temp.flag == 1 && oldState == 0) {
-            if (temp.isMine)
-              this.success++
-            this.flagCount++;
-          } else if (temp.flag == 2 && oldState == 1) {
-            if (temp.isMine)
-              this.success--
-            this.flagCount--;
-          }
-          if (this.onFlagChanged !== undefined) this.onFlagChanged(this);
+          this.makeFlag(temp)
         }
       }
-      // 0,3 double
-      else if (buttons >= 2) {
+      else if (button = 2) {
         temp.scan();
       }
-      if (((this.row * this.column - this.openCount) === this.mineCount) // 没打开的数量等于雷的数量
-        || (this.flagCount === this.mineCount && this.success === this.flagCount)) {
-        this.gameOver = true
-        let fw1 = new Firework(this.game, this.sence, "fireworks_g")
-        let fw2 = new Firework(this.game, this.sence, "fireworks_r")
-        this.sence.addElement(fw1)
-        this.sence.addElement(fw2)
-      }
+    }
+    this.checkWin()
+
+  }
+
+  onTouchStart(e: MouseArgs): void {
+    let { x, y } = e
+    this.temp = this.findCell(x, y)
+    if (this.temp === undefined) return;
+    this.touchTimer = window.setTimeout(() => {
+      if (this.temp === undefined) return;
+      if (!this.temp.isOpen)
+        this.openCell(this.temp)
+      window.clearTimeout(this.touchTimer)
+      this.touchTimer = undefined
+    }, 500)
+  }
+  onTouchEnd(): void {
+    if (this.touchTimer) {
+      window.clearTimeout(this.touchTimer)
+      this.touchTimer = undefined
+    }
+    if (!this.temp) {
+      return
+    }
+    if (!this.temp.isOpen) {
+      this.makeFlag(this.temp)
+    } else {
+      this.temp.scan()
     }
   }
 

@@ -8,6 +8,8 @@ export const MOUSE_RB_CLICK = 0x0100;
 export const MOUSE_MOVING = "MOVE";
 export const MOUSE_PRESS = "PRESS";
 export const MOUSE_RELEASE = "RELEASE";
+export const DEVICE_MOBILE = "MOBILE"
+export const DEVICE_PC = "PC"
 export interface Area {
   width: number;
   height: number;
@@ -18,21 +20,39 @@ export class Game {
   enableMouseAction: boolean;
   images: Map<string, GameImage>;
   sence!: BaseSence;
-  area: Area;
+  area!: Area;
+  device: string = DEVICE_PC
   constructor(area?: Area) {
     this.canvas = document.querySelector("#canvas");
     this.context = this.canvas.getContext("2d");
     this.enableMouseAction = false;
     this.images = new Map<string, GameImage>();
+    this.areaSetup(area)
+
+    this.eventSetup();
+  }
+  areaSetup(area?: Area) {
+    let isMobile = /Android|webOS|iPhone|iPod/i.test(navigator.userAgent)
+    this.device = isMobile ? DEVICE_MOBILE : DEVICE_PC
+    let w: number = 0
+    let h: number = 0
+    if (!area) {
+      if (isMobile) {
+        w = window.screen.availWidth
+        h = window.screen.availHeight
+      }
+      else {
+        w = 1000
+        h = 700
+      }
+    }
     this.area = area ?? {
-      width: 1000,
-      height: 700,
+      width: w,
+      height: h,
     };
     this.canvas.width = this.area.width
     this.canvas.height = this.area.height
-    this.eventSetup();
   }
-
   eventSetup() {
     this.canvas.addEventListener("mouseover", (e: MouseEvent) => {
       e.preventDefault();
@@ -49,6 +69,8 @@ export class Game {
       }
     });
     this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
+      console.log('click');
+      
       e.preventDefault();
       if (this.sence) {
         this.sence.handleMousedown(e);
@@ -60,6 +82,16 @@ export class Game {
         this.sence.handleMouseup(e);
       }
     });
+    this.canvas.addEventListener("touchstart", (e: any) => {
+      e.preventDefault()
+      if (this.sence)
+        this.sence.handleTouchStart(e)
+    })
+    this.canvas.addEventListener("touchend", (e: any) => {
+      e.preventDefault()
+      if (this.sence)
+        this.sence.handleTouchEnd(e)
+    })
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       if (this.sence) {
         this.sence.handleKeydown(e);

@@ -1,8 +1,8 @@
 import { BaseSence } from "../../gamebase/BaseSence";
 import { GameObject } from "../../gamebase/GameObject";
-import { Game } from "../../gamebase/Game";
+import { DEVICE_MOBILE, Game } from "../../gamebase/Game";
 import { Head } from "./Head";
-import { basis, middle, MineSence, professional } from "./MineSence";
+import { basis, middle, middle_m, MineSence, professional, professional_m } from "./MineSence";
 import { Button } from "./Button";
 
 export class StartSence extends BaseSence {
@@ -22,13 +22,17 @@ export class StartSence extends BaseSence {
     btnMiddleLevel.y = this.game.area.height / 2;
     this.addElement(btnMiddleLevel);
     btnMiddleLevel.onClick = () => {
-      let ms = new MineSence(this.game, middle)
+      let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? middle_m : middle)
       this.game.setSence(ms)
     }
+    // btnMiddleLevel.onTouchStart = () => {
+    //   let ms = new MineSence(this.game, middle_m)
+    //   this.game.setSence(ms)
+    // }
 
     let btnBasisLevel = Button.new(this.game, this, "初级");
-    btnBasisLevel.x = this.game.area.width / 2 - btnMiddleLevel.w;
-    btnBasisLevel.y = this.game.area.height / 2;
+    btnBasisLevel.x = this.game.area.width / 2;
+    btnBasisLevel.y = this.game.area.height / 2 - btnMiddleLevel.h;
     this.addElement(btnBasisLevel);
     btnBasisLevel.onClick = () => {
       let ms = new MineSence(this.game, basis)
@@ -36,11 +40,11 @@ export class StartSence extends BaseSence {
     }
 
     let btnProLevel = Button.new(this.game, this, "专家");
-    btnProLevel.x = this.game.area.width / 2 + btnMiddleLevel.w;
-    btnProLevel.y = this.game.area.height / 2;
+    btnProLevel.x = this.game.area.width / 2;
+    btnProLevel.y = this.game.area.height / 2 + btnMiddleLevel.h;
     this.addElement(btnProLevel);
     btnProLevel.onClick = () => {
-      let ms = new MineSence(this.game, professional)
+      let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? professional_m : professional)
       this.game.setSence(ms)
     }
   }

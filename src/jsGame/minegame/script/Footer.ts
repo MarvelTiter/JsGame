@@ -13,8 +13,9 @@ export class Footer extends TextElement {
     this.h = 50;
     this.y = this.game.area.height - 50;
     this.time = "";
+    this.font = "36px serif";
   }
   update() {
-    this.text = `雷: ${this.mineCount}        计时: ${this.time}`;
+    this.text = `雷:${this.mineCount}  计时:${this.time}`;
   }
 }

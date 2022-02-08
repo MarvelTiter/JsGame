@@ -1,5 +1,6 @@
 import { BaseSence } from "./BaseSence";
 import { Game } from "./Game";
+import { MouseArgs } from "./MouseArgs";
 import { GameImage } from "./Source";
 
 function observe(data: any) {
@@ -83,10 +84,15 @@ export class GameObject {
     return this.hasChanged;
   }
 
-  onClick(e: MouseEvent) {}
-  onMouseOver(e: MouseEvent) {}
+  onClick(e: MouseArgs) { }
+  onMouseOver(e: MouseArgs) { }
+  onMouseUp() { }
+  onTouchStart(e: MouseArgs) {
+    this.onClick(e)
+  }
+  onTouchEnd() { }
   // 子类复写
-  update() {}
+  update() { }
 
   // 子类复写
   draw() {

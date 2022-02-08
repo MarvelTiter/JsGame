@@ -6,28 +6,43 @@ import { Footer } from "./Footer";
 import { Grid } from "./Grid";
 import { Button } from "./Button";
 import { StartSence } from "./StartSence";
-interface MineMapSize {
-  row: number
-  column: number
-  mineCount: number
-}
+import { MineMapSize } from "./config";
+
 export const basis = {
   row: 10,
   column: 10,
   mineCount: 10,
+  len: 30
 }
 
 export const middle = {
   row: 16,
   column: 16,
   mineCount: 40,
+  len: 30
+}
+
+export const middle_m = {
+  row: 21,
+  column: 12,
+  mineCount: 40,
+  len: 30
 }
 
 export const professional = {
   row: 16,
   column: 30,
   mineCount: 99,
+  len: 30
 }
+
+export const professional_m = {
+  row: 30,
+  column: 16,
+  mineCount: 99,
+  len: 24
+}
+
 
 export class MineSence extends BaseSence {
   level: MineMapSize;
@@ -46,9 +61,7 @@ export class MineSence extends BaseSence {
     let grid = Grid.new<Grid>(
       this.game,
       this,
-      this.level.row,
-      this.level.column,
-      this.level.mineCount,
+      this.level
     );
     footer.mineCount = this.level.mineCount;
     grid.onFlagChanged = (g: Grid) => {

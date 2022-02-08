@@ -9,7 +9,7 @@ export class Head extends TextElement {
     this.h = 50;
     this.y = 0;
     this.text = "是兄弟就来扫雷！";
-    this.font = "40px serif";
+    this.font = "36px serif";
   }
 }
 

@@ -10,6 +10,7 @@ export class BaseSence {
   mouseupEvents: Function[];
   mousedownEvents: Function[] = [];
   mousemoveEvents: Function[] = [];
+  private aidElement: GameObject | undefined
   // game:Game;
   constructor(game: Game) {
     this.game = game;
@@ -34,6 +35,7 @@ export class BaseSence {
     for (let index = this.elements.length - 1; index > -1; index--) {
       const element = this.elements[index];
       if (element.checkFocu(offsetX, offsetY)) {
+        this.aidElement = element
         element.onMouseOver(e);
         break;
       }
@@ -41,20 +43,49 @@ export class BaseSence {
   }
 
   public handleMouseup(e: MouseEvent): void {
-    for (const event of this.mouseupEvents) {
-      event(e);
+    if (this.aidElement) {
+      this.aidElement.onMouseUp()
     }
+    this.aidElement = undefined
   }
 
   public handleMousedown(e: MouseEvent): void {
+    if (this.aidElement) {
+      this.aidElement.onClick(e)
+      return
+    }
     let { offsetX, offsetY } = e;
     for (let index = this.elements.length - 1; index > -1; index--) {
       const element = this.elements[index];
-      if (element.checkFocu(offsetX, offsetY)) {        
+      if (element.checkFocu(offsetX, offsetY)) {
         element.onClick(e);
         break;
       }
     }
+  }
+
+  public handleTouchStart(e: TouchEvent): void {
+    let { clientX, clientY } = e.touches[0]
+    for (let index = this.elements.length - 1; index > -1; index--) {
+      const element = this.elements[index];
+      if (element.checkFocu(clientX, clientY)) {
+        this.aidElement = element
+        element.onTouchStart({
+          button: 0,
+          buttons: 0,
+          x: clientX,
+          y: clientY
+        });
+        break;
+      }
+    }
+  }
+
+  public handleTouchEnd(e: TouchEvent): void {
+    if (this.aidElement) {
+    this.aidElement.onTouchEnd()
+    }
+    this.aidElement = undefined
   }
 
   public handleKeydown(e: KeyboardEvent): void {

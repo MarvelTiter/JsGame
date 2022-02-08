@@ -2,7 +2,6 @@ import { BaseSence } from "../../gamebase/BaseSence";
 import { GameObject } from "../../gamebase/GameObject";
 import { Game } from "../../gamebase/Game";
 import { Grid } from "./Grid";
-import { config } from "./config";
 
 export class Cell extends GameObject {
   gutter: number;
@@ -14,13 +13,14 @@ export class Cell extends GameObject {
   isMine: boolean;
   count: number;
   explode: boolean;
-  // explode: boolean;
+  scanning: boolean;
   constructor(
     game: Game,
     sence: BaseSence,
     grid: Grid,
     rowIndex: number,
     columnIndex: number,
+    len: number
   ) {
     super(game, sence, "normal");
     this.gutter = 0;
@@ -28,14 +28,15 @@ export class Cell extends GameObject {
     this.row = rowIndex;
     this.column = columnIndex;
     this.flag = 0;
-    this.w = config.CellSize.len;
-    this.h = config.CellSize.len;
+    this.w = len;
+    this.h = len;
     this.x = this.column * this.w + (this.column + 1) * this.gutter;
     this.y = this.row * this.h + (this.row + 1) * this.gutter;
     this.isOpen = false;
     this.isMine = false;
     this.count = 0;
     this.explode = false;
+    this.scanning = false
   }
 
   setTexture(name: string) {
@@ -75,7 +76,12 @@ export class Cell extends GameObject {
       }
     }
   }
-
+  setScanState() {
+    this.scanning = true
+    window.setTimeout(() => {
+      this.scanning = false
+    }, 200)
+  }
   scan() {
     let flagCount = 0;
     let rowIndex = this.row;
@@ -89,6 +95,7 @@ export class Cell extends GameObject {
           let temp = this.grid.data[i][j];
           if (temp.flag == 1) flagCount++;
           else if (!temp.isOpen) {
+            temp.setScanState()
             around.push(temp);
           }
         }
@@ -106,7 +113,9 @@ export class Cell extends GameObject {
     let name = "normal";
     if (!this.isOpen) {
       if (this.flag === 2) name = "unknow";
-      // name = "flag" + this.flag;
+      else if (this.scanning) {
+        name = "n0"
+      }
       else if (this.focus && this.flag == 0) {
         name = "over";
       }
