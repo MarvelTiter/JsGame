@@ -36,7 +36,12 @@ export class BaseSence {
       const element = this.elements[index];
       if (element.checkFocu(offsetX, offsetY)) {
         this.aidElement = element
-        element.onMouseOver(e);
+        element.onMouseOver({
+          button: e.button,
+          buttons: e.buttons,
+          x: e.offsetX,
+          y: e.offsetY
+        });
         break;
       }
     }
@@ -51,14 +56,24 @@ export class BaseSence {
 
   public handleMousedown(e: MouseEvent): void {
     if (this.aidElement) {
-      this.aidElement.onClick(e)
+      this.aidElement.onClick({
+        button: e.button,
+        buttons: e.buttons,
+        x: e.offsetX,
+        y: e.offsetY
+      })
       return
     }
     let { offsetX, offsetY } = e;
     for (let index = this.elements.length - 1; index > -1; index--) {
       const element = this.elements[index];
       if (element.checkFocu(offsetX, offsetY)) {
-        element.onClick(e);
+        element.onClick({
+          button: e.button,
+          buttons: e.buttons,
+          x: e.offsetX,
+          y: e.offsetY
+        });
         break;
       }
     }
@@ -83,7 +98,7 @@ export class BaseSence {
 
   public handleTouchEnd(e: TouchEvent): void {
     if (this.aidElement) {
-    this.aidElement.onTouchEnd()
+      this.aidElement.onTouchEnd()
     }
     this.aidElement = undefined
   }

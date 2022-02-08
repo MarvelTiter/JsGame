@@ -5,33 +5,34 @@ import { Back } from "@element-plus/icons-vue";
 import { computed } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
 let router = useRouter();
-let isRoot = computed(()=>{
-  return router.currentRoute.value.path === '/'
-})
+let isRoot = computed(() => {
+  return router.currentRoute.value.path === "/";
+});
 let goBack = () => {
-	router.push("/");
+  if (window.document.fullscreen) window.document.exitFullscreen();
+  router.push("/");
 };
 </script>
 <template>
-	<router-view></router-view>
-	<div class="back" @click="goBack" v-if="!isRoot">
-		<el-icon>
-			<back />
-		</el-icon>
-	</div>
+  <router-view></router-view>
+  <div class="back" @click="goBack" v-if="!isRoot">
+    <el-icon>
+      <back />
+    </el-icon>
+  </div>
 </template>
 <style lang="scss">
 .back {
-	position: fixed;
-	width: 40px;
-	height: 40px;
-	border: 1px solid #ccc;
-	background-color: #ccc;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 20px;
-	bottom: 20px;
-	right: 20px;
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  background-color: #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  bottom: 20px;
+  right: 20px;
 }
 </style>

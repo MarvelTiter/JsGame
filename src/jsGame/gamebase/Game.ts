@@ -33,7 +33,10 @@ export class Game {
   }
   areaSetup(area?: Area) {
     let isMobile = /Android|webOS|iPhone|iPod/i.test(navigator.userAgent)
-    this.device = isMobile ? DEVICE_MOBILE : DEVICE_PC
+    if (isMobile) {
+      this.device = DEVICE_MOBILE
+      window.document.documentElement.requestFullscreen()
+    }
     let w: number = 0
     let h: number = 0
     if (!area) {
