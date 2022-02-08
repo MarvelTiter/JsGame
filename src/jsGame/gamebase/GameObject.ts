@@ -1,9 +1,7 @@
 import { BaseSence } from "./BaseSence";
 import { Game } from "./Game";
 import { MouseArgs } from "./MouseArgs";
-import { GameImage } from "./Source";
-
-function observe(data: any) {
+export function observe(data: any) {
   if (!data || typeof data !== "object") {
     return;
   }
@@ -27,11 +25,12 @@ function defineProp(data: any, key: string, childVal: any) {
     configurable: false, // 不能再define
   });
 }
-
+/**
+ * 所有对象的基类
+ */
 export class GameObject {
   game: Game;
   sence: BaseSence;
-  image: GameImage | undefined;
   x: number;
   y: number;
   w: number;
@@ -41,7 +40,7 @@ export class GameObject {
   offsetY: number;
   hasChanged: boolean;
   onTick: Function | undefined;
-  constructor(game: Game, sence: BaseSence, name?: string) {
+  constructor(game: Game, sence: BaseSence) {
     this.game = game;
     this.sence = sence;
     this.x = 0;
@@ -52,14 +51,7 @@ export class GameObject {
     this.offsetX = 0;
     this.offsetY = 0;
     this.hasChanged = true;
-
-    if (name !== undefined) {
-      this.image = game.getTextureByName(name);
-      this.w = this.image.w;
-      this.h = this.image.h;
-    }
   }
-
   static new<T extends GameObject>(...args: any[]): T {
     let i = Reflect.construct(this, args);
     observe(i);
@@ -77,49 +69,41 @@ export class GameObject {
     }
     return this.focus;
   }
+
+  onClick(e: MouseArgs) { }
+  onMouseOver(e: MouseArgs) { }
+  onMouseUp() { }
+  onTouchStart(e: MouseArgs) {
+    this.onClick(e);
+  }
+  onTouchMove(e: MouseArgs) { }
+  onTouchEnd() { }
   canDraw(): boolean {
     return true;
   }
   updateRequest() {
     return this.hasChanged;
   }
-
-  onClick(e: MouseArgs) { }
-  onMouseOver(e: MouseArgs) { }
-  onMouseUp() { }
-  onTouchStart(e: MouseArgs) {
-    this.onClick(e)
-  }
-  onTouchMove(e: MouseArgs) { }
-  onTouchEnd() { }
   // 子类复写
   update() { }
 
   // 子类复写
-  draw() {
-    if (this.image !== undefined) {
-      this.game.context.drawImage(
-        this.image.texture,
-        this.x + this.offsetX,
-        this.y + this.offsetY,
-        this.w,
-        this.h,
-      );
-    }
-  }
+  draw(ctx: CanvasRenderingContext2D) { }
 
   // sence调用
   elementUpdate() {
-    if (!this.updateRequest()) return;
+    if (!this.updateRequest())
+      return;
     this.update();
-    if (this.onTick) this.onTick(this);
+    if (this.onTick)
+      this.onTick(this);
     this.hasChanged = false;
   }
 
   // sence调用
-  elementDraw() {
-    if (!this.canDraw()) return;
-    this.draw();
+  elementDraw(ctx: CanvasRenderingContext2D) {
+    if (!this.canDraw())
+      return;
+    this.draw(ctx);
   }
 }
-

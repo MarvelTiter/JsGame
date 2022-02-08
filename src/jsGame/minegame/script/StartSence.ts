@@ -1,5 +1,5 @@
 import { BaseSence } from "../../gamebase/BaseSence";
-import { GameObject } from "../../gamebase/GameObject";
+import { GameEntity } from "../../gamebase/GameEntity";
 import { DEVICE_MOBILE, Game } from "../../gamebase/Game";
 import { Head } from "./Head";
 import { basis, basis_m, middle, middle_m, MineSence, professional, professional_m } from "./MineSence";
@@ -12,7 +12,7 @@ export class StartSence extends BaseSence {
   }
 
   setup() {
-    let bg = GameObject.new(this.game, this, "bg");
+    let bg = GameEntity.new(this.game, this, "bg");
     let head = Head.new(this.game, this);
     this.addElement(bg);
     this.addElement(head);

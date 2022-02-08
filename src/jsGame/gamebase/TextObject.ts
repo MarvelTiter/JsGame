@@ -2,7 +2,10 @@ import { BaseSence } from "./BaseSence";
 import { GameObject } from "./GameObject";
 import { Game } from "./Game";
 
-export class TextElement extends GameObject {
+/**
+ * 文本对象
+ */
+export class TextObject extends GameObject {
   background: string;
   font: string | undefined;
   color: string;

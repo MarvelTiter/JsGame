@@ -1,9 +1,9 @@
 import { BaseSence } from "../../gamebase/BaseSence";
 import { Game } from "../../gamebase/Game";
-import { TextElement } from "../../gamebase/TextElement";
+import { TextObject } from "../../gamebase/TextObject";
 
 
-export class Footer extends TextElement {
+export class Footer extends TextObject {
   public mineCount: number;
   public time: string;
   constructor(game: Game, sence: BaseSence) {

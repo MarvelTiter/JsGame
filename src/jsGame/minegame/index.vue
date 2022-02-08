@@ -1,5 +1,5 @@
 <template>
-  <div style="text-align: center">
+  <div style="text-align: center" id="container">
     <canvas id="canvas"></canvas>
   </div>
 </template>

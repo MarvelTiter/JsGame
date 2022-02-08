@@ -8,7 +8,7 @@ export class Item extends GameObject {
   //   throw new Error("Method not implemented.");
   // }
   constructor(game: Game, sence: BaseSence) {
-    super(game, sence, undefined);
+    super(game, sence);
     this.x = 100;
     this.w = 50;
     this.h = 50;
@@ -24,8 +24,7 @@ export class Item extends GameObject {
   update() {
     this.y++;
   }
-  draw() {
-    let ctx = this.game.context;
+  draw(ctx:CanvasRenderingContext2D) {
     ctx.fillStyle = "green";
     ctx.fillRect(this.x, this.y, this.w, this.h);
     ctx.font = "14px serif";

@@ -1,9 +1,9 @@
 import { BaseSence } from "../../gamebase/BaseSence";
-import { GameObject } from "../../gamebase/GameObject";
+import { GameEntity } from "../../gamebase/GameEntity";
 import { Game } from "../../gamebase/Game";
 import { Grid } from "./Grid";
 
-export class Cell extends GameObject {
+export class Cell extends GameEntity {
   gutter: number;
   grid: Grid;
   row: number;
@@ -20,7 +20,7 @@ export class Cell extends GameObject {
     grid: Grid,
     rowIndex: number,
     columnIndex: number,
-    len: number
+    len: number,
   ) {
     super(game, sence, "normal");
     this.gutter = 0;
@@ -36,7 +36,7 @@ export class Cell extends GameObject {
     this.isMine = false;
     this.count = 0;
     this.explode = false;
-    this.scanning = false
+    this.scanning = false;
   }
 
   setTexture(name: string) {
@@ -50,11 +50,11 @@ export class Cell extends GameObject {
   open() {
     if (this.isOpen) return;
     this.isOpen = true;
-    this.grid.openCount++
+    this.grid.openCount++;
     if (this.isMine) {
       this.explode = true;
       this.grid.openAll();
-      this.grid.gameOver = true
+      this.grid.gameOver = true;
     }
     // 连锁开
     if (this.count == 0) {
@@ -77,10 +77,10 @@ export class Cell extends GameObject {
     }
   }
   setScanState() {
-    this.scanning = true
+    this.scanning = true;
     window.setTimeout(() => {
-      this.scanning = false
-    }, 200)
+      this.scanning = false;
+    }, 200);
   }
   scan() {
     let flagCount = 0;
@@ -95,7 +95,7 @@ export class Cell extends GameObject {
           let temp = this.grid.data[i][j];
           if (temp.flag == 1) flagCount++;
           else if (!temp.isOpen) {
-            temp.setScanState()
+            temp.setScanState();
             around.push(temp);
           }
         }
@@ -114,9 +114,8 @@ export class Cell extends GameObject {
     if (!this.isOpen) {
       if (this.flag === 2) name = "unknow";
       else if (this.scanning) {
-        name = "n0"
-      }
-      else if (this.focus && this.flag == 0) {
+        name = "n0";
+      } else if (this.focus && this.flag == 0) {
         name = "over";
       }
     } else {
@@ -128,10 +127,9 @@ export class Cell extends GameObject {
     }
     this.setTexture(name);
   }
-
-  draw(): void {
+  draw(ctx: CanvasRenderingContext2D): void {
     if (this.image !== undefined) {
-      this.game.context.drawImage(
+      ctx.drawImage(
         this.image.texture,
         this.x + this.offsetX,
         this.y + this.offsetY,
@@ -141,7 +139,7 @@ export class Cell extends GameObject {
     }
     if (this.flag == 1) {
       let img = this.game.getTextureByName("flag");
-      this.game.context.drawImage(
+      ctx.drawImage(
         img.texture,
         this.x + this.offsetX,
         this.y + this.offsetY,

@@ -1,3 +1,6 @@
+/**
+ * 动画帧定义
+ */
 export interface FrameDefinition {
   x: number;
   y: number;

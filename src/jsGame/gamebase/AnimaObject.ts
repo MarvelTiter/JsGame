@@ -1,19 +1,22 @@
 import { BaseSence } from "./BaseSence";
 import { Game } from "./Game";
-import { GameObject } from "./GameObject";
+import { GameEntity } from "./GameEntity";
 import { FrameDefinition } from "./FrameDefinition";
 
-export class AnimaObject extends GameObject {
+/**
+ * 动画对象
+ */
+export class AnimaObject extends GameEntity {
   frames: FrameDefinition[];
   frameIndex: number = 0;
   frameInterval: number = 5;
   protected frameCooldown: number = 0;
-  protected playTimes: number = 0
+  protected playTimes: number = 0;
   constructor(
     game: Game,
     sence: BaseSence,
     name: string,
-    frames: FrameDefinition[]
+    frames: FrameDefinition[],
   ) {
     super(game, sence, name);
     this.frames = frames;
@@ -24,10 +27,9 @@ export class AnimaObject extends GameObject {
 
   private calcFrameIndex(): number {
     if (this.frameIndex === this.frames.length - 1) {
-      this.playTimes++
-      console.log(this.playTimes);
+      this.playTimes++;
     }
-    return (this.frameIndex + 1) % this.frames.length
+    return (this.frameIndex + 1) % this.frames.length;
   }
 
   update(): void {
@@ -39,10 +41,10 @@ export class AnimaObject extends GameObject {
     this.frameCooldown = this.frameInterval;
   }
 
-  draw(): void {
+  draw(ctx: CanvasRenderingContext2D): void {
     let f = this.frames[this.frameIndex];
-    this.game.context.drawImage(
-      this.image?.texture,
+    ctx.drawImage(
+      this.image.texture,
       f.x,
       f.y,
       f.w,
@@ -50,7 +52,7 @@ export class AnimaObject extends GameObject {
       this.x + this.offsetX,
       this.y + this.offsetY,
       this.w,
-      this.h
+      this.h,
     );
   }
 }

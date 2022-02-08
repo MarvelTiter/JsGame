@@ -1,5 +1,5 @@
 import { BaseSence } from "./BaseSence";
-import { GameImage, Source } from "./Source";
+import { GameImage } from "./Source";
 
 export const RESET = 0x0000;
 export const MOUSE_MOVE = 0x0001;
@@ -8,12 +8,13 @@ export const MOUSE_RB_CLICK = 0x0100;
 export const MOUSE_MOVING = "MOVE";
 export const MOUSE_PRESS = "PRESS";
 export const MOUSE_RELEASE = "RELEASE";
-export const DEVICE_MOBILE = "MOBILE"
-export const DEVICE_PC = "PC"
+export const DEVICE_MOBILE = "MOBILE";
+export const DEVICE_PC = "PC";
 export interface Area {
   width: number;
   height: number;
 }
+
 export class Game {
   canvas: any;
   context: any;
@@ -21,40 +22,38 @@ export class Game {
   images: Map<string, GameImage>;
   sence!: BaseSence;
   private area!: Area;
-  device: string = DEVICE_PC
+  device: string = DEVICE_PC;
   constructor(area?: Area) {
     this.canvas = document.querySelector("#canvas");
     this.context = this.canvas.getContext("2d");
     this.enableMouseAction = false;
     this.images = new Map<string, GameImage>();
-    this.areaSetup(area)
-
+    this.areaSetup(area);
     this.eventSetup();
   }
   areaSetup(area?: Area) {
-    let isMobile = /Android|webOS|iPhone|iPod/i.test(navigator.userAgent)
+    let isMobile = /Android|webOS|iPhone|iPod/i.test(navigator.userAgent);
     if (isMobile) {
-      this.device = DEVICE_MOBILE
+      this.device = DEVICE_MOBILE;
       // window.document.documentElement.requestFullscreen()
     }
-    let w: number = 0
-    let h: number = 0
+    let w: number = 0;
+    let h: number = 0;
     if (!area) {
       if (isMobile) {
-        w = window.document.body.clientWidth
-        h = window.document.body.clientHeight
-      }
-      else {
-        w = 1000
-        h = 700
+        w = window.document.body.clientWidth;
+        h = window.document.body.clientHeight;
+      } else {
+        w = 1000;
+        h = 700;
       }
     }
     this.area = area ?? {
       width: w,
       height: h,
     };
-    this.canvas.width = this.area.width
-    this.canvas.height = this.area.height
+    this.canvas.width = this.area.width;
+    this.canvas.height = this.area.height;
   }
   eventSetup() {
     this.canvas.addEventListener("mouseover", (e: MouseEvent) => {
@@ -72,8 +71,6 @@ export class Game {
       }
     });
     this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
-      console.log('click');
-
       e.preventDefault();
       if (this.sence) {
         this.sence.handleMousedown(e);
@@ -87,18 +84,15 @@ export class Game {
     });
     this.canvas.addEventListener("touchstart", (e: TouchEvent) => {
       // e.preventDefault()
-      if (this.sence)
-        this.sence.handleTouchStart(e)
-    })
-    this.canvas.addEventListener('touchmove', (e: TouchEvent) => {
-      if (this.sence)
-        this.sence.handleTouchMove(e)
-    })
+      if (this.sence) this.sence.handleTouchStart(e);
+    });
+    this.canvas.addEventListener("touchmove", (e: TouchEvent) => {
+      if (this.sence) this.sence.handleTouchMove(e);
+    });
     this.canvas.addEventListener("touchend", (e: TouchEvent) => {
-      e.preventDefault()
-      if (this.sence)
-        this.sence.handleTouchEnd(e)
-    })
+      e.preventDefault();
+      if (this.sence) this.sence.handleTouchEnd(e);
+    });
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       if (this.sence) {
         this.sence.handleKeydown(e);
@@ -125,7 +119,7 @@ export class Game {
         let url = sources[k];
         img.src = url;
         img.onload = () => {
-          let i = new GameImage(k, url, img)
+          let i = new GameImage(k, url, img);
           this.images.set(k, i);
           count++;
 
@@ -144,30 +138,33 @@ export class Game {
   }
 
   public getWidth(): number {
-    return this.area.width
+    return this.area.width;
   }
 
   public getHeight(): number {
-    return this.area.height
+    return this.area.height;
   }
 
   public reSize(w: number, h: number): void {
     this.areaSetup({
       width: w,
-      height: h
-    })
+      height: h,
+    });
   }
 
   public setSence(sence: BaseSence): void {
     this.sence = sence;
   }
 
+  private loop() {
+    this.sence.update();
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.sence.draw(this.context);
+    window.requestAnimationFrame(this.loop.bind(this));
+  }
+
   run() {
     if (!this.sence) return;
-    window.setInterval(() => {
-      this.sence.update();
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.sence.draw();
-    }, 1000 / 30);
+    this.loop();
   }
 }

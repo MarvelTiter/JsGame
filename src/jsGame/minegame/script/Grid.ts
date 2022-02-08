@@ -16,39 +16,35 @@ export class Grid extends GameObject {
   data!: Array<Array<Cell>>;
   row: number;
   column: number;
-  flagCount: number = 0
+  flagCount: number = 0;
   onFlagChanged: Function | undefined;
   time: string;
   timer: number;
   gameOver: boolean = false;
-  success: number = 0
-  openCount: number = 0
-  mineCount: number
-  cellLen: number
-  touchTimer: number | undefined
-  temp: Cell | undefined
-  constructor(
-    game: Game,
-    sence: BaseSence,
-    level: MineMapSize
-  ) {
+  success: number = 0;
+  openCount: number = 0;
+  mineCount: number;
+  cellLen: number;
+  touchTimer: number | undefined;
+  temp: Cell | undefined;
+  constructor(game: Game, sence: BaseSence, level: MineMapSize) {
     super(game, sence);
     this.row = level.row;
     this.column = level.column;
     if (this.game.device === DEVICE_MOBILE) {
-      level.len = document.body.clientWidth / 12
+      level.len = document.body.clientWidth / 12;
     }
-    this.cellLen = level.len
+    this.cellLen = level.len;
     this.w = this.column * level.len;
     this.h = this.row * level.len;
     this.offsetX = (this.game.getWidth() - this.column * this.cellLen) / 2;
-    let marginTop = (this.game.getHeight() - this.row * this.cellLen) / 2
+    let marginTop = (this.game.getHeight() - this.row * this.cellLen) / 2;
     if (marginTop < 50) {
-      marginTop = 50
-      this.game.reSize(this.game.getWidth(), 100 + this.row * this.cellLen)
+      marginTop = 50;
+      this.game.reSize(this.game.getWidth(), 100 + this.row * this.cellLen);
     }
-    this.offsetY = marginTop
-    this.mineCount = level.mineCount
+    this.offsetY = marginTop;
+    this.mineCount = level.mineCount;
     this.time = "00:00:00";
     this.timer = -1;
 
@@ -56,13 +52,7 @@ export class Grid extends GameObject {
     this.setupEvent();
   }
   setupEvent() {
-    this.sence.registerKeyAction(
-      "a",
-      (e: MouseEvent) => {
-        this.randomOpen();
-      },
-      true,
-    );
+    this.sence.registerKeyAction("a", this, this.randomOpen, true);
   }
 
   public start(): void {
@@ -98,7 +88,14 @@ export class Grid extends GameObject {
     for (let r = 0; r < this.row; r++) {
       let row = new Array<Cell>();
       for (let c = 0; c < this.column; c++) {
-        let cell = Cell.new<Cell>(this.game, this.sence, this, r, c, this.cellLen);
+        let cell = Cell.new<Cell>(
+          this.game,
+          this.sence,
+          this,
+          r,
+          c,
+          this.cellLen,
+        );
         cell.offsetX = this.offsetX;
         cell.offsetY = this.offsetY;
         row.push(cell);
@@ -155,33 +152,32 @@ export class Grid extends GameObject {
   }
 
   private openCell(temp: Cell) {
-    if (temp.flag === 0)
-      temp.open();
+    if (temp.flag === 0) temp.open();
   }
 
   private makeFlag(temp: Cell) {
     let oldState = temp.flag;
     temp.updateState();
     if (temp.flag == 1 && oldState == 0) {
-      if (temp.isMine)
-        this.success++
+      if (temp.isMine) this.success++;
       this.flagCount++;
     } else if (temp.flag == 2 && oldState == 1) {
-      if (temp.isMine)
-        this.success--
+      if (temp.isMine) this.success--;
       this.flagCount--;
     }
     if (this.onFlagChanged !== undefined) this.onFlagChanged(this);
   }
 
   private checkWin() {
-    if (((this.row * this.column - this.openCount) === this.mineCount) // 没打开的数量等于雷的数量
-      || (this.flagCount === this.mineCount && this.success === this.flagCount)) {
-      this.gameOver = true
-      let fw1 = new Firework(this.game, this.sence, "fireworks_g")
-      let fw2 = new Firework(this.game, this.sence, "fireworks_r")
-      this.sence.addElement(fw1)
-      this.sence.addElement(fw2)
+    if (
+      this.row * this.column - this.openCount === this.mineCount || // 没打开的数量等于雷的数量
+      (this.flagCount === this.mineCount && this.success === this.flagCount)
+    ) {
+      this.gameOver = true;
+      let fw1 = new Firework(this.game, this.sence, "fireworks_g");
+      let fw2 = new Firework(this.game, this.sence, "fireworks_r");
+      this.sence.addElement(fw1);
+      this.sence.addElement(fw2);
     }
   }
 
@@ -191,7 +187,7 @@ export class Grid extends GameObject {
     if (c > -1 && c < this.column && r > -1 && r < this.row) {
       return this.data[r][c];
     }
-    return undefined
+    return undefined;
   }
 
   public onMouseOver(e: MouseArgs): void {
@@ -206,69 +202,72 @@ export class Grid extends GameObject {
 
   public onClick(e: MouseArgs): void {
     let { x, y, button, buttons } = e;
-    let temp = this.findCell(x, y)
+    let temp = this.findCell(x, y);
     if (!temp) return;
     if (this.game.device === DEVICE_MOBILE) {
-      return
+      return;
     } else {
       if (!temp.isOpen) {
         // 0 left
         if (button == 0) {
-          this.openCell(temp)
+          this.openCell(temp);
         }
         // 2 right
         if (button == 2) {
-          this.makeFlag(temp)
+          this.makeFlag(temp);
         }
-      }
-      else if (button = 2) {
+      } else if ((button = 2)) {
         temp.scan();
       }
     }
-    this.checkWin()
-
+    this.checkWin();
   }
 
   onTouchStart(e: MouseArgs): void {
-    let { x, y } = e
-    this.temp = this.findCell(x, y)
+    let { x, y } = e;
+    this.temp = this.findCell(x, y);
     if (this.temp === undefined) return;
     this.touchTimer = window.setTimeout(() => {
       if (this.temp === undefined) return;
-      if (!this.temp.isOpen)
-        this.openCell(this.temp)
-      window.clearTimeout(this.touchTimer)
-      this.touchTimer = undefined
-    }, 500)
+      if (!this.temp.isOpen) this.openCell(this.temp);
+      window.clearTimeout(this.touchTimer);
+      this.touchTimer = undefined;
+    }, 500);
   }
   onTouchMove(e: MouseArgs): void {
     if (this.touchTimer) {
-      window.clearTimeout(this.touchTimer)
-      this.touchTimer = undefined
+      window.clearTimeout(this.touchTimer);
+      this.touchTimer = undefined;
     }
   }
   onTouchEnd(): void {
     if (this.touchTimer) {
-      window.clearTimeout(this.touchTimer)
-      this.touchTimer = undefined
+      window.clearTimeout(this.touchTimer);
+      this.touchTimer = undefined;
     }
     if (!this.temp) {
-      return
+      return;
     }
     if (!this.temp.isOpen) {
-      this.makeFlag(this.temp)
+      this.makeFlag(this.temp);
     } else {
-      this.temp.scan()
+      this.temp.scan();
     }
   }
+  updateRequest(): boolean {
+    return true;
+  }
+  // update(): void {
+  //   super.update();
+  //   let fw = new Firework(this.game, this.sence, "fireworks_g");
+  //   fw.x = Math.random() * this.game.getWidth();
+  //   fw.y = Math.random() * this.game.getHeight();
+  //   this.sence.addElement(fw);
+  //   console.log("fire");
+  // }
 
-  draw() {
-    this.game.context.fillStyle = "rgba(0,0,0,0)";
-    this.game.context.fillRect(
-      this.x + this.offsetX,
-      this.y + this.offsetY,
-      this.w,
-      this.h,
-    );
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = "rgba(0,0,0,0)";
+    ctx.fillRect(this.x + this.offsetX, this.y + this.offsetY, this.w, this.h);
   }
 }

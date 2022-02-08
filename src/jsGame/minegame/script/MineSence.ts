@@ -1,5 +1,4 @@
 import { BaseSence } from "../../gamebase/BaseSence";
-import { GameObject } from "../../gamebase/GameObject";
 import { Game } from "../../gamebase/Game";
 import { Head } from "./Head";
 import { Footer } from "./Footer";
@@ -7,6 +6,7 @@ import { Grid } from "./Grid";
 import { Button } from "./Button";
 import { StartSence } from "./StartSence";
 import { MineMapSize } from "./config";
+import { GameEntity } from "../../gamebase/GameEntity";
 
 export const basis = {
   row: 10,
@@ -61,7 +61,7 @@ export class MineSence extends BaseSence {
     this.setup();
   }
   setup() {
-    let bg = GameObject.new(this.game, this, "bg");
+    let bg = GameEntity.new(this.game, this, "bg");
     let head = Head.new(this.game, this) as Head;
     let footer = Footer.new(this.game, this) as Footer;
     this.addElement(bg);

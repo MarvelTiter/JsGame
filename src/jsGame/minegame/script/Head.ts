@@ -1,8 +1,8 @@
 import { BaseSence } from "../../gamebase/BaseSence";
 import { Game } from "../../gamebase/Game";
-import { TextElement } from "../../gamebase/TextElement";
+import { TextObject } from "../../gamebase/TextObject";
 
-export class Head extends TextElement {
+export class Head extends TextObject {
   constructor(game: Game, sence: BaseSence) {
     super(game, sence);
     this.w = this.game.getWidth();
