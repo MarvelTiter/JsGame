@@ -20,7 +20,7 @@ export class Game {
   enableMouseAction: boolean;
   images: Map<string, GameImage>;
   sence!: BaseSence;
-  area!: Area;
+  private area!: Area;
   device: string = DEVICE_PC
   constructor(area?: Area) {
     this.canvas = document.querySelector("#canvas");
@@ -35,14 +35,14 @@ export class Game {
     let isMobile = /Android|webOS|iPhone|iPod/i.test(navigator.userAgent)
     if (isMobile) {
       this.device = DEVICE_MOBILE
-      window.document.documentElement.requestFullscreen()
+      // window.document.documentElement.requestFullscreen()
     }
     let w: number = 0
     let h: number = 0
     if (!area) {
       if (isMobile) {
-        w = window.screen.availWidth
-        h = window.screen.availHeight
+        w = window.document.body.clientWidth
+        h = window.document.body.clientHeight
       }
       else {
         w = 1000
@@ -68,12 +68,12 @@ export class Game {
     this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
       e.preventDefault();
       if (this.enableMouseAction && this.sence) {
-        this.sence.handleMousevove(e);
+        this.sence.handleMousemove(e);
       }
     });
     this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
       console.log('click');
-      
+
       e.preventDefault();
       if (this.sence) {
         this.sence.handleMousedown(e);
@@ -85,12 +85,16 @@ export class Game {
         this.sence.handleMouseup(e);
       }
     });
-    this.canvas.addEventListener("touchstart", (e: any) => {
-      e.preventDefault()
+    this.canvas.addEventListener("touchstart", (e: TouchEvent) => {
+      // e.preventDefault()
       if (this.sence)
         this.sence.handleTouchStart(e)
     })
-    this.canvas.addEventListener("touchend", (e: any) => {
+    this.canvas.addEventListener('touchmove', (e: TouchEvent) => {
+      if (this.sence)
+        this.sence.handleTouchMove(e)
+    })
+    this.canvas.addEventListener("touchend", (e: TouchEvent) => {
       e.preventDefault()
       if (this.sence)
         this.sence.handleTouchEnd(e)
@@ -137,6 +141,21 @@ export class Game {
     let i = this.images.get(name);
     if (i === undefined) throw new Error(`image named ${name} is not found`);
     return i;
+  }
+
+  public getWidth(): number {
+    return this.area.width
+  }
+
+  public getHeight(): number {
+    return this.area.height
+  }
+
+  public reSize(w: number, h: number): void {
+    this.areaSetup({
+      width: w,
+      height: h
+    })
   }
 
   public setSence(sence: BaseSence): void {

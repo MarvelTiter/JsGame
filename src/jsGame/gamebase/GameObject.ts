@@ -90,6 +90,7 @@ export class GameObject {
   onTouchStart(e: MouseArgs) {
     this.onClick(e)
   }
+  onTouchMove(e: MouseArgs) { }
   onTouchEnd() { }
   // 子类复写
   update() { }

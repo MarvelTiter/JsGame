@@ -9,13 +9,13 @@ export class Footer extends TextElement {
   constructor(game: Game, sence: BaseSence) {
     super(game, sence);
     this.mineCount = 0;
-    this.w = this.game.area.width;
+    this.w = this.game.getWidth();
     this.h = 50;
-    this.y = this.game.area.height - 50;
     this.time = "";
     this.font = "36px serif";
   }
   update() {
+    this.y = this.game.getHeight() - 50;
     this.text = `雷:${this.mineCount}  计时:${this.time}`;
   }
 }

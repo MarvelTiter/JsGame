@@ -2,7 +2,7 @@ import { BaseSence } from "../../gamebase/BaseSence";
 import { GameObject } from "../../gamebase/GameObject";
 import { DEVICE_MOBILE, Game } from "../../gamebase/Game";
 import { Head } from "./Head";
-import { basis, middle, middle_m, MineSence, professional, professional_m } from "./MineSence";
+import { basis, basis_m, middle, middle_m, MineSence, professional, professional_m } from "./MineSence";
 import { Button } from "./Button";
 
 export class StartSence extends BaseSence {
@@ -18,30 +18,26 @@ export class StartSence extends BaseSence {
     this.addElement(head);
 
     let btnMiddleLevel = Button.new(this.game, this, "中级");
-    btnMiddleLevel.x = this.game.area.width / 2;
-    btnMiddleLevel.y = this.game.area.height / 2;
+    btnMiddleLevel.x = this.game.getWidth() / 2;
+    btnMiddleLevel.y = 100 + btnMiddleLevel.h;
     this.addElement(btnMiddleLevel);
     btnMiddleLevel.onClick = () => {
       let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? middle_m : middle)
       this.game.setSence(ms)
     }
-    // btnMiddleLevel.onTouchStart = () => {
-    //   let ms = new MineSence(this.game, middle_m)
-    //   this.game.setSence(ms)
-    // }
 
     let btnBasisLevel = Button.new(this.game, this, "初级");
-    btnBasisLevel.x = this.game.area.width / 2;
-    btnBasisLevel.y = this.game.area.height / 2 - btnMiddleLevel.h;
+    btnBasisLevel.x = this.game.getWidth() / 2;
+    btnBasisLevel.y = 100;
     this.addElement(btnBasisLevel);
     btnBasisLevel.onClick = () => {
-      let ms = new MineSence(this.game, basis)
+      let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? basis_m : basis)
       this.game.setSence(ms)
     }
 
     let btnProLevel = Button.new(this.game, this, "专家");
-    btnProLevel.x = this.game.area.width / 2;
-    btnProLevel.y = this.game.area.height / 2 + btnMiddleLevel.h;
+    btnProLevel.x = this.game.getWidth() / 2;
+    btnProLevel.y = 100 + btnMiddleLevel.h * 2;
     this.addElement(btnProLevel);
     btnProLevel.onClick = () => {
       let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? professional_m : professional)

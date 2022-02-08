@@ -30,7 +30,7 @@ export class BaseSence {
     this.elements.splice(i, 1);
   }
 
-  public handleMousevove(e: MouseEvent): void {
+  public handleMousemove(e: MouseEvent): void {
     let { offsetX, offsetY } = e;
     for (let index = this.elements.length - 1; index > -1; index--) {
       const element = this.elements[index];
@@ -48,9 +48,7 @@ export class BaseSence {
   }
 
   public handleMouseup(e: MouseEvent): void {
-    if (this.aidElement) {
-      this.aidElement.onMouseUp()
-    }
+    this.aidElement?.onMouseUp()
     this.aidElement = undefined
   }
 
@@ -80,26 +78,34 @@ export class BaseSence {
   }
 
   public handleTouchStart(e: TouchEvent): void {
-    let { clientX, clientY } = e.touches[0]
+    let { pageX, pageY } = e.touches[0]
     for (let index = this.elements.length - 1; index > -1; index--) {
       const element = this.elements[index];
-      if (element.checkFocu(clientX, clientY)) {
+      if (element.checkFocu(pageX, pageY)) {
         this.aidElement = element
         element.onTouchStart({
           button: 0,
           buttons: 0,
-          x: clientX,
-          y: clientY
+          x: pageX,
+          y: pageY
         });
         break;
       }
     }
   }
 
+  public handleTouchMove(e: TouchEvent): void {
+    this.aidElement?.onTouchMove({
+      button: 0,
+      buttons: 0,
+      x: e.touches[0].pageX,
+      y: e.touches[0].pageY
+    })
+    this.aidElement = undefined
+  }
+
   public handleTouchEnd(e: TouchEvent): void {
-    if (this.aidElement) {
-      this.aidElement.onTouchEnd()
-    }
+    this.aidElement?.onTouchEnd()
     this.aidElement = undefined
   }
 

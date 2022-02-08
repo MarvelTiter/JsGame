@@ -22,12 +22,7 @@ export const middle = {
   len: 30
 }
 
-export const middle_m = {
-  row: 21,
-  column: 12,
-  mineCount: 40,
-  len: 30
-}
+
 
 export const professional = {
   row: 16,
@@ -36,9 +31,23 @@ export const professional = {
   len: 30
 }
 
+export const basis_m = {
+  row: 10,
+  column: 12,
+  mineCount: 12,
+  len: 30
+}
+
+export const middle_m = {
+  row: 21,
+  column: 12,
+  mineCount: 40,
+  len: 30
+}
+
 export const professional_m = {
-  row: 30,
-  column: 16,
+  row: 40,
+  column: 12,
   mineCount: 99,
   len: 24
 }
@@ -74,8 +83,8 @@ export class MineSence extends BaseSence {
     // let over = GameOverDialog.new(this.game, this);
     // this.addElement(over);
     let restartButton = Button.new(this.game, this, "重新开始");
-    restartButton.x = this.game.area.width - restartButton.w / 2 - 20;
-    restartButton.y = this.game.area.height - restartButton.h / 2 - 20;
+    restartButton.x = this.game.getWidth() - restartButton.w / 2 - 20;
+    restartButton.y = this.game.getHeight() - restartButton.h / 2 - 20;
     restartButton.canDraw = () => {
       return grid.gameOver;
     };

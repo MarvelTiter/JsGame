@@ -17,8 +17,8 @@ export class Firework extends AnimaObject {
         super(game, sence, name, frames)
         this.w = 95
         this.h = 95
-        this.x = (this.game.area.width - this.w) / 2
-        this.y = (this.game.area.height - this.h) / 2
+        this.x = (this.game.getWidth() - this.w) / 2
+        this.y = (this.game.getHeight() - this.h) / 2
     }
     update(): void {
         super.update()

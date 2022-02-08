@@ -33,13 +33,21 @@ export class Grid extends GameObject {
     level: MineMapSize
   ) {
     super(game, sence);
-    this.cellLen = level.len
     this.row = level.row;
     this.column = level.column;
+    if (this.game.device === DEVICE_MOBILE) {
+      level.len = document.body.clientWidth / 12
+    }
+    this.cellLen = level.len
     this.w = this.column * level.len;
     this.h = this.row * level.len;
-    this.offsetX = (this.game.area.width - this.column * this.cellLen) / 2;
-    this.offsetY = (this.game.area.height - this.row * this.cellLen) / 2;
+    this.offsetX = (this.game.getWidth() - this.column * this.cellLen) / 2;
+    let marginTop = (this.game.getHeight() - this.row * this.cellLen) / 2
+    if (marginTop < 50) {
+      marginTop = 50
+      this.game.reSize(this.game.getWidth(), 100 + this.row * this.cellLen)
+    }
+    this.offsetY = marginTop
     this.mineCount = level.mineCount
     this.time = "00:00:00";
     this.timer = -1;
@@ -232,6 +240,12 @@ export class Grid extends GameObject {
       window.clearTimeout(this.touchTimer)
       this.touchTimer = undefined
     }, 500)
+  }
+  onTouchMove(e: MouseArgs): void {
+    if (this.touchTimer) {
+      window.clearTimeout(this.touchTimer)
+      this.touchTimer = undefined
+    }
   }
   onTouchEnd(): void {
     if (this.touchTimer) {

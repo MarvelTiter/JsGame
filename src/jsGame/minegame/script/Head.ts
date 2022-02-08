@@ -5,7 +5,7 @@ import { TextElement } from "../../gamebase/TextElement";
 export class Head extends TextElement {
   constructor(game: Game, sence: BaseSence) {
     super(game, sence);
-    this.w = this.game.area.width;
+    this.w = this.game.getWidth();
     this.h = 50;
     this.y = 0;
     this.text = "是兄弟就来扫雷！";
