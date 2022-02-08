@@ -1,14 +1,15 @@
 <template>
   <div style="text-align: center">
-    <canvas id="canvas" width="1200" height="800"></canvas>
+    <canvas id="canvas"></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Game } from "../gamebase/Game";
 import { onMounted } from "vue";
-import { MineSence } from "./script/MineSence"
+// import { MineSence, basis } from "./script/MineSence";
 import { SPRITES_URL } from "../../utils/constDefinition";
+import { StartSence } from "./script/StartSence";
 onMounted(() => {
   let images = {
     n0: `${SPRITES_URL}/mine/n0.gif`,
@@ -28,12 +29,12 @@ onMounted(() => {
     mineFail: `${SPRITES_URL}/mine/mine_b.gif`,
     bg: `${SPRITES_URL}/mine/bg.jpg`,
     button: `${SPRITES_URL}/mine/button.png`,
-    fireworks_g:`${SPRITES_URL}/mine/yanhua.green.png`,
-    fireworks_r:`${SPRITES_URL}/mine/yanhua_red.png`,
+    fireworks_g: `${SPRITES_URL}/other/yanhua_green.png`,
+    fireworks_r: `${SPRITES_URL}/other/yanhua_red.png`,
   };
-  let g = new Game()
+  let g = new Game();
   g.loadSources(images).then((game) => {
-    let ms = new MineSence(game);
+    let ms = new StartSence(game);
     game.setSence(ms);
     game.run();
   });

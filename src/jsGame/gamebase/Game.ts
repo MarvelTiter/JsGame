@@ -1,5 +1,5 @@
 import { BaseSence } from "./BaseSence";
-import { Source } from "./Source";
+import { GameImage, Source } from "./Source";
 
 export const RESET = 0x0000;
 export const MOUSE_MOVE = 0x0001;
@@ -16,18 +16,20 @@ export class Game {
   canvas: any;
   context: any;
   enableMouseAction: boolean;
-  images: Map<string, HTMLImageElement>;
+  images: Map<string, GameImage>;
   sence!: BaseSence;
-  // area: Area;
-  constructor() {    
+  area: Area;
+  constructor(area?: Area) {
     this.canvas = document.querySelector("#canvas");
     this.context = this.canvas.getContext("2d");
     this.enableMouseAction = false;
-    this.images = new Map<string, HTMLImageElement>();
-    // this.area = {
-    //   width: 1200,
-    //   height: 800,
-    // };
+    this.images = new Map<string, GameImage>();
+    this.area = area ?? {
+      width: 1000,
+      height: 700,
+    };
+    this.canvas.width = this.area.width
+    this.canvas.height = this.area.height
     this.eventSetup();
   }
 
@@ -84,7 +86,8 @@ export class Game {
         let url = sources[k];
         img.src = url;
         img.onload = () => {
-          this.images.set(k, img);
+          let i = new GameImage(k, url, img)
+          this.images.set(k, i);
           count++;
 
           if (count == keys.length) {
@@ -95,7 +98,7 @@ export class Game {
     });
   }
 
-  public getTextureByName(name: string): HTMLImageElement {
+  public getTextureByName(name: string): GameImage {
     let i = this.images.get(name);
     if (i === undefined) throw new Error(`image named ${name} is not found`);
     return i;

@@ -2,6 +2,8 @@ import { BaseSence } from "../../gamebase/BaseSence";
 import { GameObject } from "../../gamebase/GameObject";
 import { Game } from "../../gamebase/Game";
 import { Cell } from "./Cell";
+import { config } from "./config";
+import { Firework } from "./Firework";
 
 function PadLeft(v: string, len: number, char: string): string {
   if (v.length < len) {
@@ -13,11 +15,14 @@ export class Grid extends GameObject {
   data!: Array<Array<Cell>>;
   row: number;
   column: number;
-  mineCount: number;
+  flagCount: number = 0
   onFlagChanged: Function | undefined;
   time: string;
   timer: number;
   gameOver: boolean = false;
+  success: number = 0
+  openCount: number = 0
+  mineCount: number
   constructor(
     game: Game,
     sence: BaseSence,
@@ -26,13 +31,14 @@ export class Grid extends GameObject {
     maxCount: number,
   ) {
     super(game, sence);
+    let len = config.CellSize.len
     this.row = row;
     this.column = column;
-    this.w = column * 25;
-    this.h = row * 25;
-    this.offsetX = (1200 - column * 25) / 2;
-    this.offsetY = (800 - row * 25) / 2;
-    this.mineCount = maxCount;
+    this.w = column * len;
+    this.h = row * len;
+    this.offsetX = (this.game.area.width - column * len) / 2;
+    this.offsetY = (this.game.area.height - row * len) / 2;
+    this.mineCount = maxCount
     this.time = "00:00:00";
     this.timer = -1;
 
@@ -47,14 +53,6 @@ export class Grid extends GameObject {
       },
       true,
     );
-    // this.sence.registerKeyAction(
-    //   "f",
-    //   (e) => {
-    //     let i = Item.new(this.game, this.sence);
-    //     this.sence.addElement(i);
-    //   },
-    //   true,
-    // );
   }
 
   public start(): void {
@@ -158,8 +156,9 @@ export class Grid extends GameObject {
 
   public onClick(e: MouseEvent): void {
     let { offsetX, offsetY, button, buttons } = e;
-    let c = Math.floor((offsetX - this.offsetX) / 25);
-    let r = Math.floor((offsetY - this.offsetY) / 25);
+    let len = config.CellSize.len
+    let c = Math.floor((offsetX - this.offsetX) / len);
+    let r = Math.floor((offsetY - this.offsetY) / len);
     if (c > -1 && c < this.column && r > -1 && r < this.row) {
       let temp = this.data[r][c];
       if (!temp) return;
@@ -173,9 +172,13 @@ export class Grid extends GameObject {
           let oldState = temp.flag;
           temp.updateState();
           if (temp.flag == 1 && oldState == 0) {
-            this.mineCount--;
+            if (temp.isMine)
+              this.success++
+            this.flagCount++;
           } else if (temp.flag == 2 && oldState == 1) {
-            this.mineCount++;
+            if (temp.isMine)
+              this.success--
+            this.flagCount--;
           }
           if (this.onFlagChanged !== undefined) this.onFlagChanged(this);
         }
@@ -184,12 +187,16 @@ export class Grid extends GameObject {
       else if (buttons >= 2) {
         temp.scan();
       }
+      if (((this.row * this.column - this.openCount) === this.mineCount) // 没打开的数量等于雷的数量
+        || (this.flagCount === this.mineCount && this.success === this.flagCount)) {
+        this.gameOver = true
+        let fw1 = new Firework(this.game, this.sence, "fireworks_g")
+        let fw2 = new Firework(this.game, this.sence, "fireworks_r")
+        this.sence.addElement(fw1)
+        this.sence.addElement(fw2)
+      }
     }
   }
-
-  // update() {
-  //   if (this.onTick !== undefined) this.onTick(this);
-  // }
 
   draw() {
     this.game.context.fillStyle = "rgba(0,0,0,0)";

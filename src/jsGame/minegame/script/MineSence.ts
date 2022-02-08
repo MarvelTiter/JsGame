@@ -1,24 +1,39 @@
 import { BaseSence } from "../../gamebase/BaseSence";
-import {
-  AnimaObject,
-  FrameDefinition,
-  GameObject,
-} from "../../gamebase/GameObject";
+import { GameObject } from "../../gamebase/GameObject";
 import { Game } from "../../gamebase/Game";
 import { Head } from "./Head";
 import { Footer } from "./Footer";
 import { Grid } from "./Grid";
 import { Button } from "./Button";
+import { StartSence } from "./StartSence";
+interface MineMapSize {
+  row: number
+  column: number
+  mineCount: number
+}
+export const basis = {
+  row: 10,
+  column: 10,
+  mineCount: 10,
+}
+
+export const middle = {
+  row: 16,
+  column: 16,
+  mineCount: 40,
+}
+
+export const professional = {
+  row: 16,
+  column: 30,
+  mineCount: 99,
+}
 
 export class MineSence extends BaseSence {
-  row: number;
-  column: number;
-  maxCount: number;
-  constructor(game: Game) {
+  level: MineMapSize;
+  constructor(game: Game, level: MineMapSize) {
     super(game);
-    this.row = 24;
-    this.column = 40;
-    this.maxCount = 99;
+    this.level = level
     this.setup();
   }
   setup() {
@@ -31,13 +46,13 @@ export class MineSence extends BaseSence {
     let grid = Grid.new<Grid>(
       this.game,
       this,
-      this.row,
-      this.column,
-      this.maxCount,
+      this.level.row,
+      this.level.column,
+      this.level.mineCount,
     );
-    footer.mineCount = this.maxCount;
+    footer.mineCount = this.level.mineCount;
     grid.onFlagChanged = (g: Grid) => {
-      footer.mineCount = g.mineCount;
+      footer.mineCount = g.mineCount - g.flagCount;
     };
     grid.onTick = (g: Grid) => {
       footer.time = g.time;
@@ -46,40 +61,14 @@ export class MineSence extends BaseSence {
     // let over = GameOverDialog.new(this.game, this);
     // this.addElement(over);
     let restartButton = Button.new(this.game, this, "重新开始");
-    restartButton.x = 1200 - restartButton.w - 20;
-    restartButton.y = 800 - restartButton.h - 20;
+    restartButton.x = this.game.area.width - restartButton.w / 2 - 20;
+    restartButton.y = this.game.area.height - restartButton.h / 2 - 20;
     restartButton.canDraw = () => {
       return grid.gameOver;
     };
     restartButton.onClick = () => {
-      this.game.setSence(new MineSence(this.game));
+      this.game.setSence(new StartSence(this.game));
     };
     this.addElement(restartButton);
-
-    let frames: FrameDefinition[] = [];
-    for (let index = 0; index < 10; index++) {
-      frames.push({
-        x: index * 95,
-        y: 0,
-        w: 95,
-        h: 95,
-      });
-    }
-    let ao = AnimaObject.new<AnimaObject>(
-      this.game,
-      this,
-      "fireworks_g",
-      frames,
-    );
-    let ao2 = AnimaObject.new<AnimaObject>(
-      this.game,
-      this,
-      "fireworks_r",
-      frames,
-    );
-    ao.frameInterval = 5;
-    ao2.frameInterval = 2;
-    this.addElement(ao);
-    this.addElement(ao2);
   }
 }

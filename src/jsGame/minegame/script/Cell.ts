@@ -2,7 +2,7 @@ import { BaseSence } from "../../gamebase/BaseSence";
 import { GameObject } from "../../gamebase/GameObject";
 import { Game } from "../../gamebase/Game";
 import { Grid } from "./Grid";
-import { MineSence } from "./MineSence";
+import { config } from "./config";
 
 export class Cell extends GameObject {
   gutter: number;
@@ -28,8 +28,8 @@ export class Cell extends GameObject {
     this.row = rowIndex;
     this.column = columnIndex;
     this.flag = 0;
-    this.w = 25;
-    this.h = 25;
+    this.w = config.CellSize.len;
+    this.h = config.CellSize.len;
     this.x = this.column * this.w + (this.column + 1) * this.gutter;
     this.y = this.row * this.h + (this.row + 1) * this.gutter;
     this.isOpen = false;
@@ -39,7 +39,7 @@ export class Cell extends GameObject {
   }
 
   setTexture(name: string) {
-    this.texture = this.game.getTextureByName(name);
+    this.image = this.game.getTextureByName(name);
   }
 
   updateState() {
@@ -49,6 +49,7 @@ export class Cell extends GameObject {
   open() {
     if (this.isOpen) return;
     this.isOpen = true;
+    this.grid.openCount++
     if (this.isMine) {
       this.explode = true;
       this.grid.openAll();
@@ -120,9 +121,9 @@ export class Cell extends GameObject {
   }
 
   draw(): void {
-    if (this.texture !== undefined) {
+    if (this.image !== undefined) {
       this.game.context.drawImage(
-        this.texture,
+        this.image.texture,
         this.x + this.offsetX,
         this.y + this.offsetY,
         this.w,
@@ -130,9 +131,9 @@ export class Cell extends GameObject {
       );
     }
     if (this.flag == 1) {
-      let texture = this.game.getTextureByName("flag");
+      let img = this.game.getTextureByName("flag");
       this.game.context.drawImage(
-        texture,
+        img.texture,
         this.x + this.offsetX,
         this.y + this.offsetY,
         this.w,

@@ -9,9 +9,9 @@ export class Footer extends TextElement {
   constructor(game: Game, sence: BaseSence) {
     super(game, sence);
     this.mineCount = 0;
-    this.w = 1200;
+    this.w = this.game.area.width;
     this.h = 50;
-    this.y = 750;
+    this.y = this.game.area.height - 50;
     this.time = "";
   }
   update() {

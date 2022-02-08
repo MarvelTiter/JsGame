@@ -3,7 +3,7 @@ import { GameObject } from "./GameObject";
 
 export class BaseSence {
   game: Game;
-  elements: GameObject[];
+  private elements: GameObject[];
   keys: Map<string, boolean>;
   actions: Map<string, Function>;
   onceAction: Map<string, Function>;
