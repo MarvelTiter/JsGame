@@ -35,15 +35,15 @@ export class Grid extends GameObject {
       level.len = document.body.clientWidth / 12;
     }
     this.cellLen = level.len;
-    this.w = this.column * level.len;
-    this.h = this.row * level.len;
-    this.offsetX = (this.game.getWidth() - this.column * this.cellLen) / 2;
+    this.size.w = this.column * level.len;
+    this.size.h = this.row * level.len;
+    this.offset.x = (this.game.getWidth() - this.column * this.cellLen) / 2;
     let marginTop = (this.game.getHeight() - this.row * this.cellLen) / 2;
     if (marginTop < 50) {
       marginTop = 50;
       this.game.reSize(this.game.getWidth(), 100 + this.row * this.cellLen);
     }
-    this.offsetY = marginTop;
+    this.offset.y = marginTop;
     this.mineCount = level.mineCount;
     this.time = "00:00:00";
     this.timer = -1;
@@ -96,8 +96,7 @@ export class Grid extends GameObject {
           c,
           this.cellLen,
         );
-        cell.offsetX = this.offsetX;
-        cell.offsetY = this.offsetY;
+        cell.offset = this.offset;
         row.push(cell);
 
         this.sence.addElement(cell);
@@ -182,8 +181,8 @@ export class Grid extends GameObject {
   }
 
   private findCell(x: number, y: number): Cell | undefined {
-    let c = Math.floor((x - this.offsetX) / this.cellLen);
-    let r = Math.floor((y - this.offsetY) / this.cellLen);
+    let c = Math.floor((x - this.offset.x) / this.cellLen);
+    let r = Math.floor((y - this.offset.y) / this.cellLen);
     if (c > -1 && c < this.column && r > -1 && r < this.row) {
       return this.data[r][c];
     }
@@ -268,6 +267,11 @@ export class Grid extends GameObject {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = "rgba(0,0,0,0)";
-    ctx.fillRect(this.x + this.offsetX, this.y + this.offsetY, this.w, this.h);
+    ctx.fillRect(
+      this.pos.x + this.offset.x,
+      this.pos.y + this.offset.y,
+      this.size.w,
+      this.size.h,
+    );
   }
 }

@@ -21,9 +21,9 @@ export class TextObject extends GameObject {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = this.background;
-    ctx.fillRect(this.x, this.y, this.w, this.h);
+    ctx.fillRect(this.pos.x, this.pos.y, this.size.w, this.size.h);
     if (this.font) ctx.font = this.font;
     ctx.fillStyle = this.color;
-    ctx.fillText(this.text, this.w / 2, this.y + this.h / 2);
+    ctx.fillText(this.text, this.size.w / 2, this.pos.y + this.size.h / 2);
   }
 }

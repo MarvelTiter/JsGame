@@ -1,22 +1,21 @@
+import { Size } from "./data/Size";
+
 export interface Source {
   name: string;
   url: string;
-  w: number;
-  h: number;
-  texture: HTMLImageElement
+  size: Size;
+  texture: HTMLImageElement;
 }
 
 export class GameImage implements Source {
   name: string;
   url: string;
-  w: number;
-  h: number;
+  size: Size;
   texture: HTMLImageElement;
   constructor(name: string, url: string, texture: HTMLImageElement) {
-    this.name = name
-    this.url = url
-    this.texture = texture
-    this.w = texture.width
-    this.h = texture.height
+    this.name = name;
+    this.url = url;
+    this.texture = texture;
+    this.size = new Size(texture.width, texture.height);
   }
 }

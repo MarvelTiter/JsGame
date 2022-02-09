@@ -49,10 +49,10 @@ export class AnimaObject extends GameEntity {
       f.y,
       f.w,
       f.h,
-      this.x + this.offsetX,
-      this.y + this.offsetY,
-      this.w,
-      this.h,
+      this.pos.x + this.offset.x,
+      this.pos.y + this.offset.y,
+      this.size.w,
+      this.size.h,
     );
   }
 }

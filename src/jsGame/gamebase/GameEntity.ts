@@ -11,17 +11,16 @@ export class GameEntity extends GameObject {
   constructor(game: Game, sence: BaseSence, name: string) {
     super(game, sence);
     this.image = game.getTextureByName(name);
-    this.w = this.image.w;
-    this.h = this.image.h;
-  }  
+    this.size = this.image.size;
+  }
 
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(
       this.image.texture,
-      this.x + this.offsetX,
-      this.y + this.offsetY,
-      this.w,
-      this.h,
+      this.pos.x + this.offset.x,
+      this.pos.y + this.offset.y,
+      this.size.w,
+      this.size.h,
     );
   }
 }

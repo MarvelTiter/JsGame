@@ -2,6 +2,7 @@ import { BaseSence } from "../../gamebase/BaseSence";
 import { GameEntity } from "../../gamebase/GameEntity";
 import { Game } from "../../gamebase/Game";
 import { Grid } from "./Grid";
+import { Size } from "../../gamebase/data/Size";
 
 export class Cell extends GameEntity {
   gutter: number;
@@ -28,10 +29,9 @@ export class Cell extends GameEntity {
     this.row = rowIndex;
     this.column = columnIndex;
     this.flag = 0;
-    this.w = len;
-    this.h = len;
-    this.x = this.column * this.w + (this.column + 1) * this.gutter;
-    this.y = this.row * this.h + (this.row + 1) * this.gutter;
+    this.size = new Size(len, len);
+    this.pos.x = this.column * this.size.w + (this.column + 1) * this.gutter;
+    this.pos.y = this.row * this.size.h + (this.row + 1) * this.gutter;
     this.isOpen = false;
     this.isMine = false;
     this.count = 0;
@@ -131,20 +131,20 @@ export class Cell extends GameEntity {
     if (this.image !== undefined) {
       ctx.drawImage(
         this.image.texture,
-        this.x + this.offsetX,
-        this.y + this.offsetY,
-        this.w,
-        this.h,
+        this.pos.x + this.offset.x,
+        this.pos.y + this.offset.y,
+        this.size.w,
+        this.size.h,
       );
     }
     if (this.flag == 1) {
       let img = this.game.getTextureByName("flag");
       ctx.drawImage(
         img.texture,
-        this.x + this.offsetX,
-        this.y + this.offsetY,
-        this.w,
-        this.h,
+        this.pos.x + this.offset.x,
+        this.pos.y + this.offset.y,
+        this.size.w,
+        this.size.h,
       );
     }
   }

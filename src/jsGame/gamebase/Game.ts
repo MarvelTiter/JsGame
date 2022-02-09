@@ -1,4 +1,5 @@
 import { BaseSence } from "./BaseSence";
+import { Size } from "./data/Size";
 import { GameImage } from "./Source";
 
 export const RESET = 0x0000;
@@ -10,10 +11,6 @@ export const MOUSE_PRESS = "PRESS";
 export const MOUSE_RELEASE = "RELEASE";
 export const DEVICE_MOBILE = "MOBILE";
 export const DEVICE_PC = "PC";
-export interface Area {
-  width: number;
-  height: number;
-}
 
 export class Game {
   canvas: any;
@@ -21,9 +18,9 @@ export class Game {
   enableMouseAction: boolean;
   images: Map<string, GameImage>;
   sence!: BaseSence;
-  private area!: Area;
+  private area!: Size;
   device: string = DEVICE_PC;
-  constructor(area?: Area) {
+  constructor(area?: Size) {
     this.canvas = document.querySelector("#canvas");
     this.context = this.canvas.getContext("2d");
     this.enableMouseAction = false;
@@ -31,7 +28,7 @@ export class Game {
     this.areaSetup(area);
     this.eventSetup();
   }
-  areaSetup(area?: Area) {
+  areaSetup(area?: Size) {
     let isMobile = /Android|webOS|iPhone|iPod/i.test(navigator.userAgent);
     if (isMobile) {
       this.device = DEVICE_MOBILE;
@@ -49,11 +46,11 @@ export class Game {
       }
     }
     this.area = area ?? {
-      width: w,
-      height: h,
+      w: w,
+      h: h,
     };
-    this.canvas.width = this.area.width;
-    this.canvas.height = this.area.height;
+    this.canvas.width = this.area.w;
+    this.canvas.height = this.area.h;
   }
   eventSetup() {
     this.canvas.addEventListener("mouseover", (e: MouseEvent) => {
@@ -138,17 +135,17 @@ export class Game {
   }
 
   public getWidth(): number {
-    return this.area.width;
+    return this.area.w;
   }
 
   public getHeight(): number {
-    return this.area.height;
+    return this.area.h;
   }
 
   public reSize(w: number, h: number): void {
     this.areaSetup({
-      width: w,
-      height: h,
+      w: w,
+      h: h,
     });
   }
 

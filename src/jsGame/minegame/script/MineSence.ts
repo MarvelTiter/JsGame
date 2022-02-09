@@ -83,8 +83,8 @@ export class MineSence extends BaseSence {
     // let over = GameOverDialog.new(this.game, this);
     // this.addElement(over);
     let restartButton = Button.new(this.game, this, "重新开始");
-    restartButton.x = this.game.getWidth() - restartButton.w / 2 - 20;
-    restartButton.y = this.game.getHeight() - restartButton.h / 2 - 20;
+    restartButton.pos.x = this.game.getWidth() - restartButton.size.w / 2 - 20;
+    restartButton.pos.y = this.game.getHeight() - restartButton.size.h / 2 - 20;
     restartButton.canDraw = () => {
       return grid.gameOver;
     };

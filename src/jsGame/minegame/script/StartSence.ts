@@ -18,8 +18,8 @@ export class StartSence extends BaseSence {
     this.addElement(head);
 
     let btnMiddleLevel = Button.new(this.game, this, "中级");
-    btnMiddleLevel.x = this.game.getWidth() / 2;
-    btnMiddleLevel.y = 100 + btnMiddleLevel.h;
+    btnMiddleLevel.pos.x = this.game.getWidth() / 2;
+    btnMiddleLevel.pos.y = 100 + btnMiddleLevel.size.h;
     this.addElement(btnMiddleLevel);
     btnMiddleLevel.onClick = () => {
       let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? middle_m : middle)
@@ -27,8 +27,8 @@ export class StartSence extends BaseSence {
     }
 
     let btnBasisLevel = Button.new(this.game, this, "初级");
-    btnBasisLevel.x = this.game.getWidth() / 2;
-    btnBasisLevel.y = 100;
+    btnBasisLevel.pos.x = this.game.getWidth() / 2;
+    btnBasisLevel.pos.y = 100;
     this.addElement(btnBasisLevel);
     btnBasisLevel.onClick = () => {
       let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? basis_m : basis)
@@ -36,8 +36,8 @@ export class StartSence extends BaseSence {
     }
 
     let btnProLevel = Button.new(this.game, this, "专家");
-    btnProLevel.x = this.game.getWidth() / 2;
-    btnProLevel.y = 100 + btnMiddleLevel.h * 2;
+    btnProLevel.pos.x = this.game.getWidth() / 2;
+    btnProLevel.pos.y = 100 + btnMiddleLevel.size.h * 2;
     this.addElement(btnProLevel);
     btnProLevel.onClick = () => {
       let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? professional_m : professional)
