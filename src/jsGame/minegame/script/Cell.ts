@@ -137,8 +137,20 @@ export class Cell extends GameEntity {
         this.size.h,
       );
     }
+    this.drawFlag(ctx)
+  }
+  private drawFlag(ctx: CanvasRenderingContext2D) {
+    let img = this.game.getTextureByName("flag");
     if (this.flag == 1) {
-      let img = this.game.getTextureByName("flag");
+      ctx.drawImage(
+        img.texture,
+        this.pos.x + this.offset.x,
+        this.pos.y + this.offset.y,
+        this.size.w,
+        this.size.h,
+      );
+    }
+    if (this.grid.gameOver && this.isMine && !this.isOpen) {
       ctx.drawImage(
         img.texture,
         this.pos.x + this.offset.x,
