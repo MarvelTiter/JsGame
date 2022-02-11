@@ -9,15 +9,14 @@ export class TextObject extends GameObject {
   background: string;
   font: string | undefined;
   color: string;
-  text: string | undefined;
+  text!: string;
   constructor(game: Game, sence: BaseSence) {
     super(game, sence);
     this.background = "#FFA500";
     this.color = "black";
   }
 
-  draw() {
-    let ctx = this.game.context;
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = this.background;

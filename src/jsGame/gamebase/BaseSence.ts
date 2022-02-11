@@ -1,8 +1,16 @@
 import { Game } from "./Game";
 import { GameObject } from "./GameObject";
+type actionTimes = 0 | 1
 export interface ObjectAction {
-  callBack: () => void;
-  invoker: GameObject;
+  callBack: (status: KeyStatus) => void;
+}
+export interface KeyStatus {
+  // status: keyStatus = "RELEASE"
+  // times: number = 0
+  // handled: boolean = false
+  status: boolean
+  times: actionTimes
+  handled: boolean
 }
 /**
  * 场景基类，
@@ -12,20 +20,21 @@ export interface ObjectAction {
 export class BaseSence {
   game: Game;
   private elements: GameObject[];
-  keys: Map<string, boolean>;
+  keys: Map<string, KeyStatus>;
   actions: Map<string, ObjectAction>;
-  onceAction: Map<string, ObjectAction>;
+  // onceAction: Map<string, ObjectAction>;
   mouseupEvents: Function[];
   mousedownEvents: Function[] = [];
   mousemoveEvents: Function[] = [];
+  private keydown: boolean = false
   private aidElement: GameObject | undefined;
   // game:Game;
   constructor(game: Game) {
     this.game = game;
     this.elements = [];
-    this.keys = new Map<string, boolean>();
+    this.keys = new Map<string, KeyStatus>();
     this.actions = new Map<string, ObjectAction>();
-    this.onceAction = new Map<string, ObjectAction>();
+    // this.onceAction = new Map<string, ObjectAction>();
     this.mouseupEvents = [];
   }
 
@@ -118,21 +127,23 @@ export class BaseSence {
   }
 
   public handleKeydown(e: KeyboardEvent): void {
-    if (this.keys.get(e.key) == undefined) {
+    this.keydown = true
+    let ks = this.keys.get(e.key)
+    if (ks == undefined) {
       return;
     }
-    this.keys.set(e.key, true);
-    let once = this.onceAction.get(e.key);
-    if (once !== undefined) {
-      once.callBack.apply(once.invoker);
-    }
+    ks.status = true
+    ks.handled = false
   }
 
   public handleKeyup(e: KeyboardEvent): void {
-    if (this.keys.get(e.key) === undefined) {
+    this.keydown = false
+    let ks = this.keys.get(e.key)
+    if (ks === undefined) {
       return;
     }
-    this.keys.set(e.key, false);
+    ks.status = false
+    ks.handled = true
   }
 
   /**
@@ -140,26 +151,20 @@ export class BaseSence {
    * @param key 按下的键
    * @param element 函数调用的对象(函数内部有this)
    * @param callback 按键回调函数
-   * @param once 是否按下弹起就触发一次的事件
    */
   public registerKeyAction(
     key: string,
-    element: GameObject,
-    callback: () => void,
-    once: boolean,
-  ): void {    
-    this.keys.set(key, false);
-    if (once) {
-      this.onceAction.set(key, {
-        invoker: element,
-        callBack: callback,
-      });
-    } else {
-      this.actions.set(key, {
-        invoker: element,
-        callBack: callback,
-      });
-    }
+    callback: (status: KeyStatus) => void,
+    times?: actionTimes
+  ): void {
+    this.keys.set(key, {
+      status: false,
+      times: times ?? 0,
+      handled: true
+    });
+    this.actions.set(key, {
+      callBack: callback
+    });
   }
 
   // public registerMouseAction(actionType: string, callback: Function): void {
@@ -173,11 +178,16 @@ export class BaseSence {
   // }
 
   public update(): void {
-    for (const actionKey of Object.keys(this.actions)) {
-      if (this.keys.get(actionKey)) {
-        let f = this.actions.get(actionKey);
-        if (f !== undefined) {
-          f.callBack.apply(f.invoker);
+    if (this.keydown) {
+      for (const actionKey of this.actions.keys()) {
+        let ks = this.keys.get(actionKey)!
+        if (ks.handled) continue
+        if (ks.status) {
+          let f = this.actions.get(actionKey)!;
+          f.callBack(ks);
+          if (ks.times == 1) {
+            ks.handled = true
+          }
         }
       }
     }

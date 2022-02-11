@@ -72,6 +72,12 @@ export class MineSence extends BaseSence {
       this,
       this.level
     );
+    this.registerKeyAction("a", function (status) {
+      grid.randomOpen()
+    }, 1)
+    this.registerKeyAction("m", function (status) {
+      grid.openSafe()
+    }, 1)
     footer.mineCount = this.level.mineCount;
     grid.onFlagChanged = (g: Grid) => {
       footer.mineCount = g.mineCount - g.flagCount;

@@ -49,11 +49,8 @@ export class Grid extends GameObject {
     this.timer = -1;
 
     this.init();
-    this.setupEvent();
   }
-  setupEvent() {
-    this.sence.registerKeyAction("a", this, this.randomOpen, true);
-  }
+
 
   public start(): void {
     let sec = 0;
@@ -124,16 +121,31 @@ export class Grid extends GameObject {
         }
       }
     }
+    this.openSafe()
     this.start();
   }
 
   randomOpen() {
+    if (this.gameOver) return
     while (true) {
       let r = Math.floor(Math.random() * this.row);
       let c = Math.floor(Math.random() * this.column);
       let temp = this.data[r][c];
       if (!temp.isOpen) {
-        temp.open();
+        this.openCell(temp);
+        break;
+      }
+    }
+  }
+
+  openSafe() {
+    if (this.gameOver) return
+    while (true) {
+      let r = Math.floor(Math.random() * this.row);
+      let c = Math.floor(Math.random() * this.column);
+      let temp = this.data[r][c];
+      if (!temp.isOpen && !temp.isMine) {
+        this.openCell(temp);
         break;
       }
     }
@@ -151,7 +163,10 @@ export class Grid extends GameObject {
   }
 
   private openCell(temp: Cell) {
-    if (temp.flag === 0) temp.open();
+    if (temp.flag === 0) {
+      temp.open();
+      this.checkWin();
+    }
   }
 
   private makeFlag(temp: Cell) {

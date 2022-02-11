@@ -9,26 +9,19 @@ export class Vector2 {
     this.y = y || 0;
   }
 
-  copy() {
-    var vec = new Vector2(this.x, this.y);
-    return vec;
-  }
-
   set(x: number, y: number): Vector2 {
     this.x = x;
     this.y = y;
     return this;
   }
-  
+
   /**
    * 
    * @param value
    * @returns
    */
-  multiply(value: number): Vector2 {
-    this.x = this.x * value;
-    this.y = this.y * value;
-    return this;
+  multi(value: number): Vector2 {
+    return new Vector2(this.x * value, this.y * value);
   }
 
   /**
@@ -36,26 +29,21 @@ export class Vector2 {
    * @param {Vector2} vec
    */
   add(vec: Vector2): Vector2 {
-    this.x = this.x + vec.x;
-    this.y = this.y + vec.y;
-    return this;
+    return new Vector2(this.x + vec.x, this.y + vec.y);
   }
   /**
    * 向量相减
    * @param vec 
    * @returns 
    */
-  subtract(vec: Vector2): Vector2 {
-    this.x = this.x - vec.x;
-    this.y = this.y - vec.y;
-
-    return this;
+  sub(vec: Vector2): Vector2 {
+    return new Vector2(this.x - vec.x, this.y - vec.y);
   }
   /**
    * 向量的长度
    * @return {Number}
    */
-  getLength(): number {
+  length(): number {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
@@ -63,8 +51,8 @@ export class Vector2 {
    * 向量的模
    * @returns {Vector2}
    */
-  getNormal(): Vector2 {
-    var length = this.getLength();
+  normalize(): Vector2 {
+    var length = this.length();
     return new Vector2(this.x / length, this.y / length);
   }
 
@@ -75,7 +63,6 @@ export class Vector2 {
   rotate(theta: number): Vector2 {
     var rotatedX = this.x * Math.cos(theta) - this.y * Math.sin(theta);
     var rotatedY = this.x * Math.sin(theta) + this.y * Math.cos(theta);
-
     return this.set(rotatedX, rotatedY);
   }
 
@@ -84,7 +71,7 @@ export class Vector2 {
    * @param  {Vector2} vec
    * @return {Vector2}
    */
-  dotProduct(vec: Vector2): number {
+  dot(vec: Vector2): number {
     return this.x * vec.x + this.y * vec.y;
   }
 }
