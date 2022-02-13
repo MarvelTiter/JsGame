@@ -1,21 +1,19 @@
 import { Size } from "./data/Size"
+import { FrameDefinition, SpriteDefinition } from "./FrameDefinition"
 
-export interface Source {
+export class GameImage {
     name: string
-    url: string
     size: Size
+    frames!: FrameDefinition[]
+    areas: any = undefined
     texture: HTMLImageElement
-}
-
-export class GameImage implements Source {
-    name: string
-    url: string
-    size: Size
-    texture: HTMLImageElement
-    constructor(name: string, url: string, texture: HTMLImageElement) {
+    constructor(name: string, texture: HTMLImageElement) {
         this.name = name
-        this.url = url
         this.texture = texture
         this.size = new Size(texture.width, texture.height)
+    }
+    getRectByName(name: string): SpriteDefinition {
+        if (this.areas === undefined) throw new Error("this image unsupported getRectByName")
+        return this.areas[name] as SpriteDefinition
     }
 }

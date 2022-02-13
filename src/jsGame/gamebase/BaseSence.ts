@@ -1,13 +1,13 @@
-import { Game } from './Game'
-import { GameObject } from './GameObject'
+import { Camera } from "./Camera"
+import { Size } from "./data/Size"
+import { Vector2 } from "./data/Vector2"
+import { Game } from "./Game"
+import { GameObject } from "./GameObject"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void
 }
 export interface KeyStatus {
-    // status: keyStatus = "RELEASE"
-    // times: number = 0
-    // handled: boolean = false
     status: boolean
     times: actionTimes
     handled: boolean
@@ -20,33 +20,50 @@ export interface KeyStatus {
 export class BaseSence {
     game: Game
     private elements: GameObject[]
-    keys: Map<string, KeyStatus>
-    actions: Map<string, ObjectAction>
+    private elementMap: Map<string, GameObject>
+    private keys: Map<string, KeyStatus>
+    private actions: Map<string, ObjectAction>
     // onceAction: Map<string, ObjectAction>;
-    mouseupEvents: Function[]
-    mousedownEvents: Function[] = []
-    mousemoveEvents: Function[] = []
+
+    private _camera: Camera | undefined
+    public get camera(): Camera {
+        if (this._camera === undefined) {
+            this._camera = new Camera(this, this.game.context, this.game.area)
+        }
+        return this._camera
+    }
+    // public set camera(v: Camera) {
+    //     this._camera = v
+    // }
+    size: Size
+    minX: number | undefined
+    maxX: number | undefined
+    minY: number | undefined
+    maxY: number | undefined
     private keydown: boolean = false
     private aidElement: GameObject | undefined
     // game:Game;
     constructor(game: Game) {
         this.game = game
         this.elements = []
+        this.elementMap = new Map<string, GameObject>()
         this.keys = new Map<string, KeyStatus>()
         this.actions = new Map<string, ObjectAction>()
-        // this.onceAction = new Map<string, ObjectAction>();
-        this.mouseupEvents = []
+        this.size = game.area
     }
 
     public addElement<T extends GameObject>(e: T): void {
         this.elements.push(e)
+        this.elementMap.set(e.id, e)
     }
 
     public removeElement<T extends GameObject>(e: T): void {
-        let i = this.elements.indexOf(e)
-        this.elements.splice(i, 1)
+        let index = this.elements.indexOf(e)
+        this.elements.splice(index, 1)
+        this.elementMap.delete(e.id)
     }
 
+    //#region Dom事件注册和处理
     public handleMousemove(e: MouseEvent): void {
         let { offsetX, offsetY } = e
         for (let index = this.elements.length - 1; index > -1; index--) {
@@ -70,7 +87,7 @@ export class BaseSence {
     }
 
     public handleMousedown(e: MouseEvent): void {
-        if (this.aidElement) {
+        if (this.aidElement !== undefined) {
             this.aidElement.onClick({
                 button: e.button,
                 buttons: e.buttons,
@@ -146,17 +163,15 @@ export class BaseSence {
         ks.handled = true
     }
 
+    //#endregion
+
     /**
      * 注册按键处理函数
      * @param key 按下的键
      * @param element 函数调用的对象(函数内部有this)
      * @param callback 按键回调函数
      */
-    public registerKeyAction(
-        key: string,
-        callback: (status: KeyStatus) => void,
-        times?: actionTimes
-    ): void {
+    public registerKeyAction(key: string, callback: (status: KeyStatus) => void, times?: actionTimes): void {
         this.keys.set(key, {
             status: false,
             times: times ?? 0,
@@ -167,15 +182,31 @@ export class BaseSence {
         })
     }
 
-    // public registerMouseAction(actionType: string, callback: Function): void {
-    //   if (actionType == MOUSE_PRESS) {
-    //     this.mousedownEvents.push(callback);
-    //   } else if (actionType == MOUSE_MOVING) {
-    //     this.mousemoveEvents.push(callback);
-    //   } else if (actionType == MOUSE_RELEASE) {
-    //     this.mouseupEvents.push(callback);
-    //   }
-    // }
+    public getCenter(): Vector2 {
+        return this.camera.getCenter()
+    }
+
+    public getWindowSize(): Size {
+        return this.camera.window
+    }
+
+    public findElement<T extends GameObject>(id: string): T {
+        // for (const e of this.elements.values()) {
+        //     if (e.id === id) return e as T
+        // }
+        let e = this.elementMap.get(id)
+        if (e === undefined) {
+            throw new Error(`element [${id}] not found`)
+        }
+        return e as T
+    }
+
+    public outOfWindow(obj: GameObject): boolean {
+        let { w, h } = this.camera.window
+        let { x, y } = this.camera.pos
+        if (obj.pos.x + obj.size.w < x || obj.pos.x > x + w || obj.pos.y + obj.size.h < y || obj.pos.y > y + h) return true
+        else return false
+    }
 
     public update(): void {
         if (this.keydown) {
@@ -191,13 +222,15 @@ export class BaseSence {
                 }
             }
         }
-        for (const e of this.elements) {
+        for (const e of this.elements.values()) {
             e.elementUpdate()
         }
+        this.camera.trace()
+        this.draw(this.game.context)
     }
 
     public draw(ctx: CanvasRenderingContext2D): void {
-        for (const e of this.elements) {
+        for (const e of this.elements.values()) {
             e.elementDraw(ctx)
         }
     }

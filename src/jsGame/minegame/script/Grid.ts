@@ -37,14 +37,12 @@ export class Grid extends GameObject {
         this.cellLen = level.len
         this.size.w = this.column * level.len
         this.size.h = this.row * level.len
-        this.offset.x = (this.game.getWidth() - this.column * this.cellLen) / 2
-        let marginTop = (this.game.getHeight() - this.row * this.cellLen) / 2
+        let { w, h } = this.sence.getWindowSize()
+        this.offset.x = (w - this.column * this.cellLen) / 2
+        let marginTop = (h - this.row * this.cellLen) / 2
         if (marginTop < 50) {
             marginTop = 50
-            this.game.reSize(
-                this.game.getWidth(),
-                100 + this.row * this.cellLen
-            )
+            this.game.reSize(w, 100 + this.row * this.cellLen)
         }
         this.offset.y = marginTop
         this.mineCount = level.mineCount
@@ -73,11 +71,7 @@ export class Grid extends GameObject {
                 min = 0
                 hour++
             }
-            this.time = `${PadLeft(hour.toString(), 2, "0")}:${PadLeft(
-                min.toString(),
-                2,
-                "0"
-            )}:${PadLeft(sec.toString(), 2, "0")}`
+            this.time = `${PadLeft(hour.toString(), 2, "0")}:${PadLeft(min.toString(), 2, "0")}:${PadLeft(sec.toString(), 2, "0")}`
         }, 1000)
     }
 
@@ -87,14 +81,7 @@ export class Grid extends GameObject {
         for (let r = 0; r < this.row; r++) {
             let row = new Array<Cell>()
             for (let c = 0; c < this.column; c++) {
-                let cell = Cell.new<Cell>(
-                    this.game,
-                    this.sence,
-                    this,
-                    r,
-                    c,
-                    this.cellLen
-                )
+                let cell = new Cell(this.game, this.sence, this, r, c, this.cellLen)
                 cell.offset = this.offset
                 row.push(cell)
 
@@ -115,12 +102,7 @@ export class Grid extends GameObject {
                 for (let i = rowIndex - 1; i < rowIndex + 2; i++) {
                     for (let j = colIndex - 1; j < colIndex + 2; j++) {
                         //判断坐标防越界
-                        if (
-                            i > -1 &&
-                            j > -1 &&
-                            i < this.row &&
-                            j < this.column
-                        ) {
+                        if (i > -1 && j > -1 && i < this.row && j < this.column) {
                             //计雷数+1
                             this.data[i][j].count++
                         }
@@ -192,12 +174,11 @@ export class Grid extends GameObject {
     private checkWin() {
         if (
             this.row * this.column - this.openCount === this.mineCount || // 没打开的数量等于雷的数量
-            (this.flagCount === this.mineCount &&
-                this.success === this.flagCount)
+            (this.flagCount === this.mineCount && this.success === this.flagCount)
         ) {
             this.gameOver = true
-            let fw1 = new Firework(this.game, this.sence, "fireworks_g")
-            let fw2 = new Firework(this.game, this.sence, "fireworks_r")
+            let fw1 = new Firework(this.game, this.sence, "firework_green")
+            let fw2 = new Firework(this.game, this.sence, "firework_red")
             this.sence.addElement(fw1)
             this.sence.addElement(fw2)
         }
@@ -290,11 +271,6 @@ export class Grid extends GameObject {
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = "rgba(0,0,0,0)"
-        ctx.fillRect(
-            this.pos.x + this.offset.x,
-            this.pos.y + this.offset.y,
-            this.size.w,
-            this.size.h
-        )
+        ctx.fillRect(this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
     }
 }

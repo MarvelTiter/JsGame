@@ -3,7 +3,7 @@ import { Game } from "../../gamebase/Game"
 import { Head } from "./Head"
 import { Footer } from "./Footer"
 import { Grid } from "./Grid"
-import { Button } from "./Button"
+import { Button } from "../../gamebase/Button"
 import { StartSence } from "./StartSence"
 import { MineMapSize } from "./config"
 import { GameEntity } from "../../gamebase/GameEntity"
@@ -58,13 +58,18 @@ export class MineSence extends BaseSence {
         this.setup()
     }
     setup() {
-        let bg = GameEntity.new(this.game, this, "bg")
-        let head = Head.new(this.game, this) as Head
-        let footer = Footer.new(this.game, this) as Footer
+        // 背景
+        let bg = new GameEntity(this.game, this, "bg")
         this.addElement(bg)
+        // head
+        let head = new Head(this.game, this) as Head
         this.addElement(head)
+        // footer
+        let footer = new Footer(this.game, this) as Footer
+        footer.mineCount = this.level.mineCount
         this.addElement(footer)
-        let grid = Grid.new<Grid>(this.game, this, this.level)
+        // 雷区
+        let grid = new Grid(this.game, this, this.level)
         this.registerKeyAction(
             "a",
             function (status) {
@@ -79,7 +84,6 @@ export class MineSence extends BaseSence {
             },
             1
         )
-        footer.mineCount = this.level.mineCount
         grid.onFlagChanged = (g: Grid) => {
             footer.mineCount = g.mineCount - g.flagCount
         }
@@ -89,11 +93,10 @@ export class MineSence extends BaseSence {
         this.addElement(grid)
         // let over = GameOverDialog.new(this.game, this);
         // this.addElement(over);
-        let restartButton = Button.new(this.game, this, "重新开始")
-        restartButton.pos.x =
-            this.game.getWidth() - restartButton.size.w / 2 - 20
-        restartButton.pos.y =
-            this.game.getHeight() - restartButton.size.h / 2 - 20
+        let { w, h } = this.getWindowSize()
+        let restartButton = new Button(this.game, this, "button", "重新开始")
+        restartButton.pos.x = w - restartButton.size.w / 2 - 20
+        restartButton.pos.y = h - restartButton.size.h / 2 - 20
         restartButton.canDraw = () => {
             return grid.gameOver
         }

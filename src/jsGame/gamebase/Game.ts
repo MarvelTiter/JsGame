@@ -13,18 +13,18 @@ export const DEVICE_MOBILE = "MOBILE"
 export const DEVICE_PC = "PC"
 
 export class Game {
-    canvas: any
+    canvas: HTMLCanvasElement
     context: any
     enableMouseAction: boolean
     images: Map<string, GameImage>
     sence!: BaseSence
-    private area!: Size
+    area!: Size
     device: string = DEVICE_PC
-    constructor(area?: Size) {
-        this.canvas = document.querySelector("#canvas")
+    constructor(images: Map<string, GameImage>, area?: Size) {
+        this.canvas = document.querySelector("#canvas") as HTMLCanvasElement
         this.context = this.canvas.getContext("2d")
         this.enableMouseAction = false
-        this.images = new Map<string, GameImage>()
+        this.images = images
         this.areaSetup(area)
         this.eventSetup()
     }
@@ -45,40 +45,35 @@ export class Game {
                 h = 700
             }
         }
-        this.area = area ?? {
-            w: w,
-            h: h
-        }
+        this.area = area ?? new Size(w, h)
         this.canvas.width = this.area.w
         this.canvas.height = this.area.h
     }
     eventSetup() {
         this.canvas.addEventListener("mouseover", (e: MouseEvent) => {
             e.preventDefault()
-            this.enableMouseAction = true
-        })
-        this.canvas.addEventListener("mouseout", (e: MouseEvent) => {
-            e.preventDefault()
-            this.enableMouseAction = false
-        })
-        this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
-            e.preventDefault()
-            if (this.enableMouseAction && this.sence) {
-                this.sence.handleMousemove(e)
+            let handleMouseMove = (event: MouseEvent) => {
+                event.preventDefault()
+                this.sence.handleMousemove(event)
             }
-        })
-        this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
-            e.preventDefault()
-            if (this.sence) {
-                this.sence.handleMousedown(e)
+            let handleMouseDown = (event:MouseEvent)=>{
+                this.sence.handleMousedown(event)
             }
-        })
-        this.canvas.addEventListener("mouseup", (e: MouseEvent) => {
-            e.preventDefault()
-            if (this.sence) {
-                this.sence.handleMouseup(e)
+            let handleMouseUp = (event:MouseEvent)=>{
+                this.sence.handleMouseup(event)
             }
+            let handleMoveout = (event: MouseEvent) => {
+                this.canvas.removeEventListener("mousemove", handleMouseMove)
+                this.canvas.removeEventListener("mouseout", handleMoveout)
+                this.canvas.removeEventListener("mousedown", handleMouseDown)
+                this.canvas.removeEventListener("mouseup", handleMouseUp)
+            }
+            this.canvas.addEventListener("mousemove", handleMouseMove)
+            this.canvas.addEventListener("mousedown", handleMouseDown)
+            this.canvas.addEventListener("mouseup", handleMouseUp)
+            this.canvas.addEventListener("mouseout", handleMoveout)
         })
+        
         this.canvas.addEventListener("touchstart", (e: TouchEvent) => {
             // e.preventDefault()
             if (this.sence) this.sence.handleTouchStart(e)
@@ -106,47 +101,14 @@ export class Game {
         })
     }
 
-    loadSources(sources: any): Promise<Game> {
-        let game = this
-        let count = 0
-        return new Promise((resolve, reject) => {
-            let keys = Object.keys(sources)
-            for (const k of keys) {
-                let img = new Image()
-                let url = sources[k]
-                img.src = url
-                img.onload = () => {
-                    let i = new GameImage(k, url, img)
-                    this.images.set(k, i)
-                    count++
-
-                    if (count == keys.length) {
-                        resolve(game)
-                    }
-                }
-            }
-        })
-    }
-
     public getTextureByName(name: string): GameImage {
         let i = this.images.get(name)
         if (i === undefined) throw new Error(`image named ${name} is not found`)
         return i
     }
 
-    public getWidth(): number {
-        return this.area.w
-    }
-
-    public getHeight(): number {
-        return this.area.h
-    }
-
     public reSize(w: number, h: number): void {
-        this.areaSetup({
-            w: w,
-            h: h
-        })
+        this.areaSetup(new Size(w, h))
     }
 
     public setSence(sence: BaseSence): void {
@@ -155,8 +117,6 @@ export class Game {
 
     private loop() {
         this.sence.update()
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        this.sence.draw(this.context)
         window.requestAnimationFrame(this.loop.bind(this))
     }
 

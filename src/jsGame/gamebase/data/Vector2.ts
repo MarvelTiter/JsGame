@@ -15,13 +15,19 @@ export class Vector2 {
         return this
     }
 
+    copy(): Vector2 {
+        return new Vector2(this.x, this.y)
+    }
+
     /**
      *
      * @param value
      * @returns
      */
     multi(value: number): Vector2 {
-        return new Vector2(this.x * value, this.y * value)
+        this.x = this.x * value
+        this.y = this.y * value
+        return this
     }
 
     /**
@@ -29,7 +35,9 @@ export class Vector2 {
      * @param {Vector2} vec
      */
     add(vec: Vector2): Vector2 {
-        return new Vector2(this.x + vec.x, this.y + vec.y)
+        this.x = this.x + vec.x
+        this.y = this.y + vec.y
+        return this
     }
     /**
      * 向量相减
@@ -37,7 +45,9 @@ export class Vector2 {
      * @returns
      */
     sub(vec: Vector2): Vector2 {
-        return new Vector2(this.x - vec.x, this.y - vec.y)
+        this.x = this.x - vec.x
+        this.y = this.y - vec.y
+        return this
     }
     /**
      * 向量的长度
@@ -64,6 +74,18 @@ export class Vector2 {
         var rotatedX = this.x * Math.cos(theta) - this.y * Math.sin(theta)
         var rotatedY = this.x * Math.sin(theta) + this.y * Math.cos(theta)
         return this.set(rotatedX, rotatedY)
+    }
+
+    max(maxVec: Vector2): Vector2 {
+        if (this.x < maxVec.x) this.x = maxVec.x
+        if (this.y < maxVec.y) this.y = maxVec.y
+        return this
+    }
+
+    min(minVec: Vector2): Vector2 {
+        if (this.x > minVec.x) this.x = minVec.x
+        if (this.y > minVec.y) this.y = minVec.y
+        return this
     }
 
     /**

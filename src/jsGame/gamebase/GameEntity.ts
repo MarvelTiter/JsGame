@@ -1,4 +1,5 @@
 import { BaseSence } from "./BaseSence"
+import { Size } from "./data/Size"
 import { Game } from "./Game"
 import { GameObject } from "./GameObject"
 import { GameImage } from "./Source"
@@ -11,16 +12,10 @@ export class GameEntity extends GameObject {
     constructor(game: Game, sence: BaseSence, name: string) {
         super(game, sence)
         this.image = game.getTextureByName(name)
-        this.size = this.image.size
+        this.size = new Size(this.image.size.w, this.image.size.h)
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
-        ctx.drawImage(
-            this.image.texture,
-            this.pos.x + this.offset.x,
-            this.pos.y + this.offset.y,
-            this.size.w,
-            this.size.h
-        )
+        ctx.drawImage(this.image.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
     }
 }

@@ -11,6 +11,14 @@ const routes = [
     {
         path: '/mine',
         component: () => import("@/jsGame/minegame/index.vue")
+    },
+    {
+        path: '/ball',
+        component: () => import("@/jsGame/snowball/index.vue")
+    },
+    {
+        path: '/debug',
+        component: () => import("@/jsGame/debug/index.vue")
     }
 ]
 const router = createRouter({

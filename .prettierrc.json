@@ -3,7 +3,9 @@
      "eslintIntegration": true,
      "endOfLine": "lf",
      "tabWidth": 4,
+     "printWidth": 200,
      "trailingComma": "none",
      "bracketSpacing": true,
+     "bracketSameLine": false,
      "arrowParens": "avoid"
  }

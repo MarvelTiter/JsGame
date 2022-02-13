@@ -1,12 +1,12 @@
-import { BaseSence } from "../../gamebase/BaseSence"
-import { Game } from "../../gamebase/Game"
-import { GameEntity } from "../../gamebase/GameEntity"
+import { BaseSence } from "./BaseSence"
+import { Game } from "./Game"
+import { GameEntity } from "./GameEntity"
 
 export class Button extends GameEntity {
     text: string
-    constructor(game: Game, sence: BaseSence, text: string) {
-        super(game, sence, "button")
-        this.text = text
+    constructor(game: Game, sence: BaseSence, name: string, text?: string) {
+        super(game, sence, name)
+        this.text = text || ""
     }
     checkFocu(x: number, y: number): boolean {
         let isfocus =
@@ -24,13 +24,7 @@ export class Button extends GameEntity {
         let y = this.pos.y + this.offset.y
         // ctx.fillStyle = "rgba(0,0,0,0.3)";
         // ctx.fillRect(x, y, this.w, this.h);
-        ctx.drawImage(
-            this.image.texture,
-            x - this.size.w / 2,
-            y - this.size.h / 2,
-            this.size.w,
-            this.size.h
-        )
+        ctx.drawImage(this.image.texture, x - this.size.w / 2, y - this.size.h / 2, this.size.w, this.size.h)
         ctx.fillStyle = "white"
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
