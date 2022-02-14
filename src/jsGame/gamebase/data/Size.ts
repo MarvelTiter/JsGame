@@ -9,4 +9,7 @@ export class Size {
         this.w = this.w * p
         this.h = this.h * p
     }
+    copy() {
+        return new Size(this.w, this.h)
+    }
 }

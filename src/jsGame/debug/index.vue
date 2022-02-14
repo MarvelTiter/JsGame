@@ -11,17 +11,18 @@ import { SPRITES_URL } from "../../utils/constDefinition";
 import { MainSence } from "./script/MainSence";
 import { loadSprites } from "../gamebase/SpritesLoader"
 onMounted(async () => {
-//   let images = {
-//     tree: `${SPRITES_URL}/ballgame/terr.png`,
-//     return: `${SPRITES_URL}/ballgame/return.png`,
-//     setting: `${SPRITES_URL}/ballgame/setting.png`,
-//     yes: `${SPRITES_URL}/ballgame/yes.png`,
-//   }
-  let sources = await loadSprites({})
+  let images = {
+    enemy: `${SPRITES_URL}/plane/enemy.png`,
+    attack_effect: `${SPRITES_URL}/plane/attack_effect.png`,
+  }
+  let scripts = {
+    attack_effect: `/sprites/plane/attack_effect.json`,
+  }
+  let sources = await loadSprites(images, scripts)
   let g = new Game(sources);
   let ms = new MainSence(g);
   g.setSence(ms);
   g.run();
-  
+
 });
 </script>

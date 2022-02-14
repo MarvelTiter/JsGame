@@ -1,10 +1,10 @@
 import { BaseSence } from "../../gamebase/BaseSence"
-import { GameEntity } from "../../gamebase/GameEntity"
 import { Game } from "../../gamebase/Game"
 import { Grid } from "./Grid"
 import { Size } from "../../gamebase/data/Size"
+import { GameStatisEntity } from "../../gamebase/entities/GameStatisEntity"
 
-export class Cell extends GameEntity {
+export class Cell extends GameStatisEntity {
     gutter: number
     grid: Grid
     row: number
@@ -15,14 +15,7 @@ export class Cell extends GameEntity {
     count: number
     explode: boolean
     scanning: boolean
-    constructor(
-        game: Game,
-        sence: BaseSence,
-        grid: Grid,
-        rowIndex: number,
-        columnIndex: number,
-        len: number
-    ) {
+    constructor(game: Game, sence: BaseSence, grid: Grid, rowIndex: number, columnIndex: number, len: number) {
         super(game, sence, "normal")
         this.gutter = 0
         this.grid = grid
@@ -63,12 +56,7 @@ export class Cell extends GameEntity {
             for (let i = rowIndex - 1; i < rowIndex + 2; i++) {
                 for (let j = colIndex - 1; j < colIndex + 2; j++) {
                     // 判断坐标防越界
-                    if (
-                        i > -1 &&
-                        j > -1 &&
-                        i < this.grid.row &&
-                        j < this.grid.column
-                    ) {
+                    if (i > -1 && j > -1 && i < this.grid.row && j < this.grid.column) {
                         // 递归
                         let temp = this.grid.data[i][j]
                         if (!temp.isMine) {
@@ -96,12 +84,7 @@ export class Cell extends GameEntity {
         for (let i = rowIndex - 1; i < rowIndex + 2; i++) {
             for (let j = colIndex - 1; j < colIndex + 2; j++) {
                 //判断坐标防越界
-                if (
-                    i > -1 &&
-                    j > -1 &&
-                    i < this.grid.row &&
-                    j < this.grid.column
-                ) {
+                if (i > -1 && j > -1 && i < this.grid.row && j < this.grid.column) {
                     let temp = this.grid.data[i][j]
                     if (temp.flag == 1) flagCount++
                     else if (!temp.isOpen) {
@@ -139,35 +122,17 @@ export class Cell extends GameEntity {
     }
     draw(ctx: CanvasRenderingContext2D): void {
         if (this.image !== undefined) {
-            ctx.drawImage(
-                this.image.texture,
-                this.pos.x + this.offset.x,
-                this.pos.y + this.offset.y,
-                this.size.w,
-                this.size.h
-            )
+            ctx.drawImage(this.image.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
         }
         this.drawFlag(ctx)
     }
     private drawFlag(ctx: CanvasRenderingContext2D) {
         let img = this.game.getTextureByName("flag")
         if (this.flag == 1) {
-            ctx.drawImage(
-                img.texture,
-                this.pos.x + this.offset.x,
-                this.pos.y + this.offset.y,
-                this.size.w,
-                this.size.h
-            )
+            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
         }
         if (this.grid.gameOver && this.isMine && !this.isOpen) {
-            ctx.drawImage(
-                img.texture,
-                this.pos.x + this.offset.x,
-                this.pos.y + this.offset.y,
-                this.size.w,
-                this.size.h
-            )
+            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
         }
     }
 }

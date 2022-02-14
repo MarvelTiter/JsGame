@@ -2,7 +2,7 @@ import { BaseSence } from "./BaseSence"
 import { Size } from "./data/Size"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
-import { GameObject } from "./GameObject"
+import { GameObject } from "./objects/GameObject"
 type Direction = "Horizontal" | "Vertical" | "Both" | "Static"
 
 export class Camera {
@@ -38,15 +38,15 @@ export class Camera {
                     break
                 case "Horizontal":
                     this.ctx.translate(-this.target.offset.x, 0)
-                    this.pos = this.pos.add(new Vector2(this.target.offset.x, 0))
+                    this.pos.add(new Vector2(this.target.offset.x, 0))
                     break
                 case "Vertical":
                     this.ctx.translate(0, -this.target.offset.y)
-                    this.pos = this.pos.add(new Vector2(0, this.target.offset.y))
+                    this.pos.add(new Vector2(0, this.target.offset.y))
                     break
                 case "Both":
-                    this.pos = this.pos.add(this.target.offset)
                     this.ctx.translate(-this.target.offset.x, -this.target.offset.y)
+                    this.pos.add(this.target.offset)
                     break
             }
         }
@@ -65,6 +65,8 @@ export class Camera {
         if (minY !== undefined) {
             if (y < minY) y = minY
         }
+        // console.log(x, y, w, h)
+
         this.ctx.clearRect(x, y, w, h)
     }
 }

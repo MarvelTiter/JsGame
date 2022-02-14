@@ -1,8 +1,9 @@
-import { BaseSence } from "./BaseSence"
-import { Game } from "./Game"
-import { Vector2 } from "./data/Vector2"
-import { MouseArgs } from "./MouseArgs"
-import { Size } from "./data/Size"
+import { BaseSence } from "../BaseSence"
+import { Game } from "../Game"
+import { Vector2 } from "../data/Vector2"
+import { MouseArgs } from "../MouseArgs"
+import { Size } from "../data/Size"
+import { RigidBase } from "../rigid/RigidComponent"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
 //         return
@@ -84,6 +85,14 @@ export class GameObject {
         this._size = v
     }
 
+    private _radius: number | undefined
+    public get radius(): number {
+        return this._radius || 0
+    }
+    public set radius(v: number) {
+        this._radius = v
+    }
+
     private _focus: boolean
     public get focus(): boolean {
         return this._focus
@@ -109,6 +118,16 @@ export class GameObject {
         this._onTick = v
     }
 
+    private _components: Map<string, RigidBase>
+
+    private _theta: number = 0
+    public get theta(): number {
+        return this._theta
+    }
+    public set theta(v: number) {
+        this._theta = v
+    }
+
     //#endregion
     constructor(game: Game, sence: BaseSence) {
         this._id = Math.random().toString(36).slice(2)
@@ -119,6 +138,7 @@ export class GameObject {
         this._size = new Size()
         this._focus = false
         this._hasChanged = true
+        this._components = new Map<string, RigidBase>()
     }
 
     checkFocu(x: number, y: number) {
@@ -129,6 +149,25 @@ export class GameObject {
         return this.focus
     }
 
+    public addComponent<T extends RigidBase>(name: string, com: T): void {
+        this._components.set(name, com)
+    }
+
+    public getComponent(): IterableIterator<RigidBase> {
+        return this._components.values()
+    }
+
+    public checkCollision(obj: GameObject): void {
+        let selfComponents = this.getComponent()
+        let components = obj.getComponent()
+        for (const sc of selfComponents) {
+            sc.closestPoints = []
+            for (const c of components) {
+                c.closestPoints = []
+                sc.getClosestPoint(c)
+            }
+        }
+    }
     onClick(e: MouseArgs) {}
     onMouseOver(e: MouseArgs) {}
     onMouseUp() {}
@@ -153,6 +192,9 @@ export class GameObject {
     elementUpdate() {
         // if (!this.updateRequest()) return
         this.update()
+        for (const c of this._components.values()) {
+            c.update()
+        }
         if (this._onTick) this.onTick(this)
         // this.hasChanged = false
     }
@@ -161,5 +203,8 @@ export class GameObject {
     elementDraw(ctx: CanvasRenderingContext2D) {
         if (!this.canDraw()) return
         this.draw(ctx)
+        for (const c of this._components.values()) {
+            c.drawDebug(ctx)
+        }
     }
 }

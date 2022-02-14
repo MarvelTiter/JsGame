@@ -1,7 +1,7 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
-import { GameEntity } from "../../gamebase/GameEntity"
-import { GameObject } from "../../gamebase/GameObject"
+import { GameEntity } from "../../gamebase/entities/GameEntity"
+import { GameObject } from "../../gamebase/objects/GameObject"
 
 export class Background extends GameObject {
     constructor(game: Game, sence: BaseSence) {

@@ -1,14 +1,13 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
-import { GameObject } from "../../gamebase/GameObject"
+import { CustomObject } from "../../gamebase/objects/CustomObject"
 interface SnowBallTail {
     x: number
     y: number
     degree: number
 }
-export class Ball extends GameObject {
-    radius: number = 10
+export class Ball extends CustomObject {
     direction: number = -1
     turnTo: boolean = false
     degree: number = 0
@@ -20,10 +19,9 @@ export class Ball extends GameObject {
     tailList: Array<SnowBallTail> = []
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
+        this.radius = 10
     }
-    updateRequest(): boolean {
-        return true
-    }
+
     move() {
         // 小球正在转向
         if (this.turnTo && this.direction) {
@@ -40,6 +38,9 @@ export class Ball extends GameObject {
         const radian = (this.degree * Math.PI) / 180
         const offsetX = Math.sin(radian) * this.distance
         const offsetY = Math.cos(radian) * this.distance
+
+        // const offsetX = 0
+        // const offsetY = 0
         this.pos.x += offsetX
         this.pos.y += offsetY
 
@@ -108,8 +109,7 @@ export class Ball extends GameObject {
         // 绘制小球
         ctx.beginPath()
         ctx.fillStyle = this.color
-        // ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI)
-        // ctx.fillRect(this.pos.x - this.radius, this.pos.y - this.radius, this.radius * 2, this.radius * 2)
+        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI)
         ctx.fill()
     }
 }

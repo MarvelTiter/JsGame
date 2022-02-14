@@ -1,6 +1,6 @@
 import { BaseSence } from "./BaseSence"
 import { Game } from "./Game"
-import { GameEntity } from "./GameEntity"
+import { GameEntity } from "./entities/GameEntity"
 
 export class Button extends GameEntity {
     text: string

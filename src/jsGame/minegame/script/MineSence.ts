@@ -6,7 +6,7 @@ import { Grid } from "./Grid"
 import { Button } from "../../gamebase/Button"
 import { StartSence } from "./StartSence"
 import { MineMapSize } from "./config"
-import { GameEntity } from "../../gamebase/GameEntity"
+import { Background } from "./Background"
 
 export const basis = {
     row: 10,
@@ -59,7 +59,7 @@ export class MineSence extends BaseSence {
     }
     setup() {
         // 背景
-        let bg = new GameEntity(this.game, this, "bg")
+        let bg = new Background(this.game, this)
         this.addElement(bg)
         // head
         let head = new Head(this.game, this) as Head

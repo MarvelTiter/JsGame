@@ -2,7 +2,7 @@ import { Camera } from "./Camera"
 import { Size } from "./data/Size"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
-import { GameObject } from "./GameObject"
+import { GameObject } from "./objects/GameObject"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void

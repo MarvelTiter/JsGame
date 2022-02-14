@@ -1,4 +1,4 @@
-import { AnimaObject } from "../../gamebase/AnimaObject"
+import { AnimaObject } from "../../gamebase/entities/AnimaEntity"
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
 

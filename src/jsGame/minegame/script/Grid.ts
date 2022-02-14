@@ -1,5 +1,5 @@
 import { BaseSence } from "../../gamebase/BaseSence"
-import { GameObject } from "../../gamebase/GameObject"
+import { GameObject } from "../../gamebase/objects/GameObject"
 import { DEVICE_MOBILE, Game } from "../../gamebase/Game"
 import { Cell } from "./Cell"
 import { Firework } from "./Firework"

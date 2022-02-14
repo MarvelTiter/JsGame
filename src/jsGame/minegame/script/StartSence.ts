@@ -1,12 +1,9 @@
 import { BaseSence } from "../../gamebase/BaseSence"
-import { GameEntity } from "../../gamebase/GameEntity"
 import { DEVICE_MOBILE, Game } from "../../gamebase/Game"
 import { Head } from "./Head"
 import { basis, basis_m, middle, middle_m, MineSence, professional, professional_m } from "./MineSence"
 import { Button } from "../../gamebase/Button"
-import { AnimaObject } from "../../gamebase/AnimaObject"
-import { Firework } from "./Firework"
-import { GameObject } from "../../gamebase/GameObject"
+import { Background } from "./Background"
 
 export class StartSence extends BaseSence {
     constructor(game: Game) {
@@ -15,7 +12,7 @@ export class StartSence extends BaseSence {
     }
 
     setup() {
-        let bg = new GameEntity(this.game, this, "bg")
+        let bg = new Background(this.game, this)
         let head = new Head(this.game, this)
         this.addElement(bg)
         this.addElement(head)

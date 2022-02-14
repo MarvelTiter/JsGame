@@ -1,6 +1,6 @@
-import { BaseSence } from "./BaseSence"
+import { BaseSence } from "../BaseSence"
 import { GameObject } from "./GameObject"
-import { Game } from "./Game"
+import { Game } from "../Game"
 
 /**
  * 文本对象

@@ -1,6 +1,6 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
-import { TextObject } from "../../gamebase/TextObject"
+import { TextObject } from "../../gamebase/objects/TextObject"
 
 export class Footer extends TextObject {
     public mineCount: number
