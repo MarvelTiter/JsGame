@@ -17,14 +17,14 @@ export class StartSence extends BaseSence {
         this.addElement(bg)
         this.addElement(head)
 
-        // let ani = new AnimaObject(this.game, this, "firework_green")
+        // let ani = new AnimaEntity(this.game, this, "firework_green")
         // this.addElement(ani)
 
-        // let ani2 = new AnimaObject(this.game, this, "attack_effect")
+        // let ani2 = new AnimaEntity(this.game, this, "attack_effect")
         // ani2.pos.x = 200
         // this.addElement(ani2)
 
-        // let ani3 = new AnimaObject(this.game, this, "attack_effect_explode")
+        // let ani3 = new AnimaEntity(this.game, this, "attack_effect_explode")
         // ani3.pos.x = 350
         // this.addElement(ani3)
         let { w } = this.getWindowSize()

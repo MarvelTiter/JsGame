@@ -5,9 +5,15 @@ export class Size {
         this.w = w || 0
         this.h = h || 0
     }
-    div(p: number) {
+    div(p: number): Size {
         this.w = this.w * p
         this.h = this.h * p
+        return this
+    }
+    set(w: number, h: number): Size {
+        this.w = w
+        this.h = h
+        return this
     }
     copy() {
         return new Size(this.w, this.h)

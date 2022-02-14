@@ -1,6 +1,9 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Button } from "../../gamebase/Button"
+import { Size } from "../../gamebase/data/Size"
+import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
+import { Contact } from "../../gamebase/rigid/Contact"
 import { Background } from "./Background"
 import { Ball } from "./Ball"
 import { Tree } from "./Tree"
@@ -13,7 +16,7 @@ export class MainSence extends BaseSence {
         this.maxX = this.size.w
         this.setup()
     }
-    ball!:Ball
+    ball!: Ball
     setup() {
         let bg = new Background(this.game, this)
         this.addElement(bg)
@@ -28,7 +31,7 @@ export class MainSence extends BaseSence {
         this.treeCollection = new Map<string, Tree>()
         for (let index = 0; index < 20; index++) {
             let tree = new Tree(this.game, this, this.treeCollection)
-            tree.addRectRigid(tree.size)
+            tree.addRectRigid(new Size(8, 35), new Vector2(0, 35))
             this.treeCollection.set(tree.id, tree)
             this.addElement(tree)
         }
@@ -61,7 +64,7 @@ export class MainSence extends BaseSence {
         if (num === 0) return trees
         while (num > 0) {
             let tree = new Tree(this.game, this, this.treeCollection)
-            tree.addRectRigid(tree.size)
+            tree.addRectRigid(new Size(8, 35), new Vector2(0, 35))
             trees.push(tree)
             num--
         }
@@ -78,8 +81,13 @@ export class MainSence extends BaseSence {
             this.treeCollection.set(tree.id, tree)
             this.addElement(tree)
         })
+        let contacts: Contact[] = []
         for (const t of this.treeCollection.values()) {
-            this.ball.checkCollision(t)
+            if (t.pos.y + t.size.h / 2 > this.ball.pos.y) {
+                let c = this.ball.checkCollision(t)
+                contacts = contacts.concat(c)
+            }
         }
+        this.contacts = contacts
     }
 }

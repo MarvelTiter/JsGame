@@ -3,6 +3,7 @@ import { Size } from "./data/Size"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
 import { GameObject } from "./objects/GameObject"
+import { Contact } from "./rigid/Contact"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void
@@ -25,6 +26,14 @@ export class BaseSence {
     private actions: Map<string, ObjectAction>
     // onceAction: Map<string, ObjectAction>;
 
+    private _contacts: Contact[]
+    public get contacts(): Contact[] {
+        return this._contacts
+    }
+    public set contacts(v: Contact[]) {
+        this._contacts = v
+    }
+
     private _camera: Camera | undefined
     public get camera(): Camera {
         if (this._camera === undefined) {
@@ -46,6 +55,7 @@ export class BaseSence {
     constructor(game: Game) {
         this.game = game
         this.elements = []
+        this._contacts = []
         this.elementMap = new Map<string, GameObject>()
         this.keys = new Map<string, KeyStatus>()
         this.actions = new Map<string, ObjectAction>()
@@ -232,6 +242,25 @@ export class BaseSence {
     public draw(ctx: CanvasRenderingContext2D): void {
         for (const e of this.elements.values()) {
             e.elementDraw(ctx)
+            for (const c of e.getComponent()) {
+                c.drawDebug(ctx)
+            }
+        }
+        for (const contact of this.contacts) {
+            ctx.fillStyle = "#00ff00"
+            ctx.beginPath()
+            ctx.arc(contact.mPa.x, contact.mPa.y, 2, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.arc(contact.mPb.x, contact.mPb.y, 2, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.closePath()
+
+            ctx.beginPath()
+            ctx.strokeStyle = "#0000ff"            
+            ctx.moveTo(contact.mPa.x, contact.mPa.y)
+            ctx.lineTo(contact.mPb.x, contact.mPb.y)
+            ctx.stroke()
+            ctx.closePath()
         }
     }
 }

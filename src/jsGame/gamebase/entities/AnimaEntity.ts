@@ -9,7 +9,7 @@ import { Size } from "../data/Size"
 /**
  * 动画对象
  */
-export class AnimaObject extends GameEntity {
+export class AnimaEntity extends GameEntity {
     frames!: FrameDefinition[]
     frameIndex: number = 0
     frameInterval: number = 5
@@ -20,7 +20,6 @@ export class AnimaObject extends GameEntity {
         super(game, sence, name)
         // this.image = this.game.getTextureByName(name)
         this.frames = this.image.frames
-        console.log(this.image)
     }
     updateRequest(): boolean {
         return true
@@ -41,6 +40,12 @@ export class AnimaObject extends GameEntity {
         this.frameIndex = this.calcFrameIndex()
         this.frameCooldown = this.frameInterval
         this.currentFrame = this.frames[this.frameIndex]
+        this.updateSize()
+    }
+
+    private updateSize() {
+        this.size.set(this.currentFrame.frame.w, this.currentFrame.frame.h)
+        this.radius = (this.currentFrame.frame.w + this.currentFrame.frame.h) / 2
     }
 
     draw(ctx: CanvasRenderingContext2D): void {

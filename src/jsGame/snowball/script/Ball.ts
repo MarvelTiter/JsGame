@@ -73,6 +73,7 @@ export class Ball extends CustomObject {
             if (tailListsLength) {
                 let index = 0
                 let step = 1
+                ctx.beginPath()
                 const paint = () => {
                     if (index < 0) return
                     const { x, y, degree } = this.tailList[index]

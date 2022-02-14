@@ -13,6 +13,7 @@ import { loadSprites } from "../gamebase/SpritesLoader"
 onMounted(async () => {
   let images = {
     enemy: `${SPRITES_URL}/plane/enemy.png`,
+    mine: `${SPRITES_URL}/mine/mine.png`,
     attack_effect: `${SPRITES_URL}/plane/attack_effect.png`,
   }
   let scripts = {

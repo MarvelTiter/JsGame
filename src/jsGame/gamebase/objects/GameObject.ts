@@ -4,6 +4,7 @@ import { Vector2 } from "../data/Vector2"
 import { MouseArgs } from "../MouseArgs"
 import { Size } from "../data/Size"
 import { RigidBase } from "../rigid/RigidComponent"
+import { Contact } from "../rigid/Contact"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
 //         return
@@ -149,7 +150,7 @@ export class GameObject {
         return this.focus
     }
 
-    public addComponent<T extends RigidBase>(name: string, com: T): void {
+    protected addComponent<T extends RigidBase>(name: string, com: T): void {
         this._components.set(name, com)
     }
 
@@ -157,16 +158,17 @@ export class GameObject {
         return this._components.values()
     }
 
-    public checkCollision(obj: GameObject): void {
+    public checkCollision(obj: GameObject): Contact[] {
         let selfComponents = this.getComponent()
         let components = obj.getComponent()
+        let contacts: Contact[] = []
         for (const sc of selfComponents) {
-            sc.closestPoints = []
             for (const c of components) {
-                c.closestPoints = []
-                sc.getClosestPoint(c)
+                let contact = sc.getClosestPoint(c)
+                contacts.push(contact)
             }
         }
+        return contacts
     }
     onClick(e: MouseArgs) {}
     onMouseOver(e: MouseArgs) {}
@@ -203,8 +205,5 @@ export class GameObject {
     elementDraw(ctx: CanvasRenderingContext2D) {
         if (!this.canDraw()) return
         this.draw(ctx)
-        for (const c of this._components.values()) {
-            c.drawDebug(ctx)
-        }
     }
 }
