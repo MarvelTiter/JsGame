@@ -58,12 +58,24 @@ export class Vector2 {
     }
 
     /**
-     * 向量的模
+     * 模向量
      * @returns {Vector2}
      */
     normalize(): Vector2 {
         var length = this.length()
-        return new Vector2(this.x / length, this.y / length)
+        this.x = this.x / length
+        this.y = this.y / length
+        return this
+    }
+
+    /**
+     * 法向量
+     * @returns {Vector2}
+     */
+    normal(): Vector2 {
+        if (this.x === 0) this.y = -this.y
+        else if (this.y === 0) this.x = -this.x
+        return this
     }
 
     /**

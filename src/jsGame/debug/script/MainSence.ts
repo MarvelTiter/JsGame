@@ -26,8 +26,9 @@ export class MainSence extends BaseSence {
         // this.rect = r
 
         let t = new GameEntity(this.game, this, "mine")
-        t.addTriangleRigid(100, Math.PI / 6)
+        t.addTriangleRigid(100, Math.PI / 8)
         t.pos = new Vector2(400, 400)
+        t.theta = (3 / 30) * Math.PI
         this.addElement(t)
         this.other = t
 
@@ -40,7 +41,8 @@ export class MainSence extends BaseSence {
     public update(): void {
         super.update()
         this.contacts.splice(0)
+        this.other.theta += (1 / 30) * Math.PI * 0.1
         let contact = this.ball.checkCollision(this.other)
-        this.contacts = this.contacts.concat(contact)        
+        this.contacts = this.contacts.concat(contact)
     }
 }

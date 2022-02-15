@@ -14,6 +14,10 @@ export class CircleRigid extends RigidBase {
         this._radius = radius
     }
 
+    getAxis(): Vector2[] {
+        throw new Error("Method not implemented.")
+    }
+
     getClosestPoint(rigid: RigidBase): Contact {
         let ball = this
         if (rigid instanceof RectRigid) {

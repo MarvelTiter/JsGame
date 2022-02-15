@@ -33,6 +33,13 @@ export class RectRigid extends RigidBase {
         this._offset = offset || new Vector2()
         this.pos.add(this.offset)
     }
+
+    getAxis(): Vector2[] {
+        let xAxis = new Vector2(1, 0).rotate(this.theta)
+        let yAxis = new Vector2(0, 1).rotate(this.theta)
+        return [xAxis, yAxis]
+    }
+
     getClosestPoint(rigid: RigidBase): Contact {
         let rect = this
         if (rigid instanceof CircleRigid) {
@@ -47,22 +54,25 @@ export class RectRigid extends RigidBase {
             let fixedClosestV = closestV.rotate(rect.theta)
             // 矩形中心指向边或角的点
             let closestPointOnSelf = rect.pos.copy().add(fixedClosestV)
-            
+
             // 球心指向矩形最近的点
             let d = ball.pos.copy().sub(closestPointOnSelf)
             let n = d.normalize()
             // 球上最近的点
-            let closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))            
+            let closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
             return {
                 gA: this.target,
                 gB: ball.target,
-                mPa:closestPointOnSelf,
-                mPb:closestPointOnOther,
-                normal : n,
-                distance:d.length() - ball.radius
+                mPa: closestPointOnSelf,
+                mPb: closestPointOnOther,
+                normal: n,
+                distance: d.length() - ball.radius
             }
+        } else if (rigid instanceof RectRigid) {
+            let other = rigid
+            let delta = other.pos.copy().sub(rect.pos)
         }
-        throw new Error("unknow RigidType")        
+        throw new Error("unknow RigidType")
     }
     drawDebug(ctx: CanvasRenderingContext2D): void {
         let pos = this.pos.copy().add(this.offset)

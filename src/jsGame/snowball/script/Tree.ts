@@ -25,14 +25,4 @@ export class Tree extends GameEntity {
             this.sence.removeElement(this)
         }
     }
-    draw(ctx: CanvasRenderingContext2D): void {
-        let pos = this.pos.copy().add(this.offset)        
-        ctx.save()
-        ctx.translate(pos.x, pos.y)
-        ctx.rotate(this.theta)
-        ctx.drawImage(this.image.texture, -this.size.w / 2, -this.size.h / 2, this.size.w, this.size.h)
-        ctx.translate(-pos.x, -pos.y)
-        ctx.restore()                
-
-    }
 }
