@@ -167,7 +167,7 @@ export class GameObject {
                 let contact = sc.getClosestPoint(c)
                 contacts.push(contact)
             }
-        }
+        }        
         return contacts
     }
     onClick(e: MouseArgs) {}

@@ -7,7 +7,7 @@ export interface Source {
     script: string | undefined
 }
 
-export function loadSprites(sources: any, script?: any): Promise<Map<string, GameImage>> {
+export function loadSprites(sources: any, script?: any, stepCallback?: (loaded: number, total: number) => void): Promise<Map<string, GameImage>> {
     let count = 0
     let images = new Map<string, GameImage>()
     return new Promise((resolve, reject) => {
@@ -28,6 +28,7 @@ export function loadSprites(sources: any, script?: any): Promise<Map<string, Gam
                 }
                 images.set(k, i)
                 count++
+                if (stepCallback) stepCallback(count, keys.length)
                 if (count == keys.length) {
                     resolve(images)
                 }

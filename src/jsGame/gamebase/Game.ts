@@ -1,5 +1,6 @@
 import { BaseSence } from "./BaseSence"
 import { Size } from "./data/Size"
+import { GameObject } from "./objects/GameObject"
 import { GameImage } from "./Source"
 
 export const RESET = 0x0000
@@ -11,7 +12,13 @@ export const MOUSE_PRESS = "PRESS"
 export const MOUSE_RELEASE = "RELEASE"
 export const DEVICE_MOBILE = "MOBILE"
 export const DEVICE_PC = "PC"
-
+declare global {
+    interface Window {
+        Pause: boolean
+        Debug: boolean
+        Update: Function
+    }
+}
 export class Game {
     canvas: HTMLCanvasElement
     context: any
@@ -56,10 +63,10 @@ export class Game {
                 event.preventDefault()
                 this.sence.handleMousemove(event)
             }
-            let handleMouseDown = (event:MouseEvent)=>{
+            let handleMouseDown = (event: MouseEvent) => {
                 this.sence.handleMousedown(event)
             }
-            let handleMouseUp = (event:MouseEvent)=>{
+            let handleMouseUp = (event: MouseEvent) => {
                 this.sence.handleMouseup(event)
             }
             let handleMoveout = (event: MouseEvent) => {
@@ -73,7 +80,7 @@ export class Game {
             this.canvas.addEventListener("mouseup", handleMouseUp)
             this.canvas.addEventListener("mouseout", handleMoveout)
         })
-        
+
         this.canvas.addEventListener("touchstart", (e: TouchEvent) => {
             // e.preventDefault()
             if (this.sence) this.sence.handleTouchStart(e)
@@ -116,6 +123,10 @@ export class Game {
     }
 
     private loop() {
+        if (window.Pause) {
+            window.requestAnimationFrame(this.loop.bind(this))
+            return
+        }
         this.sence.update()
         window.requestAnimationFrame(this.loop.bind(this))
     }

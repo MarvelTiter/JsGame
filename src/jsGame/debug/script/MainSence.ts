@@ -6,6 +6,7 @@ import { GameEntity } from "../../gamebase/entities/GameEntity"
 import { AnimaEntity } from "../../gamebase/entities/AnimaEntity"
 import { TestCircle } from "./TestCircle"
 import { GameObject } from "../../gamebase/objects/GameObject"
+import { CustomObject } from "../../gamebase/objects/CustomObject"
 
 export class MainSence extends BaseSence {
     constructor(game: Game) {
@@ -14,6 +15,8 @@ export class MainSence extends BaseSence {
     }
     ball!: GameObject
     other!: GameObject
+    other2!: GameObject
+
     setup() {
         // let r = new GameEntity(this.game, this, "enemy")
         // let { w, h } = this.getWindowSize()
@@ -28,7 +31,6 @@ export class MainSence extends BaseSence {
         let t = new GameEntity(this.game, this, "mine")
         t.addTriangleRigid(100, Math.PI / 8)
         t.pos = new Vector2(400, 400)
-        t.theta = (3 / 30) * Math.PI
         this.addElement(t)
         this.other = t
 
@@ -37,12 +39,24 @@ export class MainSence extends BaseSence {
         c.pos = new Vector2(200, 200)
         this.addElement(c)
         this.ball = c
+
+        let r = new CustomObject(this.game, this)
+        r.size = new Size(100, 50)
+        r.addRectRigid(r.size)
+        r.pos = new Vector2(600, 200)
+        this.addElement(r)
+        this.other2 = r
+        window.Update = () => {
+            this.other.theta += (1 / 30) * Math.PI
+            this.other2.theta += (1 / 30) * Math.PI
+        }
     }
     public update(): void {
         super.update()
         this.contacts.splice(0)
-        this.other.theta += (1 / 30) * Math.PI * 0.1
-        let contact = this.ball.checkCollision(this.other)
-        this.contacts = this.contacts.concat(contact)
+        let contact1 = this.ball.checkCollision(this.other)
+        this.contacts = this.contacts.concat(contact1)
+        let contact2 = this.ball.checkCollision(this.other2)
+        this.contacts = this.contacts.concat(contact2)
     }
 }

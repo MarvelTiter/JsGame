@@ -2,6 +2,7 @@ import { threadId } from "worker_threads"
 import { Vector2 } from "../data/Vector2"
 import { CircleRigid } from "./CircleRigid"
 import { Contact } from "./Contact"
+import { RectRigid } from "./RectRigid"
 import { RigidBase } from "./RigidComponent"
 
 export class TriangleRigid extends RigidBase {
@@ -24,7 +25,7 @@ export class TriangleRigid extends RigidBase {
     public get offset(): Vector2 {
         return this._offset
     }
-
+    private cache: any
     /**
      * 三角形为等腰三角形，初始状态底边水平
      * @param len 重心到顶点的距离
@@ -44,6 +45,11 @@ export class TriangleRigid extends RigidBase {
         let bottomLeft = new Vector2(-deltaX, +this._deltaY)
         let bottomRight = new Vector2(+deltaX, +this._deltaY)
         this._points = [top, bottomLeft, bottomRight]
+        this.cache = {}
+        this.cache["LP1"] = this.points[1].copy().rotate(Math.PI / 2 - this.dTheta)
+        this.cache["LP0"] = this.points[0].copy().rotate(Math.PI / 2 - this.dTheta)
+        this.cache["RP0"] = this.points[0].copy().rotate(this.dTheta - Math.PI / 2)
+        this.cache["RP2"] = this.points[2].copy().rotate(this.dTheta - Math.PI / 2)
     }
 
     getAxis(): Vector2[] {
@@ -53,7 +59,6 @@ export class TriangleRigid extends RigidBase {
         // return [axis1, axis2, axis3]
         throw new Error("Method not implemented.")
     }
-
 
     getClosestPoint(rigid: RigidBase): Contact {
         let tri = this
@@ -69,11 +74,10 @@ export class TriangleRigid extends RigidBase {
                 if (rotatedDelta.x <= 0) {
                     // 在三角形重心左边
                     let horRotated = rotatedDelta.rotate(Math.PI / 2 - tri.dTheta)
-                    let horLeft = tri.points[1].copy().rotate(Math.PI / 2 - tri.dTheta)
-                    let horRight = tri.points[0].copy().rotate(Math.PI / 2 - tri.dTheta)
+                    let horLeft = tri.cache["LP1"]
+                    let horRight = tri.cache["LP0"]
                     let fixed = horRotated.max(horLeft).min(horRight)
-                    let fixedClosestV = fixed.rotate(tri.dTheta - Math.PI / 2)
-                    fixedClosestV.rotate(tri.theta)
+                    let fixedClosestV = fixed.rotate(tri.dTheta - Math.PI / 2).rotate(tri.theta)
                     closestPointOnSelf = tri.pos.copy().add(fixedClosestV)
                     d = ball.pos.copy().sub(closestPointOnSelf)
                     n = d.copy().normalize()
@@ -81,11 +85,10 @@ export class TriangleRigid extends RigidBase {
                 } else if (rotatedDelta.x > 0) {
                     // 在三角形重心右边
                     let horRotated = rotatedDelta.rotate(tri.dTheta - Math.PI / 2)
-                    let horLeft = tri.points[0].copy().rotate(tri.dTheta - Math.PI / 2)
-                    let horRight = tri.points[2].copy().rotate(tri.dTheta - Math.PI / 2)
+                    let horLeft = tri.cache["RP0"]
+                    let horRight = tri.cache["RP2"]
                     let fixed = horRotated.max(horLeft).min(horRight)
-                    let fixedClosestV = fixed.rotate(Math.PI / 2 - tri.dTheta)
-                    fixedClosestV.rotate(tri.theta)
+                    let fixedClosestV = fixed.rotate(Math.PI / 2 - tri.dTheta).rotate(tri.theta)
                     closestPointOnSelf = tri.pos.copy().add(fixedClosestV)
                     d = ball.pos.copy().sub(closestPointOnSelf)
                     n = d.copy().normalize()
@@ -128,6 +131,12 @@ export class TriangleRigid extends RigidBase {
                 normal: n,
                 distance: d.length() - ball.radius
             }
+        } else if (rigid instanceof RectRigid) {
+            // TODO 三角形与矩形
+            throw new Error("not implemented")
+        } else if (rigid instanceof TriangleRigid) {
+            // TODO 三角形与三角形
+            throw new Error("not implemented")
         }
         throw new Error("unknow RigidType")
     }

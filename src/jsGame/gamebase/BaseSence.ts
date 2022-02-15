@@ -242,10 +242,13 @@ export class BaseSence {
     public draw(ctx: CanvasRenderingContext2D): void {
         for (const e of this.elements.values()) {
             e.elementDraw(ctx)
-            for (const c of e.getComponent()) {
-                c.drawDebug(ctx)
+            if (window.Debug) {
+                for (const c of e.getComponent()) {
+                    c.drawDebug(ctx)
+                }
             }
         }
+        if (!window.Debug) return 
         for (const contact of this.contacts) {
             ctx.fillStyle = "#00ff00"
             ctx.beginPath()
@@ -256,7 +259,7 @@ export class BaseSence {
             ctx.closePath()
 
             ctx.beginPath()
-            ctx.strokeStyle = "#0000ff"            
+            ctx.strokeStyle = "#0000ff"
             ctx.moveTo(contact.mPa.x, contact.mPa.y)
             ctx.lineTo(contact.mPb.x, contact.mPb.y)
             ctx.stroke()

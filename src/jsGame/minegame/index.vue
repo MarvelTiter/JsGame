@@ -1,16 +1,18 @@
 <template>
-  <div style="text-align: center" id="container">
+  <Loading :percent="percent">
     <canvas id="canvas"></canvas>
-  </div>
+  </Loading>
 </template>
 
 <script setup lang="ts">
 import { Game } from "../gamebase/Game";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 // import { MineSence, basis } from "./script/MineSence";
 import { SPRITES_URL } from "../../utils/constDefinition";
 import { StartSence } from "./script/StartSence";
 import { loadSprites } from "../gamebase/SpritesLoader"
+import Loading from "../../components/loading.vue";
+let percent = ref(0)
 onMounted(async () => {
   let images = {
     n0: `${SPRITES_URL}/mine/n0.png`,
@@ -42,8 +44,12 @@ onMounted(async () => {
     attack_effect: `/sprites/plane/attack_effect.json`,
     attack_effect_explode: `/sprites/plane/attack_effect_explode.json`,
   }
-  
-  let sources = await loadSprites(images, scripts)
+
+  let sources = await loadSprites(images, scripts, (c, t) => {
+    percent.value = c / t
+    console.log(percent.value);
+
+  })
   let g = new Game(sources);
   let ms = new StartSence(g);
   g.setSence(ms);

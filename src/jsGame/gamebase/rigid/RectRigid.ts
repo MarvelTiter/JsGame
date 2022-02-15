@@ -3,6 +3,7 @@ import { Vector2 } from "../data/Vector2"
 import { CircleRigid } from "./CircleRigid"
 import { Contact } from "./Contact"
 import { RigidBase } from "./RigidComponent"
+import { TriangleRigid } from "./TriangleRigid"
 
 export class RectRigid extends RigidBase {
     private _size: Size
@@ -65,12 +66,15 @@ export class RectRigid extends RigidBase {
                 gB: ball.target,
                 mPa: closestPointOnSelf,
                 mPb: closestPointOnOther,
-                normal: n,
+                normal: n.normalize(),
                 distance: d.length() - ball.radius
             }
         } else if (rigid instanceof RectRigid) {
             let other = rigid
             let delta = other.pos.copy().sub(rect.pos)
+            // TODO 矩形与矩形
+        } else if (rigid instanceof TriangleRigid) {
+            return rigid.getClosestPoint(this)
         }
         throw new Error("unknow RigidType")
     }
