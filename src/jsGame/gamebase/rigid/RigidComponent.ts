@@ -30,9 +30,15 @@ export abstract class RigidBase {
     update(): void {
         this.pos.set(this.target.pos.x, this.target.pos.y)
         this.theta = this.target.theta
-        
     }
+    /**
+     * 凸多边形各边的法向量（投影轴
+     */
     abstract getAxis(): Vector2[]
+    /**
+     * 凸多边形的顶点
+     */
+    abstract get points(): Vector2[]
     abstract getClosestPoint(rigid: RigidBase): Contact
     drawDebug(ctx: CanvasRenderingContext2D): void {}
 }

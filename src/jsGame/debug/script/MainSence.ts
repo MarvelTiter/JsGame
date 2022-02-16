@@ -5,8 +5,10 @@ import { Game } from "../../gamebase/Game"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
 import { AnimaEntity } from "../../gamebase/entities/AnimaEntity"
 import { TestCircle } from "./TestCircle"
+import { TestRect } from "./TestRect"
 import { GameObject } from "../../gamebase/objects/GameObject"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
+import { TestTriangle } from "./TestTriangle"
 
 export class MainSence extends BaseSence {
     constructor(game: Game) {
@@ -14,49 +16,48 @@ export class MainSence extends BaseSence {
         this.setup()
     }
     ball!: GameObject
-    other!: GameObject
-    other2!: GameObject
-
+    ball2!: GameObject
+    tri!: GameObject
+    tri2!: GameObject
+    rect!: GameObject
+    rect2!: GameObject
     setup() {
-        // let r = new GameEntity(this.game, this, "enemy")
-        // let { w, h } = this.getWindowSize()
-        // r.pos = new Vector2(w / 2, h / 2)
-        // let horSize = new Size(r.size.w, 50)
-        // let verSize = new Size(50, r.size.h)
-        // r.addRectRigid(horSize)
-        // r.addRectRigid(verSize)
-        // this.addElement(r)
-        // this.rect = r
-
-        let t = new GameEntity(this.game, this, "mine")
-        t.addTriangleRigid(100, Math.PI / 8)
+        let t = new TestTriangle(this.game, this, 100, Math.PI / 8)
         t.pos = new Vector2(400, 400)
         this.addElement(t)
-        this.other = t
+        this.tri = t
 
         let c = new TestCircle(this.game, this, 50)
-        c.addCircleRigid(50)
         c.pos = new Vector2(200, 200)
         this.addElement(c)
         this.ball = c
 
-        let r = new CustomObject(this.game, this)
-        r.size = new Size(100, 50)
-        r.addRectRigid(r.size)
+        let r = new TestRect(this.game, this, new Size(100, 50))
         r.pos = new Vector2(600, 200)
         this.addElement(r)
-        this.other2 = r
-        window.Update = () => {
-            this.other.theta += (1 / 30) * Math.PI
-            this.other2.theta += (1 / 30) * Math.PI
-        }
+        this.rect = r
+
+        let r1 = new TestRect(this.game, this, new Size(100, 50))
+        r1.pos = new Vector2(600, 400)
+        this.addElement(r1)
+        this.rect2 = r1
     }
     public update(): void {
         super.update()
         this.contacts.splice(0)
-        let contact1 = this.ball.checkCollision(this.other)
-        this.contacts = this.contacts.concat(contact1)
-        let contact2 = this.ball.checkCollision(this.other2)
-        this.contacts = this.contacts.concat(contact2)
+        // for (let i = 0; i < this.elements.length - 1; i++) {
+        //     for (let j = 1; j < this.elements.length; j++) {
+        //         let cs = this.elements[i].checkCollision(this.elements[j])
+        //         this.contacts = this.contacts.concat(cs)
+        //     }
+        // }
+        let c1 = this.ball.checkCollision(this.tri)
+        this.contacts = this.contacts.concat(c1)
+        let c2 = this.ball.checkCollision(this.rect)
+        this.contacts = this.contacts.concat(c2)
+        let c3 = this.tri.checkCollision(this.rect)
+        this.contacts = this.contacts.concat(c3)
+        let c4 = this.rect2.checkCollision(this.rect)
+        this.contacts = this.contacts.concat(c4)
     }
 }

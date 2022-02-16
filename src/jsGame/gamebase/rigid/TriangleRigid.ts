@@ -25,6 +25,7 @@ export class TriangleRigid extends RigidBase {
     public get offset(): Vector2 {
         return this._offset
     }
+
     private cache: any
     /**
      * 三角形为等腰三角形，初始状态底边水平
@@ -64,10 +65,10 @@ export class TriangleRigid extends RigidBase {
         let tri = this
         if (rigid instanceof CircleRigid) {
             let ball = rigid
-            let closestPointOnSelf: Vector2 = new Vector2()
-            let closestPointOnOther: Vector2 = new Vector2()
-            let n: Vector2 = new Vector2()
-            let d: Vector2 = new Vector2()
+            let closestPointOnSelf: Vector2
+            let closestPointOnOther: Vector2
+            let n: Vector2
+            let d: Vector2
             let delta = ball.pos.copy().sub(tri.pos)
             let rotatedDelta = delta.rotate(-tri.theta)
             if (rotatedDelta.y < tri._deltaY) {
@@ -82,7 +83,7 @@ export class TriangleRigid extends RigidBase {
                     d = ball.pos.copy().sub(closestPointOnSelf)
                     n = d.copy().normalize()
                     closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
-                } else if (rotatedDelta.x > 0) {
+                } else {
                     // 在三角形重心右边
                     let horRotated = rotatedDelta.rotate(tri.dTheta - Math.PI / 2)
                     let horLeft = tri.cache["RP0"]
@@ -132,10 +133,11 @@ export class TriangleRigid extends RigidBase {
                 distance: d.length() - ball.radius
             }
         } else if (rigid instanceof RectRigid) {
-            // TODO 三角形与矩形
-            throw new Error("not implemented")
+            return rigid.getClosestPoint(tri)
         } else if (rigid instanceof TriangleRigid) {
             // TODO 三角形与三角形
+            let triB = rigid
+
             throw new Error("not implemented")
         }
         throw new Error("unknow RigidType")

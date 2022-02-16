@@ -12,13 +12,18 @@ export const MOUSE_PRESS = "PRESS"
 export const MOUSE_RELEASE = "RELEASE"
 export const DEVICE_MOBILE = "MOBILE"
 export const DEVICE_PC = "PC"
+
+/**
+ * Window Attach
+ */
 declare global {
     interface Window {
         Pause: boolean
         Debug: boolean
-        Update: Function
+        Update: Function[]
     }
 }
+window.Update = []
 export class Game {
     canvas: HTMLCanvasElement
     context: any

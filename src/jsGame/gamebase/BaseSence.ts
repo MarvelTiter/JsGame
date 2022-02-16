@@ -20,7 +20,7 @@ export interface KeyStatus {
  */
 export class BaseSence {
     game: Game
-    private elements: GameObject[]
+    protected elements: GameObject[]
     private elementMap: Map<string, GameObject>
     private keys: Map<string, KeyStatus>
     private actions: Map<string, ObjectAction>

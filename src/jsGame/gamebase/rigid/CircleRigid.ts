@@ -9,6 +9,9 @@ export class CircleRigid extends RigidBase {
     public get radius() {
         return this._radius
     }
+    public get points(): Vector2[] {
+        throw new Error("Method not implemented.")
+    }
     constructor(radius: number, mass?: number) {
         super("Circle", mass)
         this._radius = radius
@@ -21,11 +24,9 @@ export class CircleRigid extends RigidBase {
     getClosestPoint(rigid: RigidBase): Contact {
         let ball = this
         if (rigid instanceof RectRigid) {
-            let rect = rigid
-            return rect.getClosestPoint(ball)
+            return rigid.getClosestPoint(ball)
         } else if (rigid instanceof TriangleRigid) {
-            let tri = rigid
-            return tri.getClosestPoint(ball)
+            return rigid.getClosestPoint(ball)
         } else if (rigid instanceof CircleRigid) {
             let ballB = rigid
             let delata = new Vector2(ballB.pos.x - ball.pos.x, ballB.pos.y - ball.pos.y)

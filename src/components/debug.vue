@@ -13,6 +13,8 @@ let ToggleDebug = () => {
     window.Debug = !window.Debug
 }
 let StepUpdate = () => {
-    window.Update()
+    for (const func of window.Update) {
+        func()        
+    }
 }
 </script>

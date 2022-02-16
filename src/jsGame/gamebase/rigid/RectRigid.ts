@@ -28,6 +28,11 @@ export class RectRigid extends RigidBase {
     public get offset() {
         return this._offset
     }
+
+    public get points(): Vector2[] {
+        throw new Error("Method not implemented.")
+    }
+
     constructor(size: Size, offset?: Vector2, mass?: number) {
         super("Rect", mass)
         this._size = size
@@ -62,19 +67,45 @@ export class RectRigid extends RigidBase {
             // 球上最近的点
             let closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
             return {
-                gA: this.target,
+                gA: rect.target,
                 gB: ball.target,
                 mPa: closestPointOnSelf,
                 mPb: closestPointOnOther,
                 normal: n.normalize(),
                 distance: d.length() - ball.radius
             }
-        } else if (rigid instanceof RectRigid) {
-            let other = rigid
-            let delta = other.pos.copy().sub(rect.pos)
-            // TODO 矩形与矩形
         } else if (rigid instanceof TriangleRigid) {
-            return rigid.getClosestPoint(this)
+            let tri = rigid
+            let delta = tri.pos.copy().sub(rect.pos)
+            let rotatedVector = delta.rotate(-rect.theta)
+            let closestV = rotatedVector.max(rect.halfExtendMin).min(rect.halfExtendMax)
+            let fixedClosestV = closestV.rotate(rect.theta)
+            let closestPointOnSelf = rect.pos.copy().add(fixedClosestV)
+
+            return {
+                gA: rect.target,
+                gB: tri.target,
+                mPa: closestPointOnSelf,
+                mPb: tri.pos,
+                normal: new Vector2(),
+                distance: 0
+            }
+        } else if (rigid instanceof RectRigid) {
+            let rectB = rigid
+            let deltaB = rectB.pos.copy().sub(rect.pos)
+            let delta = rect.pos.copy().sub(rectB.pos)
+
+            let p1 = deltaB.max(rect.halfExtendMin).min(rect.halfExtendMax)
+            let p2 = delta.max(rectB.halfExtendMin).min(rectB.halfExtendMax)
+
+            return {
+                gA: rect.target,
+                gB: rectB.target,
+                mPa: rect.pos.copy().add(p1),
+                mPb: rectB.pos.copy().add(p2),
+                normal: new Vector2(),
+                distance: 0
+            }
         }
         throw new Error("unknow RigidType")
     }
