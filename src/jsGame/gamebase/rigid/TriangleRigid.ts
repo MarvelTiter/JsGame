@@ -16,10 +16,20 @@ export class TriangleRigid extends RigidBase {
     }
 
     private _deltaY!: number
-    private _points: Vector2[]
+    private _points: Vector2[] | undefined
     public get points(): Vector2[] {
+        if (this._points === undefined) {
+            let cos = Math.cos(this.dTheta)
+            let sin = Math.sin(this.dTheta)
+            let top = new Vector2(0, -this.dLength)
+            this._deltaY = (2 * cos * cos - 1) * this.dLength
+            let deltaX = 2 * cos * this.dLength * sin
+            let bottomLeft = new Vector2(-deltaX, +this._deltaY)
+            let bottomRight = new Vector2(+deltaX, +this._deltaY)
+            this._points = [top, bottomLeft, bottomRight]
+        }
         return this._points
-    }
+    }   
 
     private _offset: Vector2
     public get offset(): Vector2 {
@@ -38,14 +48,6 @@ export class TriangleRigid extends RigidBase {
         this._dLength = len
         this._dTheta = theta
         this._offset = offset || new Vector2()
-        let cos = Math.cos(this.dTheta)
-        let sin = Math.sin(this.dTheta)
-        let top = new Vector2(0, -this.dLength)
-        this._deltaY = (2 * cos * cos - 1) * this.dLength
-        let deltaX = 2 * cos * this.dLength * sin
-        let bottomLeft = new Vector2(-deltaX, +this._deltaY)
-        let bottomRight = new Vector2(+deltaX, +this._deltaY)
-        this._points = [top, bottomLeft, bottomRight]
         this.cache = {}
         this.cache["LP1"] = this.points[1].copy().rotate(Math.PI / 2 - this.dTheta)
         this.cache["LP0"] = this.points[0].copy().rotate(Math.PI / 2 - this.dTheta)
@@ -54,14 +56,13 @@ export class TriangleRigid extends RigidBase {
     }
 
     getAxis(): Vector2[] {
-        // let axis1 = this.points[1].copy().sub(this.points[0]).rotate(this.theta)
-        // let axis2 = this.points[2].copy().sub(this.points[1]).rotate(this.theta)
-        // let axis3 = this.points[0].copy().sub(this.points[2]).rotate(this.theta)
-        // return [axis1, axis2, axis3]
-        throw new Error("Method not implemented.")
+        let axis1 = this.points[1].copy().sub(this.points[0]).rotate(this.theta).normal()
+        let axis2 = this.points[2].copy().sub(this.points[1]).rotate(this.theta).normal()
+        let axis3 = this.points[0].copy().sub(this.points[2]).rotate(this.theta).normal()
+        return [axis1, axis2, axis3]
     }
 
-    getClosestPoint(rigid: RigidBase): Contact {
+    getClosestPoint(rigid: RigidBase): Contact[] {
         let tri = this
         if (rigid instanceof CircleRigid) {
             let ball = rigid
@@ -124,14 +125,14 @@ export class TriangleRigid extends RigidBase {
             //     closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
             // }
 
-            return {
+            return [{
                 gA: tri.target,
                 gB: ball.target,
                 mPa: closestPointOnSelf,
                 mPb: closestPointOnOther,
                 normal: n,
                 distance: d.length() - ball.radius
-            }
+            }]
         } else if (rigid instanceof RectRigid) {
             return rigid.getClosestPoint(tri)
         } else if (rigid instanceof TriangleRigid) {
@@ -155,5 +156,8 @@ export class TriangleRigid extends RigidBase {
         ctx.closePath()
         ctx.stroke()
         ctx.restore()
+        
+        // 画分离轴
+        
     }
 }

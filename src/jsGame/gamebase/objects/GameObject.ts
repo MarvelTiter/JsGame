@@ -165,7 +165,7 @@ export class GameObject {
         for (const sc of selfComponents) {
             for (const c of components) {
                 let contact = sc.getClosestPoint(c)
-                contacts.push(contact)
+                contacts = contacts.concat(contact)
             }
         }        
         return contacts

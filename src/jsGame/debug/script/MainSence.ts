@@ -24,6 +24,7 @@ export class MainSence extends BaseSence {
     setup() {
         let t = new TestTriangle(this.game, this, 100, Math.PI / 8)
         t.pos = new Vector2(400, 400)
+        t.theta = Math.PI / 6
         this.addElement(t)
         this.tri = t
 
@@ -38,7 +39,8 @@ export class MainSence extends BaseSence {
         this.rect = r
 
         let r1 = new TestRect(this.game, this, new Size(100, 50))
-        r1.pos = new Vector2(600, 400)
+        r1.pos = new Vector2(630, 290)
+        r1.theta = Math.PI / 6
         this.addElement(r1)
         this.rect2 = r1
     }
@@ -51,10 +53,12 @@ export class MainSence extends BaseSence {
         //         this.contacts = this.contacts.concat(cs)
         //     }
         // }
-        let c1 = this.ball.checkCollision(this.tri)
-        this.contacts = this.contacts.concat(c1)
-        let c2 = this.ball.checkCollision(this.rect)
-        this.contacts = this.contacts.concat(c2)
+        // let c1 = this.ball.checkCollision(this.tri)
+        // this.contacts = this.contacts.concat(c1)
+        // let c2 = this.ball.checkCollision(this.rect)
+        // this.contacts = this.contacts.concat(c2)
+        // let c5 = this.ball.checkCollision(this.rect2)
+        // this.contacts = this.contacts.concat(c5)
         let c3 = this.tri.checkCollision(this.rect)
         this.contacts = this.contacts.concat(c3)
         let c4 = this.rect2.checkCollision(this.rect)

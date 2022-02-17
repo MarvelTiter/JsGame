@@ -73,8 +73,9 @@ export class Vector2 {
      * @returns {Vector2}
      */
     normal(): Vector2 {
-        if (this.x === 0) this.y = -this.y
-        else if (this.y === 0) this.x = -this.x
+        let { x, y } = this
+        this.x = -y
+        this.y = x
         return this
     }
 

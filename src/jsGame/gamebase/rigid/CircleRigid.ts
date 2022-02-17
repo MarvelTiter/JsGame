@@ -21,7 +21,7 @@ export class CircleRigid extends RigidBase {
         throw new Error("Method not implemented.")
     }
 
-    getClosestPoint(rigid: RigidBase): Contact {
+    getClosestPoint(rigid: RigidBase): Contact[] {
         let ball = this
         if (rigid instanceof RectRigid) {
             return rigid.getClosestPoint(ball)
@@ -47,14 +47,16 @@ export class CircleRigid extends RigidBase {
             // getdistance
             var dist = delata.length() - (ball.radius + ball.radius)
 
-            return {
-                gA: ball.target,
-                gB: ballB.target,
-                mPa: closestPointOnSelf,
-                mPb: closestPointOnOther,
-                normal: n,
-                distance: dist
-            }
+            return [
+                {
+                    gA: ball.target,
+                    gB: ballB.target,
+                    mPa: closestPointOnSelf,
+                    mPb: closestPointOnOther,
+                    normal: n,
+                    distance: dist
+                }
+            ]
         }
         throw new Error("unknow RigidType")
     }
