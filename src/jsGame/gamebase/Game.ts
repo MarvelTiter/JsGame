@@ -49,13 +49,8 @@ export class Game {
         let w: number = 0
         let h: number = 0
         if (!area) {
-            if (isMobile) {
-                w = window.document.body.clientWidth
-                h = window.document.body.clientHeight
-            } else {
-                w = 1000
-                h = 700
-            }
+            w = window.document.body.clientWidth
+            h = window.document.body.clientHeight
         }
         this.area = area ?? new Size(w, h)
         this.canvas.width = this.area.w

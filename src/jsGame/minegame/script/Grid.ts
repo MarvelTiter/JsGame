@@ -5,6 +5,7 @@ import { Cell } from "./Cell"
 import { Firework } from "./Firework"
 import { MineMapSize } from "./config"
 import { MouseArgs } from "../../gamebase/MouseArgs"
+import { CustomObject } from "../../gamebase/objects/CustomObject"
 
 function PadLeft(v: string, len: number, char: string): string {
     if (v.length < len) {
@@ -12,7 +13,7 @@ function PadLeft(v: string, len: number, char: string): string {
     }
     return v.toString()
 }
-export class Grid extends GameObject {
+export class Grid extends CustomObject {
     data!: Array<Array<Cell>>
     row: number
     column: number

@@ -1,4 +1,4 @@
-import { Vector2 } from "../data/Vector2";
+import { Vector2 } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
 
 /**
@@ -7,8 +7,8 @@ import { GameObject } from "../objects/GameObject"
 export interface Contact {
     gA: GameObject
     gB: GameObject
-    mPa:Vector2
-    mPb:Vector2
-    normal:Vector2
-    distance:number
+    mPa: Vector2
+    mPb: Vector2
+    normal: Vector2
+    distance: number
 }

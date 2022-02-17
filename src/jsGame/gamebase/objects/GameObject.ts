@@ -5,6 +5,7 @@ import { MouseArgs } from "../MouseArgs"
 import { Size } from "../data/Size"
 import { RigidBase } from "../rigid/RigidComponent"
 import { Contact } from "../rigid/Contact"
+import { IRectangle, Rect } from "../data/Rect"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
 //         return
@@ -33,7 +34,7 @@ import { Contact } from "../rigid/Contact"
 /**
  * 所有对象的基类
  */
-export class GameObject {
+export abstract class GameObject implements IRectangle {
     // onTick: Function | undefined
 
     //#region props
@@ -69,6 +70,8 @@ export class GameObject {
     public set pos(v: Vector2) {
         this._pos = v
     }
+
+    public abstract get center(): Vector2 
 
     private _offset: Vector2
     public get offset(): Vector2 {
@@ -141,6 +144,14 @@ export class GameObject {
         this._hasChanged = true
         this._components = new Map<string, RigidBase>()
     }
+    getRect(): Rect {
+        return {
+            x: this.pos.x,
+            y: this.pos.y,
+            w: this.size.w,
+            h: this.size.h
+        }
+    }
 
     checkFocu(x: number, y: number) {
         let isfocus = x - this.offset.x > this.pos.x && x - this.offset.x < this.pos.x + this.size.w && y - this.offset.y > this.pos.y && y - this.offset.y < this.pos.y + this.size.h
@@ -167,7 +178,7 @@ export class GameObject {
                 let contact = sc.getClosestPoint(c)
                 contacts = contacts.concat(contact)
             }
-        }        
+        }
         return contacts
     }
     onClick(e: MouseArgs) {}

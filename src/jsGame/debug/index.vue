@@ -3,7 +3,6 @@
     <Loading :percent="percent">
       <canvas id="canvas"></canvas>
     </Loading>
-    <br />
     <Debug></Debug>
   </div>
 </template>

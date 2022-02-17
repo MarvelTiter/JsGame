@@ -70,24 +70,23 @@ export class RectRigid extends RigidBase {
             let closestPointOnSelf = rect.pos.copy().add(fixedClosestV)
             // 球心指向矩形最近的点
             let d = ball.pos.copy().sub(closestPointOnSelf)
+            let dist = d.length()
             let n = d.normalize()
             // 球上最近的点
-            let closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
+            let closestPointOnOther = ball.pos.copy().sub(n.copy().multi(ball.radius))
             return [
                 {
                     gA: rect.target,
                     gB: ball.target,
                     mPa: closestPointOnSelf,
                     mPb: closestPointOnOther,
-                    normal: n.normalize(),
-                    distance: d.length() - ball.radius
+                    normal: n,
+                    distance: dist - ball.radius
                 }
             ]
         } else if (rigid instanceof TriangleRigid) {
             let tri = rigid
             let result = getClosestPoints(rect, tri)
-            console.log("tri dist", result.distance)
-
             return [
                 {
                     gA: rect.target,
@@ -101,7 +100,6 @@ export class RectRigid extends RigidBase {
         } else if (rigid instanceof RectRigid) {
             let rectB = rigid
             let result = getClosestPoints(rect, rectB)
-            console.log("rect dist", result.distance)
             return [
                 {
                     gA: rect.target,

@@ -1,5 +1,6 @@
 import { BaseSence } from "../BaseSence"
 import { Size } from "../data/Size"
+import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CustomObject } from "../objects/CustomObject"
 import { GameImage } from "../Source"
@@ -11,6 +12,14 @@ export class GameStatisEntity extends CustomObject {
         this.image = game.getTextureByName(name)
         this.size = new Size(this.image.size.w, this.image.size.h)
         this.radius = (this.size.w + this.size.h) / 2
+    }
+
+    private _center: Vector2 | undefined
+    public get center(): Vector2 {
+        if (this._center === undefined) {
+            this._center = new Vector2(this.pos.x + this.size.w / 2, this.pos.y + this.size.h / 2)
+        }
+        return this._center
     }
 
     draw(ctx: CanvasRenderingContext2D): void {

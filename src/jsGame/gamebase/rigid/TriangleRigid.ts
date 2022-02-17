@@ -29,7 +29,7 @@ export class TriangleRigid extends RigidBase {
             this._points = [top, bottomLeft, bottomRight]
         }
         return this._points
-    }   
+    }
 
     private _offset: Vector2
     public get offset(): Vector2 {
@@ -70,6 +70,7 @@ export class TriangleRigid extends RigidBase {
             let closestPointOnOther: Vector2
             let n: Vector2
             let d: Vector2
+            let dist: number
             let delta = ball.pos.copy().sub(tri.pos)
             let rotatedDelta = delta.rotate(-tri.theta)
             if (rotatedDelta.y < tri._deltaY) {
@@ -81,9 +82,6 @@ export class TriangleRigid extends RigidBase {
                     let fixed = horRotated.max(horLeft).min(horRight)
                     let fixedClosestV = fixed.rotate(tri.dTheta - Math.PI / 2).rotate(tri.theta)
                     closestPointOnSelf = tri.pos.copy().add(fixedClosestV)
-                    d = ball.pos.copy().sub(closestPointOnSelf)
-                    n = d.copy().normalize()
-                    closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
                 } else {
                     // 在三角形重心右边
                     let horRotated = rotatedDelta.rotate(tri.dTheta - Math.PI / 2)
@@ -92,9 +90,6 @@ export class TriangleRigid extends RigidBase {
                     let fixed = horRotated.max(horLeft).min(horRight)
                     let fixedClosestV = fixed.rotate(Math.PI / 2 - tri.dTheta).rotate(tri.theta)
                     closestPointOnSelf = tri.pos.copy().add(fixedClosestV)
-                    d = ball.pos.copy().sub(closestPointOnSelf)
-                    n = d.copy().normalize()
-                    closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
                 }
             } else {
                 let horLeft = tri.points[1]
@@ -102,37 +97,21 @@ export class TriangleRigid extends RigidBase {
                 let fixed = rotatedDelta.max(horLeft).min(horRight)
                 fixed.rotate(tri.theta)
                 closestPointOnSelf = tri.pos.copy().add(fixed)
-                d = ball.pos.copy().sub(closestPointOnSelf)
-                n = d.copy().normalize()
-                closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
             }
-            // for (let index = 0; index < 3; index++) {
-            //     const p1 = tri.points[index]
-            //     const p2 = tri.points[(index + 1) % 3]
-            //     let v1 = p2.copy().sub(p1)
-            //     let vo = ball.pos.copy().sub(p1)
-            //     let dot = v1.dot(vo)
-            //     if (dot <= 0) {
-            //         closestPointOnSelf = p1
-            //     } else if (dot >= v1.length()) {
-            //         closestPointOnSelf = p2
-            //     } else {
-            //         let vn = v1.normalize()
-            //         closestPointOnSelf = vn.multi(dot)
-            //     }
-            //     let d = ball.pos.copy().sub(closestPointOnSelf)
-            //     let n = d.normalize()
-            //     closestPointOnOther = ball.pos.copy().sub(n.multi(ball.radius))
-            // }
-
-            return [{
-                gA: tri.target,
-                gB: ball.target,
-                mPa: closestPointOnSelf,
-                mPb: closestPointOnOther,
-                normal: n,
-                distance: d.length() - ball.radius
-            }]
+            d = ball.pos.copy().sub(closestPointOnSelf)
+            dist = d.length()
+            n = d.normalize()
+            closestPointOnOther = ball.pos.copy().sub(n.copy().multi(ball.radius))
+            return [
+                {
+                    gA: tri.target,
+                    gB: ball.target,
+                    mPa: closestPointOnSelf,
+                    mPb: closestPointOnOther,
+                    normal: n,
+                    distance: dist - ball.radius
+                }
+            ]
         } else if (rigid instanceof RectRigid) {
             return rigid.getClosestPoint(tri)
         } else if (rigid instanceof TriangleRigid) {
@@ -156,8 +135,7 @@ export class TriangleRigid extends RigidBase {
         ctx.closePath()
         ctx.stroke()
         ctx.restore()
-        
+
         // 画分离轴
-        
     }
 }

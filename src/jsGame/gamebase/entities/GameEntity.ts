@@ -1,5 +1,6 @@
 import { BaseSence } from "../BaseSence"
 import { Size } from "../data/Size"
+import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CustomObject } from "../objects/CustomObject"
 import { GameImage } from "../Source"
@@ -16,8 +17,12 @@ export class GameEntity extends CustomObject {
         this.radius = (this.size.w + this.size.h) / 2
     }
 
+    public get center(): Vector2 {
+        return this.pos
+    }
+
     draw(ctx: CanvasRenderingContext2D): void {
-        let pos = this.pos.copy().add(this.offset)        
+        let pos = this.pos.copy().add(this.offset)
         ctx.save()
         ctx.translate(pos.x, pos.y)
         ctx.rotate(this.theta)

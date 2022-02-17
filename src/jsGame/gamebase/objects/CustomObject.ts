@@ -8,6 +8,9 @@ import { TriangleRigid } from "../rigid/TriangleRigid"
 import { GameObject } from "./GameObject"
 
 export class CustomObject extends GameObject {
+    public get center(): Vector2 {
+        throw new Error("Method not implemented.")
+    }
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
     }

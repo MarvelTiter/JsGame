@@ -1,9 +1,8 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
-import { GameEntity } from "../../gamebase/entities/GameEntity"
-import { GameObject } from "../../gamebase/objects/GameObject"
+import { CustomObject } from "../../gamebase/objects/CustomObject"
 
-export class Background extends GameObject {
+export class Background extends CustomObject {
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
     }

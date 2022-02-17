@@ -1,3 +1,5 @@
+import { Rect } from "./Rect"
+
 export class Size {
     w: number
     h: number
@@ -19,3 +21,5 @@ export class Size {
         return new Size(this.w, this.h)
     }
 }
+
+
