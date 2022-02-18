@@ -101,6 +101,13 @@ export class Vector2 {
         return this
     }
 
+    equal(vec: Vector2): boolean {
+        let deltaX = this.x - vec.x
+        let deltaY = this.y - vec.y
+
+        return Math.abs(deltaX) < 0.00001 && Math.abs(deltaY) < 0.00001
+    }
+
     /**
      * 向量点积
      * @param  {Vector2} vec

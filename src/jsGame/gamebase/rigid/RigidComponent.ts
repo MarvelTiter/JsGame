@@ -1,3 +1,4 @@
+import { AxisInfo } from "../data/AxisInfo"
 import { Vector2 } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
 import { Contact } from "./Contact"
@@ -15,6 +16,7 @@ export abstract class RigidBase {
 
     // 整体旋转角度/弧度
     private _theta: number = 0
+    private posHasChanged: boolean = false
     public get theta(): number {
         return this._theta
     }
@@ -25,17 +27,19 @@ export abstract class RigidBase {
     }
 
     protected thetaChanged: boolean = false
-    
+
     private _apCache: Vector2[] | undefined
     /**
      * 绘制在坐标轴中的实际坐标
      */
     public get actualPoints(): Vector2[] {
-        if (this.thetaChanged || this._apCache === undefined) {
+        if (this.thetaChanged || this.posHasChanged || this._apCache === undefined) {
             this._apCache = []
             for (const p of this.points) {
                 this._apCache.push(p.copy().rotate(this.theta).add(this.pos))
             }
+            this.thetaChanged = false
+            this.posHasChanged = false
         }
         return this._apCache
     }
@@ -52,13 +56,16 @@ export abstract class RigidBase {
         this.target = obj
     }
     update(): void {
-        this.pos.set(this.target.pos.x, this.target.pos.y)
+        if (!this.pos.equal(this.target.pos)) {
+            this.posHasChanged = true
+            this.pos.set(this.target.pos.x, this.target.pos.y)
+        }
         this.theta = this.target.theta
     }
     /**
      * 凸多边形各边的法向量（投影轴
      */
-    abstract getAxis(): Vector2[]
+    abstract getAxis(): AxisInfo[]
     /**
      * 定义多边形的顶点(原点(0,0))
      */

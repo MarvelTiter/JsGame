@@ -6,7 +6,7 @@ export class QuadTree<T extends IRectangle> {
     private objects!: T[]
     private level: number = 0
     private bounds!: Rect
-    private nodes!: QuadTree<T>[] | null[]
+    private nodes!: QuadTree<T>[] | undefined[]
 
     constructor(level: number, pBounds: Rect) {
         this.level = level
@@ -18,7 +18,7 @@ export class QuadTree<T extends IRectangle> {
         this.objects.splice(0)
         for (let i = 0; i < this.nodes.length; i++) {
             this.nodes[i]?.clear()
-            this.nodes[i] = null
+            this.nodes[i] = undefined
         }
     }
     split(): void {
@@ -89,7 +89,7 @@ export class QuadTree<T extends IRectangle> {
         let first: T = obj
         let pRect: Rect = first.getRect()
 
-        if (this.nodes[0] != null) {
+        if (this.nodes[0] != undefined) {
             let indexes: number[] = this.getIndexes(pRect)
             for (let ii = 0; ii < indexes.length; ii++) {
                 let index = indexes[ii]
@@ -103,7 +103,7 @@ export class QuadTree<T extends IRectangle> {
         this.objects.push(first)
 
         if (this.objects.length > MAX_OBJECTS && this.level < MAX_LEVELS) {
-            if (this.nodes[0] == null) {
+            if (this.nodes[0] == undefined) {
                 this.split()
             }
 
@@ -129,7 +129,7 @@ export class QuadTree<T extends IRectangle> {
         let indexes = this.getIndexes(pRect)
         for (let ii = 0; ii < indexes.length; ii++) {
             let index = indexes[ii]
-            if (index != -1 && this.nodes[0] != null) {
+            if (index != -1 && this.nodes[0] != undefined) {
                 this.nodes[index]?.retrieve(fSpriteList, pRect)
             }
             fSpriteList = fSpriteList.concat(this.objects)

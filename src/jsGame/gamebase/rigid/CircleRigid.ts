@@ -1,3 +1,4 @@
+import { AxisInfo } from "../data/AxisInfo"
 import { Vector2 } from "../data/Vector2"
 import { Contact } from "./Contact"
 import { RectRigid } from "./RectRigid"
@@ -17,7 +18,7 @@ export class CircleRigid extends RigidBase {
         this._radius = radius
     }
 
-    getAxis(): Vector2[] {
+    getAxis(): AxisInfo[] {
         throw new Error("Method not implemented.")
     }
 

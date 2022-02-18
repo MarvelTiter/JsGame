@@ -17,7 +17,7 @@ export class TestObject extends CustomObject {
             let clickPoint = new Vector2(x, y)
             let offset = clickPoint.sub(this.pos)
             this.pos.add(offset)
-            
+            console.log(this.pos)
         }
     }
     onMouseUp(): void {

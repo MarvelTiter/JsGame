@@ -41,7 +41,7 @@ export class MainSence extends BaseSence {
         let r1 = new TestRect(this.game, this, new Size(100, 50))
         r1.pos = new Vector2(630, 290)
         r1.theta = Math.PI / 6
-        this.addElement(r1)
+        // this.addElement(r1)
         this.rect2 = r1
     }
     public update(): void {
@@ -61,7 +61,7 @@ export class MainSence extends BaseSence {
         // this.contacts = this.contacts.concat(c5)
         let c3 = this.tri.checkCollision(this.rect)
         this.contacts = this.contacts.concat(c3)
-        let c4 = this.rect2.checkCollision(this.rect)
-        this.contacts = this.contacts.concat(c4)
+        // let c4 = this.rect2.checkCollision(this.rect)
+        // this.contacts = this.contacts.concat(c4)
     }
 }

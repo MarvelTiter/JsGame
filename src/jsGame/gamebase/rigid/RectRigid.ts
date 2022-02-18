@@ -1,3 +1,4 @@
+import { AxisInfo } from "../data/AxisInfo"
 import { Size } from "../data/Size"
 import { Vector2 } from "../data/Vector2"
 import { CircleRigid } from "./CircleRigid"
@@ -48,10 +49,17 @@ export class RectRigid extends RigidBase {
         this.pos.add(this.offset)
     }
 
-    getAxis(): Vector2[] {
+    getAxis(): AxisInfo[] {
         let xAxis = new Vector2(1, 0).rotate(this.theta)
         let yAxis = new Vector2(0, 1).rotate(this.theta)
-        return [xAxis, yAxis]
+        let xStart = new Vector2(this.actualPoints[0].x, this.actualPoints[0].y + this.size.h / 2)
+        let xEnd = new Vector2(this.actualPoints[2].x, this.actualPoints[2].y + this.size.h / 2)
+        let yStart = new Vector2(this.actualPoints[0].x + this.size.w / 2, this.actualPoints[0].y)
+        let yEnd = new Vector2(this.actualPoints[1].x + this.size.w / 2, this.actualPoints[1].y)
+        return [
+            { axis: xAxis, points: { start: xStart, end: xEnd, offset: this.size.w / 2 } },
+            { axis: yAxis, points: { start: yStart, end: yEnd, offset: this.size.h / 2 } }
+        ]
     }
 
     getClosestPoint(rigid: RigidBase): Contact[] {

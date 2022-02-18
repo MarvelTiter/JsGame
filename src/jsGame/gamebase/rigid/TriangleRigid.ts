@@ -1,4 +1,5 @@
 import { threadId } from "worker_threads"
+import { AxisInfo } from "../data/AxisInfo"
 import { Vector2 } from "../data/Vector2"
 import { CircleRigid } from "./CircleRigid"
 import { Contact } from "./Contact"
@@ -55,11 +56,15 @@ export class TriangleRigid extends RigidBase {
         this.cache["RP2"] = this.points[2].copy().rotate(this.dTheta - Math.PI / 2)
     }
 
-    getAxis(): Vector2[] {
-        let axis1 = this.points[1].copy().sub(this.points[0]).rotate(this.theta).normal()
-        let axis2 = this.points[2].copy().sub(this.points[1]).rotate(this.theta).normal()
-        let axis3 = this.points[0].copy().sub(this.points[2]).rotate(this.theta).normal()
-        return [axis1, axis2, axis3]
+    getAxis(): AxisInfo[] {
+        let axis1 = this.actualPoints[1].copy().sub(this.actualPoints[0]).normal().normalize()
+        let axis2 = this.actualPoints[2].copy().sub(this.actualPoints[1]).normal().normalize()
+        let axis3 = this.actualPoints[0].copy().sub(this.actualPoints[2]).normal().normalize()
+        return [
+            { axis: axis1, points: { start: this.actualPoints[0], end: this.actualPoints[1] } },
+            { axis: axis2, points: { start: this.actualPoints[1], end: this.actualPoints[2] } },
+            { axis: axis3, points: { start: this.actualPoints[2], end: this.actualPoints[0] } }
+        ]
     }
 
     getClosestPoint(rigid: RigidBase): Contact[] {
