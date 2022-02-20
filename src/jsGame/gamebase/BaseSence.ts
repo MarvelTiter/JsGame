@@ -1,9 +1,13 @@
 import { Camera } from "./Camera"
+import { collides } from "./collision/collides"
 import { Size } from "./data/Size"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
 import { GameObject } from "./objects/GameObject"
-import { Contact } from "./rigid/Contact"
+import { Contact } from "./collision/Contact"
+import { ContactManage } from "./collision/ContactManage"
+import { CollisionInfo } from "./collision/CollisionInfo"
+import { RigidBase } from "./rigid/RigidComponent"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void
@@ -20,18 +24,19 @@ export interface KeyStatus {
  */
 export class BaseSence {
     game: Game
-    protected elements: GameObject[]
+    protected elements: GameObject[] = []
+    private rigidElements: Map<string, RigidBase>
     private elementMap: Map<string, GameObject>
     private keys: Map<string, KeyStatus>
     private actions: Map<string, ObjectAction>
     // onceAction: Map<string, ObjectAction>;
 
-    private _contacts: Contact[]
-    public get contacts(): Contact[] {
-        return this._contacts
+    private _ContactsMag: ContactManage
+    public get ContactsMag(): ContactManage {
+        return this._ContactsMag
     }
-    public set contacts(v: Contact[]) {
-        this._contacts = v
+    public set ContactsMag(v: ContactManage) {
+        this._ContactsMag = v
     }
 
     private _camera: Camera | undefined
@@ -54,9 +59,9 @@ export class BaseSence {
     // game:Game;
     constructor(game: Game) {
         this.game = game
-        this.elements = []
-        this._contacts = []
+        this._ContactsMag = new ContactManage()
         this.elementMap = new Map<string, GameObject>()
+        this.rigidElements = new Map<string, RigidBase>()
         this.keys = new Map<string, KeyStatus>()
         this.actions = new Map<string, ObjectAction>()
         this.size = game.area
@@ -65,12 +70,16 @@ export class BaseSence {
     public addElement<T extends GameObject>(e: T): void {
         this.elements.push(e)
         this.elementMap.set(e.id, e)
+        if (e.IsRigid) {
+            this.rigidElements.set(e.id, e.getComponent())
+        }
     }
 
     public removeElement<T extends GameObject>(e: T): void {
         let index = this.elements.indexOf(e)
         this.elements.splice(index, 1)
         this.elementMap.delete(e.id)
+        this.rigidElements.delete(e.id)
     }
 
     //#region Dom事件注册和处理
@@ -218,7 +227,31 @@ export class BaseSence {
         else return false
     }
 
-    public update(): void {
+    public update(): void {}
+
+    public draw(ctx: CanvasRenderingContext2D): void {
+        for (const e of this.elements.values()) {
+            e.elementDraw(ctx)
+            if (window.Debug) {
+                let c = e.getComponent()
+                c?.drawDebug(ctx)
+            }
+        }
+        if (window.Debug) {
+            ctx.fillStyle = "#00ff00"
+            for (const c of this.ContactsMag.list) {
+                for (const p of c.collision.supports) {
+                    if (p === undefined) continue
+                    ctx.beginPath()
+                    ctx.arc(p.point.x, p.point.y, 2, 0, Math.PI * 2)
+                    ctx.closePath()
+                    ctx.fill()
+                }
+            }
+        }
+    }
+
+    private handleKeyboardEvents(): void {
         if (this.keydown) {
             for (const actionKey of this.actions.keys()) {
                 let ks = this.keys.get(actionKey)!
@@ -232,38 +265,75 @@ export class BaseSence {
                 }
             }
         }
-        for (const e of this.elements.values()) {
-            e.elementUpdate()
-        }
-        this.camera.trace()
-        this.draw(this.game.context)
     }
 
-    public draw(ctx: CanvasRenderingContext2D): void {
-        for (const e of this.elements.values()) {
-            e.elementDraw(ctx)
-            if (window.Debug) {
-                for (const c of e.getComponent()) {
-                    c.drawDebug(ctx)
+    /**
+     * 更新重力影响
+     */
+    private applyGravity(objects: RigidBase[]): void {
+        if (!this.game.options.enableGravity) {
+            return
+        }
+        let options = this.game.options
+        let g = options.gravity.copy().multi(options.gravityScale)
+        for (const ee of objects) {
+            if (ee.mass > 0) {
+                ee.applyGravity(g)
+            }
+        }
+    }
+    private collitionTest(objects: RigidBase[]): CollisionInfo[] {
+        if (!this.game.options.enableCollide) {
+            return []
+        }
+        let ret: CollisionInfo[] = []
+        for (let ii = 0; ii < objects.length; ii++) {
+            const eii = objects[ii]
+            for (let jj = ii + 1; jj < this.elements.length; jj++) {
+                const ejj = objects[jj]
+                let coll = collides(this.ContactsMag, eii, ejj)
+                if (coll !== undefined) {
+                    ret.push(coll)
                 }
             }
         }
-        if (!window.Debug) return 
-        for (const contact of this.contacts) {
-            ctx.fillStyle = "#00ff00"
-            ctx.beginPath()
-            ctx.arc(contact.mPa.x, contact.mPa.y, 2, 0, Math.PI * 2)
-            ctx.fill()
-            ctx.arc(contact.mPb.x, contact.mPb.y, 2, 0, Math.PI * 2)
-            ctx.fill()
-            ctx.closePath()
-
-            ctx.beginPath()
-            ctx.strokeStyle = "#0000ff"
-            ctx.moveTo(contact.mPa.x, contact.mPa.y)
-            ctx.lineTo(contact.mPb.x, contact.mPb.y)
-            ctx.stroke()
-            ctx.closePath()
+        return ret
+    }
+    private _rigidsCache: RigidBase[] | undefined
+    get rigidsCache(): RigidBase[] {
+        if (this._rigidsCache === undefined) {
+            this._rigidsCache = Array.from(this.rigidElements.values())
         }
+        return this._rigidsCache
+    }
+    private updateCollide(): void {
+        let colls = this.collitionTest(this.rigidsCache)
+        this.ContactsMag.Update(colls)
+    }
+    private clearForce(rigidsCache: RigidBase[]) {
+        for (const ri of rigidsCache) {
+            ri.clearForce()
+        }
+    }
+
+    public Tick(): void {
+        for (const e of this.elements.values()) {
+            e.elementUpdate()
+        }
+        this.update()
+        // 处理按键事件
+        this.handleKeyboardEvents()
+        //
+        this.applyGravity(this.rigidsCache)
+        //
+        this.updateCollide()
+        this.ContactsMag.preSolve()
+        this.ContactsMag.solve()
+        this.ContactsMag.postSolve(this.rigidsCache)
+        this.ContactsMag.preSolveVelocity()
+        this.ContactsMag.solveVelocity()
+        this.clearForce(this.rigidsCache)
+        this.camera.trace()
+        this.draw(this.game.context)
     }
 }

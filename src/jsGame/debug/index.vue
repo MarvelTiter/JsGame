@@ -27,10 +27,14 @@ onMounted(async () => {
     attack_effect: `/sprites/plane/attack_effect.json`,
   }
   let sources = await loadSprites(images, scripts, (c, t) => percent.value = c / t)
-  let g = new Game(sources);
+  let g = new Game(sources, {
+    enableCollide: true, enableGravity: false
+  });
   let ms = new MainSence(g);
   g.setSence(ms);
   g.run();
-
+  Object.assign(window, {
+    game: g
+  })
 });
 </script>

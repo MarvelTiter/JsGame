@@ -1,6 +1,6 @@
 import { AxisInfo } from "../data/AxisInfo"
 import { Vector2 } from "../data/Vector2"
-import { Contact } from "./Contact"
+import { Contact } from "../collision/Contact"
 import { RectRigid } from "./RectRigid"
 import { RigidBase } from "./RigidComponent"
 import { TriangleRigid } from "./TriangleRigid"
@@ -14,51 +14,47 @@ export class CircleRigid extends RigidBase {
         throw new Error("Method not implemented.")
     }
     constructor(radius: number, mass?: number) {
-        super("Circle", mass)
+        super(mass)
         this._radius = radius
     }
 
-    getAxis(): AxisInfo[] {
-        throw new Error("Method not implemented.")
-    }
-
     getClosestPoint(rigid: RigidBase): Contact[] {
-        let ball = this
-        if (rigid instanceof RectRigid) {
-            return rigid.getClosestPoint(ball)
-        } else if (rigid instanceof TriangleRigid) {
-            return rigid.getClosestPoint(ball)
-        } else if (rigid instanceof CircleRigid) {
-            let ballB = rigid
-            let delata = new Vector2(ballB.pos.x - ball.pos.x, ballB.pos.y - ball.pos.y)
-            let n: Vector2
-            if (delata.length()) {
-                n = delata.normalize()
-            } else {
-                n = new Vector2(1, 0)
-            }
-            let closestPointOnSelf = new Vector2()
-            closestPointOnSelf.x = ball.pos.x + n.x * ball.radius
-            closestPointOnSelf.y = ball.pos.y + n.y * ball.radius
+        // let ball = this
+        // if (rigid instanceof RectRigid) {
+        //     return rigid.getClosestPoint(ball)
+        // } else if (rigid instanceof TriangleRigid) {
+        //     return rigid.getClosestPoint(ball)
+        // } else if (rigid instanceof CircleRigid) {
+        //     let ballB = rigid
+        //     let delata = new Vector2(ballB.pos.x - ball.pos.x, ballB.pos.y - ball.pos.y)
+        //     let n: Vector2
+        //     if (delata.length()) {
+        //         n = delata.normalize()
+        //     } else {
+        //         n = new Vector2(1, 0)
+        //     }
+        //     let closestPointOnSelf = new Vector2()
+        //     closestPointOnSelf.x = ball.pos.x + n.x * ball.radius
+        //     closestPointOnSelf.y = ball.pos.y + n.y * ball.radius
 
-            let closestPointOnOther = new Vector2()
-            closestPointOnOther.x = ballB.pos.x - n.x * ballB.radius
-            closestPointOnOther.y = ballB.pos.y - n.y * ballB.radius
+        //     let closestPointOnOther = new Vector2()
+        //     closestPointOnOther.x = ballB.pos.x - n.x * ballB.radius
+        //     closestPointOnOther.y = ballB.pos.y - n.y * ballB.radius
 
-            // getdistance
-            var dist = delata.length() - (ball.radius + ball.radius)
+        //     // getdistance
+        //     var dist = delata.length() - (ball.radius + ball.radius)
 
-            return [
-                {
-                    gA: ball.target,
-                    gB: ballB.target,
-                    mPa: closestPointOnSelf,
-                    mPb: closestPointOnOther,
-                    normal: n,
-                    distance: dist
-                }
-            ]
-        }
+        //     return [
+        //         {
+        //             gA: ball.target,
+        //             gB: ballB.target,
+        //             mPa: closestPointOnSelf,
+        //             mPb: closestPointOnOther,
+        //             normal: n,
+        //             distance: dist
+        //         }
+        //     ]
+        // }
         throw new Error("unknow RigidType")
     }
 

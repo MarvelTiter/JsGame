@@ -17,16 +17,16 @@ export class CustomObject extends GameObject {
     public addRectRigid(size: Size, offset?: Vector2, name?: string): void {
         let rg = new RectRigid(size, offset)
         rg.bind(this)
-        this.addComponent(name ?? Math.random().toString(36).slice(2), rg)
+        this.addComponent(rg)
     }
     public addCircleRigid(radius: number, name?: string): void {
         let cg = new CircleRigid(radius, 0)
         cg.bind(this)
-        this.addComponent(name ?? Math.random().toString(36).slice(2), cg)
+        this.addComponent(cg)
     }
     public addTriangleRigid(len: number, theta: number, name?: string): void {
         let tg = new TriangleRigid(len, theta)
         tg.bind(this)
-        this.addComponent(name ?? Math.random().toString(36).slice(2), tg)
+        this.addComponent(tg)
     }
 }

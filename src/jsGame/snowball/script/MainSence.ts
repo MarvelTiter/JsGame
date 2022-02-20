@@ -3,7 +3,7 @@ import { Button } from "../../gamebase/Button"
 import { Size } from "../../gamebase/data/Size"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
-import { Contact } from "../../gamebase/rigid/Contact"
+import { Contact } from "../../gamebase/collision/Contact"
 import { Background } from "./Background"
 import { Ball } from "./Ball"
 import { Tree } from "./Tree"
@@ -76,18 +76,9 @@ export class MainSence extends BaseSence {
     }
 
     public update(): void {
-        super.update()
         this.createTree(20 - this.treeCollection.size).forEach(tree => {
             this.treeCollection.set(tree.id, tree)
             this.addElement(tree)
         })
-        let contacts: Contact[] = []
-        for (const t of this.treeCollection.values()) {
-            if (t.pos.y + t.size.h / 2 > this.ball.pos.y) {
-                let c = this.ball.checkCollision(t)
-                contacts = contacts.concat(c)
-            }
-        }
-        this.contacts = contacts
     }
 }

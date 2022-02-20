@@ -4,7 +4,7 @@ import { Vector2 } from "../data/Vector2"
 import { MouseArgs } from "../MouseArgs"
 import { Size } from "../data/Size"
 import { RigidBase } from "../rigid/RigidComponent"
-import { Contact } from "../rigid/Contact"
+import { Contact } from "../collision/Contact"
 import { IRectangle, Rect } from "../data/Rect"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
@@ -71,7 +71,7 @@ export abstract class GameObject implements IRectangle {
         this._pos = v
     }
 
-    public abstract get center(): Vector2 
+    public abstract get center(): Vector2
 
     private _offset: Vector2
     public get offset(): Vector2 {
@@ -122,8 +122,6 @@ export abstract class GameObject implements IRectangle {
         this._onTick = v
     }
 
-    private _components: Map<string, RigidBase>
-
     private _theta: number = 0
     public get theta(): number {
         return this._theta
@@ -142,7 +140,6 @@ export abstract class GameObject implements IRectangle {
         this._size = new Size()
         this._focus = false
         this._hasChanged = true
-        this._components = new Map<string, RigidBase>()
     }
     getRect(): Rect {
         return {
@@ -161,26 +158,33 @@ export abstract class GameObject implements IRectangle {
         return this.focus
     }
 
-    protected addComponent<T extends RigidBase>(name: string, com: T): void {
-        this._components.set(name, com)
+    public get IsRigid(): boolean {
+        return this._components !== undefined
+    }
+    private _components: RigidBase | undefined
+    protected addComponent<T extends RigidBase>(com: T): void {
+        this._components = com
     }
 
-    public getComponent(): IterableIterator<RigidBase> {
-        return this._components.values()
-    }
-
-    public checkCollision(obj: GameObject): Contact[] {
-        let selfComponents = this.getComponent()
-        let components = obj.getComponent()
-        let contacts: Contact[] = []
-        for (const sc of selfComponents) {
-            for (const c of components) {
-                let contact = sc.getClosestPoint(c)
-                contacts = contacts.concat(contact)
-            }
+    public getComponent(): RigidBase {
+        if (this._components === undefined) {
+            throw new Error(`${this.id} did not set component`)
         }
-        return contacts
+        return this._components
     }
+
+    // public checkCollision(obj: GameObject): Contact[] {
+    //     let selfComponents = this.getComponent()
+    //     let components = obj.getComponent()
+    //     let contacts: Contact[] = []
+    //     for (const sc of selfComponents) {
+    //         for (const c of components) {
+    //             let contact = sc.getClosestPoint(c)
+    //             contacts = contacts.concat(contact)
+    //         }
+    //     }
+    //     return contacts
+    // }
     onClick(e: MouseArgs) {}
     onMouseOver(e: MouseArgs) {}
     onMouseUp() {}
@@ -205,9 +209,7 @@ export abstract class GameObject implements IRectangle {
     elementUpdate() {
         // if (!this.updateRequest()) return
         this.update()
-        for (const c of this._components.values()) {
-            c.update()
-        }
+        if (this.IsRigid) this.getComponent().update()
         if (this._onTick) this.onTick(this)
         // this.hasChanged = false
     }

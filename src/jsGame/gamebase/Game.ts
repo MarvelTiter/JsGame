@@ -1,5 +1,6 @@
 import { BaseSence } from "./BaseSence"
 import { Size } from "./data/Size"
+import { createOption, defaultOption, options } from "./GameOptions"
 import { GameObject } from "./objects/GameObject"
 import { GameImage } from "./Source"
 
@@ -32,12 +33,14 @@ export class Game {
     sence!: BaseSence
     area!: Size
     device: string = DEVICE_PC
-    constructor(images: Map<string, GameImage>, area?: Size) {
+    options: options
+    constructor(images: Map<string, GameImage>, opts?: Partial<options>, area?: Size) {
         this.canvas = document.querySelector("#canvas") as HTMLCanvasElement
         this.context = this.canvas.getContext("2d")
         this.enableMouseAction = false
         this.images = images
         this.areaSetup(area)
+        this.options = createOption(opts || {})
         this.eventSetup()
     }
     areaSetup(area?: Size) {
@@ -127,7 +130,7 @@ export class Game {
             window.requestAnimationFrame(this.loop.bind(this))
             return
         }
-        this.sence.update()
+        this.sence.Tick()
         window.requestAnimationFrame(this.loop.bind(this))
     }
 

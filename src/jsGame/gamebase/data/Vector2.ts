@@ -1,3 +1,5 @@
+import { RigidBase } from "../rigid/RigidComponent"
+
 /**
  * 二维向量
  */
@@ -7,6 +9,10 @@ export class Vector2 {
     constructor(x?: number, y?: number) {
         this.x = x || 0
         this.y = y || 0
+    }
+
+    static new(x: number, y: number) {
+        return new Vector2(x, y)
     }
 
     set(x: number, y: number): Vector2 {
@@ -116,4 +122,17 @@ export class Vector2 {
     dot(vec: Vector2): number {
         return this.x * vec.x + this.y * vec.y
     }
+    /**
+     * 向量叉积
+     * @param {Vector2} vec
+     */
+    cross(vec: Vector2): number {
+        return this.x * vec.y - this.y * vec.x
+    }
+}
+
+export interface Vertex {
+    point: Vector2
+    index: number
+    belonged: RigidBase
 }
