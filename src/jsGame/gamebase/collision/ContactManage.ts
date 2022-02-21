@@ -155,13 +155,13 @@ export class ContactManage {
             for (const rel of relates) {
                 let relVertex = rel.vertex
                 //
-                let offsetA = relVertex.point.copy().sub(bodyA.pos),
-                    offsetB = relVertex.point.copy().sub(bodyB.pos)
+                let rA = relVertex.point.copy().sub(bodyA.pos),
+                    rB = relVertex.point.copy().sub(bodyB.pos)
                 //
-                let velocityPointAX = bodyAVelocity.x - offsetA.y * bodyA.angularVelocity,
-                    velocityPointAY = bodyAVelocity.y + offsetA.x * bodyA.angularVelocity,
-                    velocityPointBX = bodyBVelocity.x - offsetB.y * bodyB.angularVelocity,
-                    velocityPointBY = bodyBVelocity.y + offsetB.x * bodyB.angularVelocity
+                let velocityPointAX = bodyAVelocity.x - rA.y * bodyA.angularVelocity,
+                    velocityPointAY = bodyAVelocity.y + rA.x * bodyA.angularVelocity,
+                    velocityPointBX = bodyBVelocity.x - rB.y * bodyB.angularVelocity,
+                    velocityPointBY = bodyBVelocity.y + rB.x * bodyB.angularVelocity
                 //
                 let relativeVelocityX = velocityPointAX - velocityPointBX,
                     relativeVelocityY = velocityPointAY - velocityPointBY
@@ -187,9 +187,9 @@ export class ContactManage {
                     tangentImpulse = tangentVelocity
                     maxFriction = Number.MAX_VALUE
                 }
-                // account for mass, inertia and contact offset
-                let oAcN = offsetA.cross(normal),
-                    oBcN = offsetB.cross(normal),
+                // 计算有效质量
+                let oAcN = rA.cross(normal),
+                    oBcN = rB.cross(normal),
                     share = shared / (inverseMassTotal + bodyA.invInertia * oAcN * oAcN + bodyB.invInertia * oBcN * oBcN)
 
                 // raw impulses
@@ -229,11 +229,11 @@ export class ContactManage {
                 // apply impulse from contact
                 if (!bodyA.isStatis) {
                     bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
-                    bodyA.anglePrev! += offsetA.cross(impulseVec) * bodyA.invInertia
+                    bodyA.anglePrev! += rA.cross(impulseVec) * bodyA.invInertia
                 }
                 if (!bodyB.isStatis) {
                     bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
-                    bodyB.anglePrev! -= offsetB.cross(impulseVec) * bodyB.invInertia
+                    bodyB.anglePrev! -= rB.cross(impulseVec) * bodyB.invInertia
                 }
             }
         }

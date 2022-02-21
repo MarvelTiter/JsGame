@@ -54,9 +54,9 @@ export abstract class RigidBase {
         return 1 / this.mass
     }
     /**
-     * 惯性
+     * 转动惯量
      */
-    inertia: number = 1
+    inertia!: number
     /**
      *
      */
@@ -147,7 +147,7 @@ export abstract class RigidBase {
     }
     setStatis() {
         this.isStatis = true
-        this.restitution = 0
+        this.restitution = 1
         this.friction = 1
         this.mass = this.inertia = this.density = Infinity
         this.posPrev = this.pos
@@ -219,7 +219,7 @@ export abstract class RigidBase {
      */
     abstract calcMass(): void
     /**
-     * 根据多边形计算惯性, points初始化之后才能调用
+     * 根据多边形计算转动惯量
      */
     calcInertia(): void {
         let numerator = 0,

@@ -17,22 +17,13 @@ export class MainSence extends BaseSence {
         this.setup()
     }
     setup() {
-        // let t = new TestTriangle(this.game, this, 50, Math.PI / 8)
-        // t.pos = new Vector2(400, 400)
-        // // t.theta = Math.PI / 6
-        // this.addElement(t)
-        // this.tri = t
+        for (let i = 0; i < 10; i++) {
+            let r = new TestRect(this.game, this, new Size(100, 50))
+            r.pos = new Vector2(i * 100 + 50, 200)
+            r.theta = Math.PI / 6
+            this.addElement(r)
+        }
 
-        // let c = new TestCircle(this.game, this, 50)
-        // c.pos = new Vector2(200, 200)
-        // this.addElement(c)
-        // this.ball = c
-
-        let r = new TestRect(this.game, this, new Size(100, 50))
-        r.pos = new Vector2(600, 200)
-        r.theta = Math.PI / 6
-        this.addElement(r)
-        
         let left = new TestRect(this.game, this, new Size(100, this.camera.window.h))
         left.getComponent().setStatis()
         left.pos = new Vector2(-40, this.camera.window.h / 2)
@@ -52,18 +43,5 @@ export class MainSence extends BaseSence {
         right.getComponent().setStatis()
         right.pos = new Vector2(this.camera.window.w + 40, this.camera.window.h / 2)
         this.addElement(right)
-
-        this.registerKeyAction("w", status => {
-            r.pos.y -= 1
-        })
-        this.registerKeyAction("s", status => {
-            r.pos.y += 1
-        })
-        this.registerKeyAction("a", status => {
-            r.pos.x -= 1
-        })
-        this.registerKeyAction("d", status => {
-            r.pos.x += 1
-        })
     }
 }
