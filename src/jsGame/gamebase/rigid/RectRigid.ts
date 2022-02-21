@@ -38,72 +38,17 @@ export class RectRigid extends RigidBase {
         return this._points
     }
 
-    constructor(size: Size, offset?: Vector2, mass?: number) {
-        super(mass)
+    constructor(size: Size, offset?: Vector2, density?: number) {
+        super(density)
         this._size = size
-        this.mass = size.w * size.h
         this.offset = offset || new Vector2()
+        this.calcMass()
+        this.calcInertia()
+    }
+    calcMass(): void {
+        this.mass = this.size.w * this.size.h * this.density
     }
 
-    getClosestPoint(rigid: RigidBase): Contact[] {
-        // let rect = this
-        // if (rigid instanceof CircleRigid) {
-        //     let ball = rigid
-        //     // 球相对矩形的位置
-        //     let delta = ball.pos.copy().sub(rect.pos)
-        //     // 如果矩形旋转了，就反向旋转向量，得到相当于没有旋转的时候的相对位置
-        //     let rotatedVector = delta.rotate(-rect.theta)
-        //     //  x, y 限制在矩形的宽高中, 得到矩形四个角或者圆心投影到边上的点
-        //     let closestV = rotatedVector.max(rect.halfExtendMin).min(rect.halfExtendMax)
-        //     // 旋转回来
-        //     let fixedClosestV = closestV.rotate(rect.theta)
-        //     // 矩形中心指向边或角的点
-        //     let closestPointOnSelf = rect.pos.copy().add(fixedClosestV)
-        //     // 球心指向矩形最近的点
-        //     let d = ball.pos.copy().sub(closestPointOnSelf)
-        //     let dist = d.length()
-        //     let n = d.normalize()
-        //     // 球上最近的点
-        //     let closestPointOnOther = ball.pos.copy().sub(n.copy().multi(ball.radius))
-        //     return [
-        //         {
-        //             gA: rect.target,
-        //             gB: ball.target,
-        //             mPa: closestPointOnSelf,
-        //             mPb: closestPointOnOther,
-        //             normal: n,
-        //             distance: dist - ball.radius
-        //         }
-        //     ]
-        // } else if (rigid instanceof TriangleRigid) {
-        //     let tri = rigid
-        //     let result = getClosestPoints(rect, tri)
-        //     return [
-        //         {
-        //             gA: rect.target,
-        //             gB: tri.target,
-        //             mPa: result.point1,
-        //             mPb: result.point2,
-        //             normal: new Vector2(),
-        //             distance: result.distance
-        //         }
-        //     ]
-        // } else if (rigid instanceof RectRigid) {
-        //     let rectB = rigid
-        //     let result = getClosestPoints(rect, rectB)
-        //     return [
-        //         {
-        //             gA: rect.target,
-        //             gB: rectB.target,
-        //             mPa: result.point1,
-        //             mPb: result.point2,
-        //             normal: new Vector2(),
-        //             distance: result.distance
-        //         }
-        //     ]
-        // }
-        throw new Error("unknow RigidType")
-    }
     drawDebug(ctx: CanvasRenderingContext2D): void {
         let pos = this.pos.copy().add(this.offset)
         ctx.save()

@@ -289,8 +289,9 @@ export class BaseSence {
         let ret: CollisionInfo[] = []
         for (let ii = 0; ii < objects.length; ii++) {
             const eii = objects[ii]
-            for (let jj = ii + 1; jj < this.elements.length; jj++) {
+            for (let jj = ii + 1; jj < objects.length; jj++) {
                 const ejj = objects[jj]
+                if (eii.isStatis && ejj.isStatis) continue
                 let coll = collides(this.ContactsMag, eii, ejj)
                 if (coll !== undefined) {
                     ret.push(coll)
@@ -317,6 +318,8 @@ export class BaseSence {
     }
 
     public Tick(): void {
+        this.applyGravity(this.rigidsCache)
+
         for (const e of this.elements.values()) {
             e.elementUpdate()
         }
@@ -324,14 +327,17 @@ export class BaseSence {
         // 处理按键事件
         this.handleKeyboardEvents()
         //
-        this.applyGravity(this.rigidsCache)
         //
         this.updateCollide()
         this.ContactsMag.preSolve()
-        this.ContactsMag.solve()
+        for (let i = 0; i < 6; i++) {
+            this.ContactsMag.solve()
+        }
         this.ContactsMag.postSolve(this.rigidsCache)
         this.ContactsMag.preSolveVelocity()
-        this.ContactsMag.solveVelocity()
+        for (let i = 0; i < 6; i++) {
+            this.ContactsMag.solveVelocity()
+        }
         this.clearForce(this.rigidsCache)
         this.camera.trace()
         this.draw(this.game.context)

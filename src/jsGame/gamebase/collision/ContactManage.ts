@@ -64,26 +64,19 @@ export class ContactManage {
             delta: Vector2,
             positionDampen: number = 0.9
         for (const c of this.contacts) {
+            if (!c.isActive) continue
             collision = c.collision
             bodyA = collision.parentA
             bodyB = collision.parentB
             normal = collision.normal
             let n = bodyB.positionImpulse.copy().add(collision.penetration).sub(bodyA.positionImpulse)
             c.separation = n.dot(normal)
-        }
-        for (const c of this.contacts) {
-            if (!c.isActive) continue
-            collision = c.collision
-            bodyA = collision.parentA
-            bodyB = collision.parentB
-            normal = collision.normal
             positionImpulse = c.separation - c.slop
-
             //
             shared = positionDampen / bodyA.totalRelates
             delta = normal.copy().multi(positionImpulse * shared)
-            bodyA.positionImpulse.add(delta)
-            bodyB.positionImpulse.sub(delta)
+            if (!bodyA.isStatis) bodyA.positionImpulse.add(delta)
+            if (!bodyB.isStatis) bodyB.positionImpulse.sub(delta)
         }
     }
 
@@ -96,7 +89,7 @@ export class ContactManage {
                 velocity = body.velocity
             body.totalRelates = 0
             if (positionImpulseX !== 0 || positionImpulseY !== 0) {
-                body.angle = Math.atan2(positionImpulse.x, positionImpulse.y) * 0.1
+                // body.angle = Math.atan2(positionImpulse.x, positionImpulse.y) * 0.01
                 body.pos.add(positionImpulse)
                 body.posPrev?.add(positionImpulse)
                 if (positionImpulse.copy().dot(velocity) < 0) {
@@ -121,13 +114,17 @@ export class ContactManage {
                 let relateVertex = relate.vertex,
                     normalImpulse = relate.normalImpulse,
                     tangentImpulse = relate.tangentImpulse
+
                 if (normalImpulse !== 0 || tangentImpulse !== 0) {
                     let impulseVec = normal.copy().multi(normalImpulse).add(tangent.copy().multi(tangentImpulse))
-                    bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
-                    bodyA.anglePrev += bodyA.invInertia * relateVertex.point.copy().sub(bodyA.pos).cross(impulseVec)
-                    
-                    bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
-                    bodyB.anglePrev += bodyB.invInertia * relateVertex.point.copy().sub(bodyB.pos).cross(impulseVec)
+                    if (!bodyA.isStatis) {
+                        bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
+                        bodyA.anglePrev! += bodyA.invInertia * relateVertex.point.copy().sub(bodyA.pos).cross(impulseVec)
+                    }
+                    if (!bodyB.isStatis) {
+                        bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
+                        bodyB.anglePrev! += bodyB.invInertia * relateVertex.point.copy().sub(bodyB.pos).cross(impulseVec)
+                    }
                 }
             }
         }
@@ -151,13 +148,10 @@ export class ContactManage {
                 friction = c.friction * c.frictionStatic * _frictionNormalMultiplier
 
             // update body velocities
-            bodyAVelocity.x = bodyA.pos.x - bodyA.posPrev!.x
-            bodyAVelocity.y = bodyA.pos.y - bodyA.posPrev!.y
-            bodyBVelocity.x = bodyB.pos.x - bodyB.posPrev!.x
-            bodyBVelocity.y = bodyB.pos.y - bodyB.posPrev!.y
-            bodyA.angularVelocity = bodyA.angle - bodyA.anglePrev
-            bodyB.angularVelocity = bodyB.angle - bodyB.anglePrev
-
+            bodyAVelocity = bodyA.pos.copy().sub(bodyA.posPrev!)
+            bodyBVelocity = bodyB.pos.copy().sub(bodyB.posPrev!)
+            bodyA.angularVelocity = bodyA.angle - bodyA.anglePrev!
+            bodyB.angularVelocity = bodyB.angle - bodyB.anglePrev!
             for (const rel of relates) {
                 let relVertex = rel.vertex
                 //
@@ -233,11 +227,14 @@ export class ContactManage {
                 let impulseVec = normal.copy().multi(normalImpulse).add(tangent.copy().multi(tangentImpulse))
 
                 // apply impulse from contact
-                bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
-                bodyA.anglePrev += offsetA.cross(impulseVec) * bodyA.invInertia
-
-                bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
-                bodyB.anglePrev -= offsetB.cross(impulseVec) * bodyB.invInertia
+                if (!bodyA.isStatis) {
+                    bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
+                    bodyA.anglePrev! += offsetA.cross(impulseVec) * bodyA.invInertia
+                }
+                if (!bodyB.isStatis) {
+                    bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
+                    bodyB.anglePrev! -= offsetB.cross(impulseVec) * bodyB.invInertia
+                }
             }
         }
     }

@@ -29,7 +29,7 @@ export abstract class RigidBase {
     velocity: Vector2 = new Vector2()
     offset: Vector2 = new Vector2()
     // angle: number = 0
-    anglePrev: number = 0
+    anglePrev: number | undefined
     /**
      * 角速度
      */
@@ -43,10 +43,14 @@ export abstract class RigidBase {
      */
     mass!: number
     /**
+     * 密度
+     */
+    density: number
+    /**
      * 1 / 质量， 求加速度 a = f / mass = f * invMass
      */
     get invMass(): number {
-        if (this.mass === 0) return 0
+        if (this.mass === 0 || this.mass === Infinity) return 0
         return 1 / this.mass
     }
     /**
@@ -57,7 +61,7 @@ export abstract class RigidBase {
      *
      */
     get invInertia(): number {
-        if (this.inertia === 0) return 0
+        if (this.inertia === 0 || this.inertia === Infinity) return 0
         return 1 / this.inertia
     }
     /**
@@ -76,7 +80,7 @@ export abstract class RigidBase {
     /**
      * 恢复系数（e）是碰撞前后两物体沿接触处法线方向上的分离速度与接近速度之比，只与碰撞物体的材料有关。弹性碰撞时e=1；完全非弹性碰撞时e=0
      */
-    restitution: number = 0
+    restitution: number = 0.3
     /**
      * 指定允许物体“下沉”或旋转到其他物体的距离的公差
      */
@@ -85,6 +89,10 @@ export abstract class RigidBase {
      * 碰撞关联其他物体的数量
      */
     totalRelates: number = 0
+    /**
+     * 是否静态
+     */
+    isStatis: boolean = false
     positionImpulse: Vector2 = Vector2.new(0, 0)
 
     private posHasChanged: boolean = false
@@ -109,7 +117,8 @@ export abstract class RigidBase {
     protected thetaChanged: boolean = false
 
     private _apCache: Vertex[] | undefined
-    constructor(mass?: number) {
+    constructor(density?: number) {
+        this.density = density || 1
         this.id = nextId()
     }
     /**
@@ -135,6 +144,15 @@ export abstract class RigidBase {
     bind(obj: GameObject) {
         this.target = obj
         this.angle = obj.theta
+    }
+    setStatis() {
+        this.isStatis = true
+        this.restitution = 0
+        this.friction = 1
+        this.mass = this.inertia = this.density = Infinity
+        this.posPrev = this.pos
+        this.anglePrev = this.angle
+        this.angularVelocity = 0
     }
     /**
      * 凸多边形各边的法向量（投影轴
@@ -186,7 +204,7 @@ export abstract class RigidBase {
      * 更新重力
      */
     applyGravity(g: Vector2) {
-        this.force.add(g.copy().multi(this.mass * 0.05))
+        this.force.add(g.copy().multi(this.mass))
     }
     clearForce() {
         this.force.set(0, 0)
@@ -196,32 +214,47 @@ export abstract class RigidBase {
      * 定义多边形的顶点(原点(0,0))
      */
     abstract get points(): Vector2[]
+    /**
+     * 计算多边形面积，用作质量
+     */
+    abstract calcMass(): void
+    /**
+     * 根据多边形计算惯性, points初始化之后才能调用
+     */
+    calcInertia(): void {
+        let numerator = 0,
+            denominator = 0,
+            v = this.points,
+            cross,
+            j
 
-    abstract getClosestPoint(rigid: RigidBase): Contact[]
+        // find the polygon's moment of inertia, using second moment of area
+        // from equations at http://www.physicsforums.com/showthread.php?t=25293
+        for (var n = 0; n < v.length; n++) {
+            j = (n + 1) % v.length
+            cross = Math.abs(v[j].cross(v[n]))
+            numerator += cross * (v[j].dot(v[j]) + v[j].dot(v[n]) + v[n].dot(v[n]))
+            denominator += cross
+        }
+        this.inertia = (this.mass / 6) * (numerator / denominator)
+    }
     drawDebug(ctx: CanvasRenderingContext2D): void {}
     update(): void {
+        if (this.isStatis) return
         let deltaTimeSquared = Math.pow(1000 / 60, 2)
-        let correction = 1
+
         // from the previous step     global timeScale   self timeScale
         let frictionAir = 1 - this.frictionAir * 1 * 1,
             velocityPrev = this.pos.copy().sub(this.posPrev ?? this.pos)
 
         // update velocity with Verlet integration
-        velocityPrev.multi(frictionAir * correction).add(this.force.copy().multi(this.invMass * deltaTimeSquared))
+        velocityPrev.multi(frictionAir).add(this.force.copy().multi(this.invMass * deltaTimeSquared))
 
-        this.velocity.add(velocityPrev)
-        // this.velocity.x = velocityPrevX * frictionAir * 1 + this.force.x * this.invMass * deltaTimeSquared
-        // this.velocity.y = velocityPrevY * frictionAir * 1 + this.force.y * this.invMass * deltaTimeSquared
-        this.posPrev = this.pos
+        this.velocity = velocityPrev
+        this.posPrev = this.pos.copy()
         this.pos.add(this.velocity)
 
-        // this.posPrev.x = this.pos.x
-        // this.posPrev.y = this.pos.y
-        // this.pos.x += this.velocity.x
-        // this.pos.y += this.velocity.y
-
-        // update angular velocity with Verlet integration
-        this.angularVelocity = (this.angle - this.anglePrev) * frictionAir * correction + this.torque * this.invInertia * deltaTimeSquared
+        this.angularVelocity = (this.angle - (this.anglePrev ?? this.angle)) * frictionAir + this.torque * this.invInertia * deltaTimeSquared
         this.anglePrev = this.angle
         this.angle += this.angularVelocity
 
