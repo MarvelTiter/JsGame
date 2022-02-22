@@ -39,8 +39,10 @@ export class ContactManage {
         for (let i = 0; i < this.contacts.length; i++) {
             const contact = this.contacts[i]
             if (!contact.confirmActive) {
-                removeIndex.push(i)
-                this.contactMap.delete(contact.id)
+                if (!contact.bodyA.isSleeping && !contact.bodyB.isSleeping) {
+                    removeIndex.push(i)
+                    this.contactMap.delete(contact.id)
+                }
             }
         }
         removeIndex.forEach(i => this.contacts.splice(i, 1))
@@ -73,11 +75,25 @@ export class ContactManage {
             c.separation = n.dot(normal)
             positionImpulse = c.separation - c.slop
             //
+            if (bodyA.isStatic || bodyB.isStatic) positionImpulse *= 2
             shared = positionDampen / bodyA.totalRelates
             delta = normal.copy().multi(positionImpulse * shared)
-            if (!bodyA.isStatis) bodyA.positionImpulse.add(delta)
-            if (!bodyB.isStatis) bodyB.positionImpulse.sub(delta)
+            if (!bodyA.isStatic) bodyA.positionImpulse.add(delta)
+            if (!bodyB.isStatic) bodyB.positionImpulse.sub(delta)
         }
+        // for (const c of this.contacts) {
+        //     collision = c.collision
+        //     bodyA = collision.parentA
+        //     bodyB = collision.parentB
+        //     normal = collision.normal
+        //     positionImpulse = c.separation - c.slop
+        //     //
+        //     if (bodyA.isStatic || bodyB.isStatic) positionImpulse *= 2
+        //     shared = positionDampen / bodyA.totalRelates
+        //     delta = normal.copy().multi(positionImpulse * shared)
+        //     if (!bodyA.isStatic) bodyA.positionImpulse.add(delta)
+        //     if (!bodyB.isStatic) bodyB.positionImpulse.sub(delta)
+        // }
     }
 
     postSolve(objects: RigidBase[]): void {
@@ -117,11 +133,11 @@ export class ContactManage {
 
                 if (normalImpulse !== 0 || tangentImpulse !== 0) {
                     let impulseVec = normal.copy().multi(normalImpulse).add(tangent.copy().multi(tangentImpulse))
-                    if (!bodyA.isStatis) {
+                    if (!bodyA.isStatic) {
                         bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
                         bodyA.anglePrev! += bodyA.invInertia * relateVertex.point.copy().sub(bodyA.pos).cross(impulseVec)
                     }
-                    if (!bodyB.isStatis) {
+                    if (!bodyB.isStatic) {
                         bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
                         bodyB.anglePrev! += bodyB.invInertia * relateVertex.point.copy().sub(bodyB.pos).cross(impulseVec)
                     }
@@ -190,7 +206,9 @@ export class ContactManage {
                 // 计算有效质量
                 let oAcN = rA.cross(normal),
                     oBcN = rB.cross(normal),
-                    share = shared / (inverseMassTotal + bodyA.invInertia * oAcN * oAcN + bodyB.invInertia * oBcN * oBcN)
+                    kNormal = inverseMassTotal + bodyA.invInertia * oAcN * oAcN + bodyB.invInertia * oBcN * oBcN,
+                    effectiveMassNormal = (kNormal == 0 ? 0 : 1) / kNormal,
+                    share = shared / kNormal
 
                 // raw impulses
                 let normalImpulse = (1 + c.restitution) * normalVelocity * share
@@ -227,11 +245,11 @@ export class ContactManage {
                 let impulseVec = normal.copy().multi(normalImpulse).add(tangent.copy().multi(tangentImpulse))
 
                 // apply impulse from contact
-                if (!bodyA.isStatis) {
+                if (!bodyA.isStatic) {
                     bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
                     bodyA.anglePrev! += rA.cross(impulseVec) * bodyA.invInertia
                 }
-                if (!bodyB.isStatis) {
+                if (!bodyB.isStatic) {
                     bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
                     bodyB.anglePrev! -= rB.cross(impulseVec) * bodyB.invInertia
                 }

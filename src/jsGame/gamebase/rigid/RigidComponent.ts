@@ -28,8 +28,18 @@ export abstract class RigidBase {
     parnet!: RigidBase
     velocity: Vector2 = new Vector2()
     offset: Vector2 = new Vector2()
-    // angle: number = 0
-    anglePrev: number | undefined
+    /**
+     * 运动量  speed * speed + angularVelocity * angularVelocity
+     */
+    motion: number = 0
+    /**
+     * 速度大小
+     */
+    speed: number = 0
+    /**
+     * 角速度大小
+     */
+    angularSpeed: number = 0
     /**
      * 角速度
      */
@@ -58,7 +68,7 @@ export abstract class RigidBase {
      */
     inertia!: number
     /**
-     *
+     * 1 / 转动惯量
      */
     get invInertia(): number {
         if (this.inertia === 0 || this.inertia === Infinity) return 0
@@ -92,10 +102,14 @@ export abstract class RigidBase {
     /**
      * 是否静态
      */
-    isStatis: boolean = false
+    isStatic: boolean = false
+    /**
+     * 是否已休眠
+     */
+    isSleeping: boolean = false
     positionImpulse: Vector2 = Vector2.new(0, 0)
 
-    private posHasChanged: boolean = false
+    anglePrev: number | undefined
     /**
      * 整体旋转角度/弧度
      */
@@ -146,7 +160,7 @@ export abstract class RigidBase {
         this.angle = obj.theta
     }
     setStatis() {
-        this.isStatis = true
+        this.isStatic = true
         this.restitution = 1
         this.friction = 1
         this.mass = this.inertia = this.density = Infinity
@@ -240,7 +254,7 @@ export abstract class RigidBase {
     }
     drawDebug(ctx: CanvasRenderingContext2D): void {}
     update(): void {
-        if (this.isStatis) return
+        if (this.isStatic) return
         let deltaTimeSquared = Math.pow(1000 / 60, 2)
 
         // from the previous step     global timeScale   self timeScale
@@ -259,7 +273,7 @@ export abstract class RigidBase {
         this.angle += this.angularVelocity
 
         // track speed and acceleration
-        // this.speed = this.velocity.length
-        // this.angularSpeed = Math.abs(this.angularVelocity)
+        this.speed = this.velocity.length()
+        this.angularSpeed = Math.abs(this.angularVelocity)
     }
 }

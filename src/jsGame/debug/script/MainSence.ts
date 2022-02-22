@@ -17,7 +17,7 @@ export class MainSence extends BaseSence {
         this.setup()
     }
     setup() {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 3; i++) {
             let r = new TestRect(this.game, this, new Size(100, 50))
             r.pos = new Vector2(i * 100 + 50, 200)
             r.theta = Math.PI / 6

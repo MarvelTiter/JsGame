@@ -291,7 +291,7 @@ export class BaseSence {
             const eii = objects[ii]
             for (let jj = ii + 1; jj < objects.length; jj++) {
                 const ejj = objects[jj]
-                if (eii.isStatis && ejj.isStatis) continue
+                if (eii.isStatic && ejj.isStatic) continue
                 let coll = collides(this.ContactsMag, eii, ejj)
                 if (coll !== undefined) {
                     ret.push(coll)

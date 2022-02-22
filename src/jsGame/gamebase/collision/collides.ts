@@ -52,6 +52,12 @@ export function collides(cmg: ContactManage, rigidA: RigidBase, rigidB: RigidBas
         supports = collision.supports,
         { x: minAxisX, y: minAxisY } = minOverlap.axis!
     // 修正检测轴模向量的方向
+    // let delta = bodyB.pos.copy().sub(bodyA.pos)
+    // if (delta.dot(minOverlap.axis!) < 0) {
+    //     collision.normal = minOverlap.axis!.copy()
+    // } else {
+    //     collision.normal = minOverlap.axis!.copy().multi(-1)
+    // }
     if (minAxisX * (bodyB.pos.x - bodyA.pos.x) + minAxisY * (bodyB.pos.y - bodyA.pos.y) < 0) {
         normal.x = minAxisX
         normal.y = minAxisY
@@ -64,8 +70,6 @@ export function collides(cmg: ContactManage, rigidA: RigidBase, rigidB: RigidBas
     collision.penetration = normal.copy().multi(collision.depth)
     let supportsB = findSupports(bodyA, bodyB, normal, 1),
         supportCount = 0
-    // console.log(supportsB, bodyA, bodyA.contains(supportsB[0].point))
-
     if (bodyA.contains(supportsB[0].point)) {
         supports[supportCount++] = supportsB[0]
     }
