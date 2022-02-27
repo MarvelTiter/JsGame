@@ -1,5 +1,5 @@
 import { BaseSence } from "./BaseSence"
-import { Size } from "./data/Size"
+import { Bound } from "./data/Bound"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
 import { GameObject } from "./objects/GameObject"
@@ -10,9 +10,9 @@ export class Camera {
     pos: Vector2
     direction: Direction
     ctx: CanvasRenderingContext2D
-    window: Size
+    window: Bound
     sence: BaseSence
-    constructor(sence: BaseSence, ctx: CanvasRenderingContext2D, window: Size, direction?: Direction) {
+    constructor(sence: BaseSence, ctx: CanvasRenderingContext2D, window: Bound, direction?: Direction) {
         this.sence = sence
         this.ctx = ctx
         this.pos = new Vector2()

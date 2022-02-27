@@ -58,9 +58,8 @@ export class CircleRigid extends RigidBase {
         throw new Error("unknow RigidType")
     }
 
-    update(): void {
-        super.update()
-        this._radius = this.target.radius
+    calcMass(): void {
+        this.mass = this.radius * this.radius * Math.PI
     }
 
     drawDebug(ctx: CanvasRenderingContext2D): void {

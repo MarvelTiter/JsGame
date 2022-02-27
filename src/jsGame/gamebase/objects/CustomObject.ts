@@ -1,5 +1,5 @@
 import { BaseSence } from "../BaseSence"
-import { Size } from "../data/Size"
+import { Bound } from "../data/Bound"
 import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CircleRigid } from "../rigid/CircleRigid"
@@ -14,9 +14,10 @@ export class CustomObject extends GameObject {
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
     }
-    public addRectRigid(size: Size, offset?: Vector2, name?: string): void {
-        let rg = new RectRigid(size, offset)
+    public addRectRigid(size: Bound, offset?: Vector2, name?: string): void {
+        let rg = new RectRigid(size.w, size.h, offset)
         rg.bind(this)
+        rg.init()
         this.addComponent(rg)
     }
     public addCircleRigid(radius: number, name?: string): void {

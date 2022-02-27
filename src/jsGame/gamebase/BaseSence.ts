@@ -1,6 +1,6 @@
 import { Camera } from "./Camera"
 import { collides } from "./collision/collides"
-import { Size } from "./data/Size"
+import { Bound } from "./data/Bound"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
 import { GameObject } from "./objects/GameObject"
@@ -8,6 +8,7 @@ import { Contact } from "./collision/Contact"
 import { ContactManage } from "./collision/ContactManage"
 import { CollisionInfo } from "./collision/CollisionInfo"
 import { RigidBase } from "./rigid/RigidComponent"
+import { broadphase } from "./collision/broadphase"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void
@@ -49,7 +50,7 @@ export class BaseSence {
     // public set camera(v: Camera) {
     //     this._camera = v
     // }
-    size: Size
+    size: Bound
     minX: number | undefined
     maxX: number | undefined
     minY: number | undefined
@@ -190,7 +191,11 @@ export class BaseSence {
      * @param element 函数调用的对象(函数内部有this)
      * @param callback 按键回调函数
      */
-    public registerKeyAction(key: string, callback: (status: KeyStatus) => void, times?: actionTimes): void {
+    public registerKeyAction(
+        key: string,
+        callback: (status: KeyStatus) => void,
+        times?: actionTimes
+    ): void {
         this.keys.set(key, {
             status: false,
             times: times ?? 0,
@@ -205,7 +210,7 @@ export class BaseSence {
         return this.camera.getCenter()
     }
 
-    public getWindowSize(): Size {
+    public getWindowSize(): Bound {
         return this.camera.window
     }
 
@@ -223,7 +228,13 @@ export class BaseSence {
     public outOfWindow(obj: GameObject): boolean {
         let { w, h } = this.camera.window
         let { x, y } = this.camera.pos
-        if (obj.pos.x + obj.size.w < x || obj.pos.x > x + w || obj.pos.y + obj.size.h < y || obj.pos.y > y + h) return true
+        if (
+            obj.pos.x + obj.size.w < x ||
+            obj.pos.x > x + w ||
+            obj.pos.y + obj.size.h < y ||
+            obj.pos.y > y + h
+        )
+            return true
         else return false
     }
 
@@ -240,6 +251,7 @@ export class BaseSence {
         if (window.Debug) {
             ctx.fillStyle = "#00ff00"
             for (const c of this.ContactsMag.list) {
+                if (!c.collision.collided) continue
                 for (const p of c.collision.supports) {
                     if (p === undefined) continue
                     ctx.beginPath()
@@ -287,15 +299,19 @@ export class BaseSence {
             return []
         }
         let ret: CollisionInfo[] = []
+        // let temp = broadphase(objects, this.getWindowSize(), true)
+        // // console.log("temp: ", temp)
+        // for (const t of temp) {
+        //     let coll = collides(this.ContactsMag, t.bodyA, t.bodyB)
+        //     if (coll !== undefined) ret.push(coll)
+        // }
         for (let ii = 0; ii < objects.length; ii++) {
             const eii = objects[ii]
-            for (let jj = ii + 1; jj < objects.length; jj++) {
+            for (let jj = 0; jj < objects.length; jj++) {
                 const ejj = objects[jj]
                 if (eii.isStatic && ejj.isStatic) continue
                 let coll = collides(this.ContactsMag, eii, ejj)
-                if (coll !== undefined) {
-                    ret.push(coll)
-                }
+                if (coll !== undefined) ret.push(coll)
             }
         }
         return ret
@@ -307,9 +323,10 @@ export class BaseSence {
         }
         return this._rigidsCache
     }
-    private updateCollide(): void {
+    private findCollide(): void {
         let colls = this.collitionTest(this.rigidsCache)
-        this.ContactsMag.Update(colls)
+        this.ContactsMag.Update(colls, this.timing.timestamp)
+        this.ContactsMag.removeOld(this.timing.timestamp)
     }
     private clearForce(rigidsCache: RigidBase[]) {
         for (const ri of rigidsCache) {
@@ -317,18 +334,24 @@ export class BaseSence {
         }
     }
 
-    public Tick(): void {
-        this.applyGravity(this.rigidsCache)
+    public timing = {
+        timestamp: 0,
+        timeScale: 1,
+        lastDelta: 0,
+        lastElapsed: 0
+    }
 
-        for (const e of this.elements.values()) {
-            e.elementUpdate()
-        }
-        this.update()
+    public Tick(delta: number, correction: number): void {
+        this.timing.timestamp += delta * this.timing.timeScale
         // 处理按键事件
         this.handleKeyboardEvents()
+        this.applyGravity(this.rigidsCache)
+        for (const e of this.elements.values()) {
+            e.elementUpdate(delta, this.timing.timeScale, correction)
+        }
+        this.update()
         //
-        //
-        this.updateCollide()
+        this.findCollide()
         this.ContactsMag.preSolve()
         for (let i = 0; i < 6; i++) {
             this.ContactsMag.solve()

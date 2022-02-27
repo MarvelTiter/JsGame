@@ -2,7 +2,7 @@ import { BaseSence } from "../BaseSence"
 import { Game } from "../Game"
 import { Vector2 } from "../data/Vector2"
 import { MouseArgs } from "../MouseArgs"
-import { Size } from "../data/Size"
+import { Bound } from "../data/Bound"
 import { RigidBase } from "../rigid/RigidComponent"
 import { Contact } from "../collision/Contact"
 import { IRectangle, Rect } from "../data/Rect"
@@ -30,12 +30,10 @@ import { IRectangle, Rect } from "../data/Rect"
 //         configurable: false // 不能再define
 //     })
 // }
-
 /**
  * 所有对象的基类
  */
 export abstract class GameObject implements IRectangle {
-    // onTick: Function | undefined
 
     //#region props
 
@@ -81,11 +79,11 @@ export abstract class GameObject implements IRectangle {
         this._offset = v
     }
 
-    private _size: Size
-    public get size(): Size {
+    private _size: Bound
+    public get size(): Bound {
         return this._size
     }
-    public set size(v: Size) {
+    public set size(v: Bound) {
         this._size = v
     }
 
@@ -123,10 +121,10 @@ export abstract class GameObject implements IRectangle {
     }
 
     private _theta: number = 0
-    public get theta(): number {
+    public get angle(): number {
         return this._theta
     }
-    public set theta(v: number) {
+    public set angle(v: number) {
         this._theta = v
     }
 
@@ -137,7 +135,7 @@ export abstract class GameObject implements IRectangle {
         this._sence = sence
         this._pos = new Vector2()
         this._offset = new Vector2()
-        this._size = new Size()
+        this._size = new Bound()
         this._focus = false
         this._hasChanged = true
     }
@@ -151,7 +149,11 @@ export abstract class GameObject implements IRectangle {
     }
 
     checkFocu(x: number, y: number) {
-        let isfocus = x - this.offset.x > this.pos.x && x - this.offset.x < this.pos.x + this.size.w && y - this.offset.y > this.pos.y && y - this.offset.y < this.pos.y + this.size.h
+        let isfocus =
+            x - this.offset.x > this.pos.x &&
+            x - this.offset.x < this.pos.x + this.size.w &&
+            y - this.offset.y > this.pos.y &&
+            y - this.offset.y < this.pos.y + this.size.h
         if (isfocus !== this.focus) {
             this.focus = isfocus
         }
@@ -173,18 +175,6 @@ export abstract class GameObject implements IRectangle {
         return this._components
     }
 
-    // public checkCollision(obj: GameObject): Contact[] {
-    //     let selfComponents = this.getComponent()
-    //     let components = obj.getComponent()
-    //     let contacts: Contact[] = []
-    //     for (const sc of selfComponents) {
-    //         for (const c of components) {
-    //             let contact = sc.getClosestPoint(c)
-    //             contacts = contacts.concat(contact)
-    //         }
-    //     }
-    //     return contacts
-    // }
     onClick(e: MouseArgs) {}
     onMouseOver(e: MouseArgs) {}
     onMouseUp() {}
@@ -200,16 +190,16 @@ export abstract class GameObject implements IRectangle {
         return this.hasChanged
     }
     // 子类复写
-    update() {}
+    update(delta: number, timeScale: number, correction: number) {}
 
     // 子类复写
     draw(ctx: CanvasRenderingContext2D) {}
 
     // sence调用
-    elementUpdate() {
+    elementUpdate(delta: number, timeScale: number, correction: number) {
         // if (!this.updateRequest()) return
-        this.update()
-        if (this.IsRigid) this.getComponent().update()
+        this.update(delta, timeScale, correction)
+        if (this.IsRigid) this.getComponent().update(delta, timeScale, correction)
         if (this._onTick) this.onTick(this)
         // this.hasChanged = false
     }

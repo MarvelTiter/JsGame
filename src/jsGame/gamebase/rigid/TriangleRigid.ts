@@ -27,7 +27,7 @@ export class TriangleRigid extends RigidBase {
             let deltaX = 2 * cos * this.dLength * sin
             let bottomLeft = new Vector2(-deltaX, +this._deltaY)
             let bottomRight = new Vector2(+deltaX, +this._deltaY)
-            this._points = [top, bottomLeft, bottomRight]
+            this._points = [top, bottomRight, bottomLeft]
         }
         return this._points
     }
@@ -55,7 +55,7 @@ export class TriangleRigid extends RigidBase {
     calcMass(): void {
         let w = this.points[1].x - this.points[2].x
         let h = this.points[0].y - this.points[1].y
-        this.mass = (Math.abs(w) * Math.abs(h)) / 2 * this.density
+        this.mass = ((Math.abs(w) * Math.abs(h)) / 2) * this.density
     }
 
     drawDebug(ctx: CanvasRenderingContext2D): void {

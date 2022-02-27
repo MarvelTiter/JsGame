@@ -2,6 +2,11 @@ import { AxisInfo } from "../data/AxisInfo"
 import { Vector2, Vertex } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
 import { Contact } from "../collision/Contact"
+import { Vertices } from "./vertices"
+import { Axes } from "./axes"
+import { Bound } from "../data/Bound"
+import { Game } from "../Game"
+import { BaseSence } from "../BaseSence"
 
 const gravity = 10
 type ShapeType = "Circle" | "Rect" | "Triangle"
@@ -22,7 +27,6 @@ export function GetContactId(rigidA: RigidBase, rigidB: RigidBase): string {
 export abstract class RigidBase {
     id: number
     force: Vector2 = new Vector2()
-    posPrev: Vector2 | undefined
     target!: GameObject
     parts!: RigidBase[]
     parnet!: RigidBase
@@ -107,58 +111,84 @@ export abstract class RigidBase {
      * 是否已休眠
      */
     isSleeping: boolean = false
+    /**
+     *
+     */
+    timeScale: number = 1
+    /**
+     * 冲量
+     */
     positionImpulse: Vector2 = Vector2.new(0, 0)
-
-    anglePrev: number | undefined
+    /**
+     * 多边形面积
+     */
+    area!: number
     /**
      * 整体旋转角度/弧度
      */
     public get angle(): number {
-        return this.target.theta
+        // return this.angle
+        return this.target.angle
     }
     public set angle(v: number) {
-        this.target.theta = v
+        // this.angle = v
+        this.target.angle = v
     }
+    anglePrev: number | undefined
 
     public get pos(): Vector2 {
         return this.target.pos
     }
 
-    public set pos(p: Vector2) {
-        this.target.pos.set(p.x, p.y)
-    }
+    // public set pos(p: Vector2) {
 
-    protected thetaChanged: boolean = false
+    //     this.target.pos.set(p.x, p.y)
+    // }
+    posPrev: Vector2 = new Vector2()
+    bound: Bound = new Bound()
 
-    private _apCache: Vertex[] | undefined
     constructor(density?: number) {
-        this.density = density || 1
-        this.id = nextId()
+        this.density = density || 0.001
+        this.id = nextId().toString()
+        this.parts = []
+        this.parts.push(this)
     }
+
     /**
      * 绘制在坐标轴中的实际坐标
      */
-    public get actualPoints(): Vertex[] {
-        // if (this.thetaChanged || this.posHasChanged || this._apCache === undefined) {
-        // this._apCache = []
-        let ret = []
-        for (let i = 0; i < this.points.length; i++) {
-            const p = this.points[i]
-            ret.push({
-                point: p.copy().rotate(this.angle).add(this.pos),
-                index: i,
-                belonged: this
-            })
-        }
-        // this.thetaChanged = false
-        // this.posHasChanged = false
-        // }
-        return ret
+    get vertexs(): Vertex[] {
+        return this.vertices.vertexs
     }
+    get axes(): Vector2[] {
+        return this.axesMg.axes
+    }
+    vertices!: Vertices
+    /**
+     * 凸多边形各边的法向量（投影轴
+     */
+    axesMg!: Axes
+
     bind(obj: GameObject) {
         this.target = obj
-        this.angle = obj.theta
     }
+
+    init() {
+        this.vertices = new Vertices(this.points, this)
+        this.axesMg = new Axes(this.vertices)
+        this.area = this.vertices.area()
+        this.mass = this.density * this.area
+        this.vertices.fixOrigin()
+        this.inertia = this.vertices.inertia(this.mass) * 4
+        this.vertices.translate(this.pos)
+        this.posPrev.set(this.pos.x, this.pos.y)
+        this.bound.update(this.vertices, this.velocity)
+    }
+
+    addPart(part: RigidBase) {
+        this.parts.push(part)
+    }
+
     setStatis() {
         this.isStatic = true
         this.restitution = 1
@@ -168,52 +198,7 @@ export abstract class RigidBase {
         this.anglePrev = this.angle
         this.angularVelocity = 0
     }
-    /**
-     * 凸多边形各边的法向量（投影轴
-     */
-    _axes: Vector2[] | undefined
-    getAxes(): Vector2[] {
-        // if (this.thetaChanged || this.posHasChanged || this._axes === undefined) {
-        let axes: any = {}
-        let points = this.actualPoints
-        for (var i = 0; i < points.length; i++) {
-            var j = (i + 1) % points.length
-            let head = points[i].point
-            let tail = points[j].point
-            let normal = Vector2.new(tail.y - head.y, head.x - tail.x).normalize()
-            let g: number | string = normal.y === 0 ? Infinity : normal.x / normal.y
-            // 粗略精度
-            g = g.toFixed(3).toString()
-            // 去除重复的轴
-            axes[g] = normal
-        }
-        // this._axes = Object.values(axes)
-        // }
-        // return this._axes
-        return Object.values(axes)
-    }
-    /**
-     * 给定的点是否在多边形中
-     * @param point
-     * @returns
-     */
-    contains(point: Vector2): boolean {
-        let vertices = this.actualPoints,
-            pointX = point.x,
-            pointY = point.y,
-            verticesLength = vertices.length,
-            vertex = vertices[verticesLength - 1],
-            nextVertex
-        for (var i = 0; i < verticesLength; i++) {
-            nextVertex = vertices[i]
-            // 顶点与点的连线的向量与边的法向量的点积，如果大于0，说明是锐角，在多边形外面
-            if ((pointX - vertex.point.x) * (vertex.point.y - nextVertex.point.y) + (pointY - vertex.point.y) * (nextVertex.point.x - vertex.point.x) > 0) {
-                return false
-            }
-            vertex = nextVertex
-        }
-        return true
-    }
+
     /**
      * 更新重力
      */
@@ -228,52 +213,59 @@ export abstract class RigidBase {
      * 定义多边形的顶点(原点(0,0))
      */
     abstract get points(): Vector2[]
-    /**
-     * 计算多边形面积，用作质量
-     */
-    abstract calcMass(): void
-    /**
-     * 根据多边形计算转动惯量
-     */
-    calcInertia(): void {
-        let numerator = 0,
-            denominator = 0,
-            v = this.points,
-            cross,
-            j
 
-        // find the polygon's moment of inertia, using second moment of area
-        // from equations at http://www.physicsforums.com/showthread.php?t=25293
-        for (var n = 0; n < v.length; n++) {
-            j = (n + 1) % v.length
-            cross = Math.abs(v[j].cross(v[n]))
-            numerator += cross * (v[j].dot(v[j]) + v[j].dot(v[n]) + v[n].dot(v[n]))
-            denominator += cross
-        }
-        this.inertia = (this.mass / 6) * (numerator / denominator)
+    drawDebug(ctx: CanvasRenderingContext2D): void {
+        let pos = this.pos.copy().add(this.offset)
+        let bw = this.bound.max.x - this.bound.min.x
+        let bh = this.bound.max.y - this.bound.min.y
+        ctx.save()
+        ctx.strokeStyle = "#a9a9a9"
+        ctx.translate(pos.x, pos.y)
+        ctx.beginPath()
+        ctx.strokeRect(-bw / 2, -bh / 2, bw, bh)
+        ctx.closePath()
+        ctx.translate(-pos.x, -pos.y)
+        ctx.restore()
     }
-    drawDebug(ctx: CanvasRenderingContext2D): void {}
-    update(): void {
+
+    update(delta: number, timeScale: number, correction: number): void {
         if (this.isStatic) return
-        let deltaTimeSquared = Math.pow(1000 / 60, 2)
+        let deltaTimeSquared = Math.pow(delta * timeScale * this.timeScale, 2)
 
         // from the previous step     global timeScale   self timeScale
-        let frictionAir = 1 - this.frictionAir * 1 * 1,
-            velocityPrev = this.pos.copy().sub(this.posPrev ?? this.pos)
-
+        let frictionAir = 1 - this.frictionAir * timeScale * this.timeScale
+        let velocityPrev = this.pos.copy().sub(this.posPrev)
         // update velocity with Verlet integration
-        velocityPrev.multi(frictionAir).add(this.force.copy().multi(this.invMass * deltaTimeSquared))
-
-        this.velocity = velocityPrev
-        this.posPrev = this.pos.copy()
+        velocityPrev
+            .multi(frictionAir * correction)
+            .add(this.force.copy().multi(this.invMass * deltaTimeSquared))
+        this.velocity.x = velocityPrev.x
+        this.velocity.y = velocityPrev.y
+        this.posPrev.set(this.pos.x, this.pos.y)
         this.pos.add(this.velocity)
 
-        this.angularVelocity = (this.angle - (this.anglePrev ?? this.angle)) * frictionAir + this.torque * this.invInertia * deltaTimeSquared
+        this.angularVelocity =
+            (this.angle - (this.anglePrev ?? this.angle)) * frictionAir * correction +
+            this.torque * this.invInertia * deltaTimeSquared
         this.anglePrev = this.angle
         this.angle += this.angularVelocity
 
         // track speed and acceleration
         this.speed = this.velocity.length()
         this.angularSpeed = Math.abs(this.angularVelocity)
+
+        for (var i = 0; i < this.parts.length; i++) {
+            const part = this.parts[i]
+            part.vertices.translate(this.velocity)
+            if (i > 0) {
+                part.pos.add(this.velocity)
+            }
+            part.vertices.rotate(this.angularVelocity, this.pos)
+            part.axesMg.rotate(this.angularVelocity)
+            if (i > 0) {
+                part.pos.rotateAbout(this.angularVelocity, this.pos)
+            }
+            part.bound.update(this.vertices, this.velocity)
+        }
     }
 }

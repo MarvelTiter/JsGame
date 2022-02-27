@@ -1,7 +1,7 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
 import { Grid } from "./Grid"
-import { Size } from "../../gamebase/data/Size"
+import { Bound } from "../../gamebase/data/Bound"
 import { GameStatisEntity } from "../../gamebase/entities/GameStatisEntity"
 
 export class Cell extends GameStatisEntity {
@@ -22,7 +22,7 @@ export class Cell extends GameStatisEntity {
         this.row = rowIndex
         this.column = columnIndex
         this.flag = 0
-        this.size = new Size(len, len)
+        this.size = new Bound(len, len)
         this.pos.x = this.column * this.size.w + (this.column + 1) * this.gutter
         this.pos.y = this.row * this.size.h + (this.row + 1) * this.gutter
         this.isOpen = false

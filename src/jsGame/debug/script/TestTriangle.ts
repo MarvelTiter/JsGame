@@ -1,12 +1,12 @@
 import { BaseSence } from "../../gamebase/BaseSence"
-import { Size } from "../../gamebase/data/Size"
+import { Bound } from "../../gamebase/data/Bound"
 import { Game } from "../../gamebase/Game"
 import { TestObject } from "./TestObject"
 
 export class TestTriangle extends TestObject {
     constructor(game: Game, sence: BaseSence, len: number, theta: number) {
         super(game, sence)
-        this.size = new Size(len, len)
+        this.size = new Bound(len, len)
         this.addTriangleRigid(len, theta)
     }
     checkFocu(x: number, y: number): boolean {

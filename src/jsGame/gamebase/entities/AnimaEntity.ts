@@ -4,7 +4,7 @@ import { FrameDefinition } from "../FrameDefinition"
 import { GameObject } from "../objects/GameObject"
 import { GameImage } from "../Source"
 import { GameEntity } from "./GameEntity"
-import { Size } from "../data/Size"
+import { Bound } from "../data/Bound"
 
 /**
  * 动画对象

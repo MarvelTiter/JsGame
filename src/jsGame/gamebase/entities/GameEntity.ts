@@ -1,5 +1,5 @@
 import { BaseSence } from "../BaseSence"
-import { Size } from "../data/Size"
+import { Bound } from "../data/Bound"
 import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CustomObject } from "../objects/CustomObject"

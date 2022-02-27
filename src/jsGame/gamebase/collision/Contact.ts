@@ -20,7 +20,7 @@ export interface Contact {
     readonly bodyB: RigidBase
     isActive: boolean
     collision: CollisionInfo
-    relates: Relate[]
+    relates: Map<string, Relate>
     activeRelates: Relate[]
     separation: number
     inverseMass: number
@@ -30,7 +30,8 @@ export interface Contact {
     slop: number
     timeCreated: number
     timeUpdated: number
-    update(coll: CollisionInfo): void
+    timestamp: number
+    update(coll: CollisionInfo, timestamp: number): void
 }
 
 export class ContactInstance implements Contact {
@@ -44,9 +45,10 @@ export class ContactInstance implements Contact {
     frictionStatic: number = 0
     restitution: number = 0
     slop: number = 0
-    timeCreated: number = 0
-    timeUpdated: number = 0
-    relates: Relate[] = []
+    timeCreated: number
+    timeUpdated: number
+    timestamp: number
+    relates: Map<string, Relate>
     activeRelates: Relate[] = []
     get bodyA(): RigidBase {
         return this.collision.bodyA
@@ -54,47 +56,73 @@ export class ContactInstance implements Contact {
     get bodyB(): RigidBase {
         return this.collision.bodyB
     }
-    constructor(coll: CollisionInfo) {
+    constructor(coll: CollisionInfo, timestamp: number) {
         this.collision = coll
         this.isActive = true
+        this.timeCreated = timestamp
+        this.timeUpdated = timestamp
+        this.timestamp = timestamp
+        this.relates = new Map<string, Relate>()
         this.id = GetContactId(this.bodyA, this.bodyB)
         this.separation = coll.depth
     }
+    setActive(active: boolean, timestamp: number) {
+        if (active) {
+            this.isActive = true
+            this.timestamp = timestamp
+        } else {
+            this.isActive = false
+        }
+    }
 
-    update(coll: CollisionInfo): void {
+    update(coll: CollisionInfo, timestamp: number): void {
         let supports = coll.supports,
             parentA = coll.parentA,
-            parentB = coll.parentB,
-            parentAVerticesLength = parentA.points.length
+            parentB = coll.parentB
 
-        this.isActive = true
         this.collision = coll
+        this.timeUpdated = timestamp
         this.inverseMass = parentA.invMass + parentB.invMass
         this.friction = parentA.friction > parentB.friction ? parentB.friction : parentA.friction
-        this.frictionStatic = parentA.frictionStatic > parentB.frictionStatic ? parentA.frictionStatic : parentB.frictionStatic
+        this.frictionStatic =
+            parentA.frictionStatic > parentB.frictionStatic
+                ? parentA.frictionStatic
+                : parentB.frictionStatic
         this.slop = parentA.slop > parentB.slop ? parentA.slop : parentB.slop
         coll.contact = this
 
         this.activeRelates = []
         let relates = this.relates,
             activeRelates = this.activeRelates
-        for (let i = 0; i < supports.length; i++) {
-            let support = supports[i],
-                id = support.belonged === parentA ? support.index : parentAVerticesLength + support.index,
-                relate = relates[id]
-            if (!relate) {
-                relate = {
-                    vertex: support,
-                    normalImpulse: 0,
-                    tangentImpulse: 0
+        if (coll.collided) {
+            for (const vertex of supports) {
+                let id = getId(vertex)
+                let relate: Relate
+                if (relates.has(id)) {
+                    relate = relates.get(id)!
+                } else {
+                    relate = {
+                        vertex: vertex,
+                        normalImpulse: 0,
+                        tangentImpulse: 0
+                    }
+                    relates.set(id, relate)
                 }
-                relates[id] = relate
+                activeRelates.push(relate)
             }
-            activeRelates.push(relate)
+            this.separation = coll.depth
+            this.setActive(true, timestamp)
+        } else {
+            if (this.isActive) {
+                this.setActive(false, timestamp)
+            }
         }
     }
 }
 
-export function createContact(coll: CollisionInfo): Contact {
-    return new ContactInstance(coll)
+function getId(vertex: Vertex) {
+    return `${vertex.belonged.id}_${vertex.index}`
+}
+export function createContact(coll: CollisionInfo, timestamp: number): Contact {
+    return new ContactInstance(coll, timestamp)
 }

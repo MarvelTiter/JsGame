@@ -68,14 +68,14 @@ export class Vector2 {
      * @returns {Vector2}
      */
     normalize(): Vector2 {
-        var length = this.length()
+        let length = this.length()
         this.x = this.x / length
         this.y = this.y / length
         return this
     }
 
     /**
-     * 法向量
+     * 法向量 / 切线
      * @returns {Vector2}
      */
     normal(): Vector2 {
@@ -84,15 +84,23 @@ export class Vector2 {
         this.y = x
         return this
     }
-
     /**
      * 向量旋转
      * @param {Number} theta
      */
     rotate(theta: number): Vector2 {
-        var rotatedX = this.x * Math.cos(theta) - this.y * Math.sin(theta)
-        var rotatedY = this.x * Math.sin(theta) + this.y * Math.cos(theta)
+        let rotatedX = this.x * Math.cos(theta) - this.y * Math.sin(theta)
+        let rotatedY = this.x * Math.sin(theta) + this.y * Math.cos(theta)
         return this.set(rotatedX, rotatedY)
+    }
+
+    rotateAbout(angle: number, p: Vector2): Vector2 {
+        let cos = Math.cos(angle)
+        let sin = Math.sin(angle)
+        let x = p.x + ((this.x - p.x) * cos - (this.y - p.y) * sin)
+        this.y = p.y + ((this.x - p.x) * sin + (this.y - p.y) * cos)
+        this.x = x
+        return this
     }
 
     max(maxVec: Vector2): Vector2 {
@@ -131,8 +139,35 @@ export class Vector2 {
     }
 }
 
-export interface Vertex {
+export class Vertex {
     point: Vector2
     index: number
     belonged: RigidBase
+    get x(): number {
+        return this.point.x
+    }
+    get y(): number {
+        return this.point.y
+    }
+    constructor(p: Vector2, index: number, parent: RigidBase) {
+        this.point = p
+        this.index = index
+        this.belonged = parent
+    }
+    cross(ver: Vertex): number {
+        return this.point.cross(ver.point)
+    }
+    dot(ver: Vertex): number {
+        return this.point.dot(ver.point)
+    }
+    add(ver: Vertex | Vector2): Vector2 {
+        if (ver instanceof Vertex) {
+            return this.point.copy().add(ver.point)
+        } else {
+            return this.point.copy().add(ver)
+        }
+    }
+    sub(vec: Vector2): Vector2 {
+        return this.point.copy().sub(vec)
+    }
 }

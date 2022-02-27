@@ -1,5 +1,5 @@
 import { BaseSence } from "../BaseSence"
-import { Size } from "../data/Size"
+import { Bound } from "../data/Bound"
 import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CustomObject } from "../objects/CustomObject"
@@ -10,7 +10,7 @@ export class GameStatisEntity extends CustomObject {
     constructor(game: Game, sence: BaseSence, name: string) {
         super(game, sence)
         this.image = game.getTextureByName(name)
-        this.size = new Size(this.image.size.w, this.image.size.h)
+        this.size = new Bound(this.image.size.w, this.image.size.h)
         this.radius = (this.size.w + this.size.h) / 2
     }
 

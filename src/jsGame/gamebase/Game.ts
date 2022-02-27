@@ -1,5 +1,5 @@
 import { BaseSence } from "./BaseSence"
-import { Size } from "./data/Size"
+import { Bound } from "./data/Bound"
 import { createOption, defaultOption, options } from "./GameOptions"
 import { GameObject } from "./objects/GameObject"
 import { GameImage } from "./Source"
@@ -31,10 +31,10 @@ export class Game {
     enableMouseAction: boolean
     images: Map<string, GameImage>
     sence!: BaseSence
-    area!: Size
+    area!: Bound
     device: string = DEVICE_PC
     options: options
-    constructor(images: Map<string, GameImage>, opts?: Partial<options>, area?: Size) {
+    constructor(images: Map<string, GameImage>, opts?: Partial<options>, area?: Bound) {
         this.canvas = document.querySelector("#canvas") as HTMLCanvasElement
         this.context = this.canvas.getContext("2d")
         this.enableMouseAction = false
@@ -43,7 +43,7 @@ export class Game {
         this.options = createOption(opts || {})
         this.eventSetup()
     }
-    areaSetup(area?: Size) {
+    areaSetup(area?: Bound) {
         let isMobile = /Android|webOS|iPhone|iPod/i.test(navigator.userAgent)
         if (isMobile) {
             this.device = DEVICE_MOBILE
@@ -55,7 +55,7 @@ export class Game {
             w = window.document.body.clientWidth
             h = window.document.body.clientHeight
         }
-        this.area = area ?? new Size(w, h)
+        this.area = area ?? new Bound(w, h)
         this.canvas.width = this.area.w
         this.canvas.height = this.area.h
     }
@@ -118,24 +118,39 @@ export class Game {
     }
 
     public reSize(w: number, h: number): void {
-        this.areaSetup(new Size(w, h))
+        this.areaSetup(new Bound(w, h))
     }
 
     public setSence(sence: BaseSence): void {
         this.sence = sence
     }
-
-    private loop() {
+    private timePrev: number = 0
+    private deltaMin: number = 1000.0 / 60
+    private deltaMax: number = 1000.0 / 30
+    private delta: number = 1000.0 / 60
+    private timeScalePrev: number = 1
+    private correction: number = 1
+    private loop(time: number) {
         if (window.Pause) {
-            window.requestAnimationFrame(this.loop.bind(this))
+            window.requestAnimationFrame(this.loop.bind(this, Date.now()))
             return
         }
-        this.sence.Tick()
-        window.requestAnimationFrame(this.loop.bind(this))
+        let delta = time - this.timePrev
+        this.timePrev = time
+        delta = delta < this.deltaMin ? this.deltaMin : delta
+        delta = delta > this.deltaMax ? this.deltaMax : delta
+        let correction = delta / this.delta
+        this.delta = delta
+        if (this.timeScalePrev > 0.0001) correction *= this.sence.timing.timeScale / this.timeScalePrev
+        if (this.sence.timing.timeScale < 0.0001) correction = 0
+        this.timeScalePrev = this.sence.timing.timeScale
+        this.correction = correction
+        this.sence.Tick(delta, correction)
+        window.requestAnimationFrame(this.loop.bind(this, Date.now()))
     }
 
     run() {
         if (!this.sence) return
-        this.loop()
+        this.loop(Date.now())
     }
 }

@@ -1,6 +1,6 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Button } from "../../gamebase/Button"
-import { Size } from "../../gamebase/data/Size"
+import { Bound } from "../../gamebase/data/Bound"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { Contact } from "../../gamebase/collision/Contact"
@@ -31,7 +31,7 @@ export class MainSence extends BaseSence {
         this.treeCollection = new Map<string, Tree>()
         for (let index = 0; index < 20; index++) {
             let tree = new Tree(this.game, this, this.treeCollection)
-            tree.addRectRigid(new Size(8, 35), new Vector2(0, 35))
+            tree.addRectRigid(new Bound(8, 35), new Vector2(0, 35))
             this.treeCollection.set(tree.id, tree)
             this.addElement(tree)
         }
@@ -64,7 +64,7 @@ export class MainSence extends BaseSence {
         if (num === 0) return trees
         while (num > 0) {
             let tree = new Tree(this.game, this, this.treeCollection)
-            tree.addRectRigid(new Size(8, 35), new Vector2(0, 35))
+            tree.addRectRigid(new Bound(8, 35), new Vector2(0, 35))
             trees.push(tree)
             num--
         }

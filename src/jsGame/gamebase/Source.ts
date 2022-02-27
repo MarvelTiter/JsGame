@@ -1,16 +1,16 @@
-import { Size } from "./data/Size"
+import { Bound } from "./data/Bound"
 import { FrameDefinition, SpriteDefinition } from "./FrameDefinition"
 
 export class GameImage {
     name: string
-    size: Size
+    size: Bound
     frames!: FrameDefinition[]
     areas: any = undefined
     texture: HTMLImageElement
     constructor(name: string, texture: HTMLImageElement) {
         this.name = name
         this.texture = texture
-        this.size = new Size(texture.width, texture.height)
+        this.size = new Bound(texture.width, texture.height)
     }
     getRectByName(name: string): SpriteDefinition {
         if (this.areas === undefined) throw new Error("this image unsupported getRectByName")
