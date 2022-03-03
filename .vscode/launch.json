@@ -5,11 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "edge",
+            "name": "Launch Edge",
             "request": "launch",
-            "name": "针对 localhost 启动 Edge",
-            "url": "http://localhost:5100",
-            "webRoot": "${workspaceFolder}"
+            "type": "pwa-msedge",
+            "url": "http://localhost:3000/#/debug",
+            "trace": true
+            // "webRoot": "${workspaceFolder}",
+            // "file": "${workspaceFolder}/index.html"
         }
     ]
 }

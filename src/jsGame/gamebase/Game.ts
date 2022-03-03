@@ -130,6 +130,7 @@ export class Game {
     private delta: number = 1000.0 / 60
     private timeScalePrev: number = 1
     private correction: number = 1
+    private deltaSampleSize:number = 60
     private loop(time: number) {
         if (window.Pause) {
             window.requestAnimationFrame(this.loop.bind(this, Date.now()))
@@ -141,16 +142,19 @@ export class Game {
         delta = delta > this.deltaMax ? this.deltaMax : delta
         let correction = delta / this.delta
         this.delta = delta
-        if (this.timeScalePrev > 0.0001) correction *= this.sence.timing.timeScale / this.timeScalePrev
+        if (this.timeScalePrev > 0.0001)
+            correction *= this.sence.timing.timeScale / this.timeScalePrev
         if (this.sence.timing.timeScale < 0.0001) correction = 0
         this.timeScalePrev = this.sence.timing.timeScale
         this.correction = correction
         this.sence.Tick(delta, correction)
-        window.requestAnimationFrame(this.loop.bind(this, Date.now()))
+        // window.requestAnimationFrame(this.loop.bind(this, Date.now()))
     }
 
     run() {
         if (!this.sence) return
-        this.loop(Date.now())
+        window.setInterval(() => {
+            this.loop(Date.now())
+        }, 1000 / 30)
     }
 }

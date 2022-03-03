@@ -35,17 +35,17 @@ export class RectRigid extends RigidBase {
         // }
         return this._points
     }
-    w:number
-    h:number
+    w: number
+    h: number
     constructor(w: number, h: number, offset?: Vector2, density?: number) {
         super(density)
         this.w = w
         this.h = h
-        let lt = Vector2.new(0, 0)
-        let lb = Vector2.new(w, 0)
-        let rb = Vector2.new(w, h)
-        let rt = Vector2.new(0, h)
-        this._points = [lt, lb, rb, rt]
+        let v1 = Vector2.new(0, 0)
+        let v2 = Vector2.new(w, 0)
+        let v3 = Vector2.new(w, h)
+        let v4 = Vector2.new(0, h)
+        this._points = [v1, v2, v3, v4]
         this.offset = offset || new Vector2()
     }
 
@@ -54,12 +54,20 @@ export class RectRigid extends RigidBase {
         let pos = this.pos.copy().add(this.offset)
         ctx.save()
         ctx.strokeStyle = "#ff0000"
-        ctx.translate(pos.x, pos.y)
         ctx.beginPath()
-        ctx.rotate(this.angle)
-        ctx.strokeRect(-this.w / 2, -this.h / 2, this.w, this.h)
+        for (const p of this.vertexs) {
+            ctx.lineTo(p.x, p.y)
+        }
         ctx.closePath()
-        ctx.translate(-pos.x, -pos.y)
+        ctx.stroke()
+        // draw bound
+        ctx.strokeStyle = "#a9a9a9"
+        ctx.beginPath()
+        for (const v of this.bound.paths) {
+            ctx.lineTo(v.x, v.y)
+        }
+        ctx.closePath()
+        ctx.stroke()
         ctx.restore()
     }
 }

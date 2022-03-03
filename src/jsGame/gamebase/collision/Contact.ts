@@ -14,7 +14,6 @@ export interface Relate {
  * 记录检测碰撞的两个物体的信息
  */
 export interface Contact {
-    confirmActive: boolean
     id: string
     readonly bodyA: RigidBase
     readonly bodyB: RigidBase
@@ -32,11 +31,11 @@ export interface Contact {
     timeUpdated: number
     timestamp: number
     update(coll: CollisionInfo, timestamp: number): void
+    setActive(active: boolean, timestamp: number): void
 }
 
 export class ContactInstance implements Contact {
     id: string
-    confirmActive: boolean = true
     isActive: boolean
     collision: CollisionInfo
     separation: number
@@ -66,7 +65,7 @@ export class ContactInstance implements Contact {
         this.id = GetContactId(this.bodyA, this.bodyB)
         this.separation = coll.depth
     }
-    setActive(active: boolean, timestamp: number) {
+    setActive(active: boolean, timestamp: number): void {
         if (active) {
             this.isActive = true
             this.timestamp = timestamp
@@ -80,35 +79,31 @@ export class ContactInstance implements Contact {
             parentA = coll.parentA,
             parentB = coll.parentB
 
+        coll.contact = this
         this.collision = coll
         this.timeUpdated = timestamp
         this.inverseMass = parentA.invMass + parentB.invMass
-        this.friction = parentA.friction > parentB.friction ? parentB.friction : parentA.friction
-        this.frictionStatic =
-            parentA.frictionStatic > parentB.frictionStatic
-                ? parentA.frictionStatic
-                : parentB.frictionStatic
-        this.slop = parentA.slop > parentB.slop ? parentA.slop : parentB.slop
-        coll.contact = this
+        this.friction = Math.min(parentA.friction, parentB.friction)
+        this.frictionStatic = Math.max(parentA.frictionStatic, parentB.frictionStatic)
+        this.slop = Math.min(parentA.slop, parentB.slop)
+        this.restitution = Math.max(parentA.restitution, parentB.restitution)
 
-        this.activeRelates = []
-        let relates = this.relates,
-            activeRelates = this.activeRelates
+        this.activeRelates.splice(0)
         if (coll.collided) {
             for (const vertex of supports) {
                 let id = getId(vertex)
                 let relate: Relate
-                if (relates.has(id)) {
-                    relate = relates.get(id)!
+                if (this.relates.has(id)) {
+                    relate = this.relates.get(id)!
                 } else {
                     relate = {
                         vertex: vertex,
                         normalImpulse: 0,
                         tangentImpulse: 0
                     }
-                    relates.set(id, relate)
+                    this.relates.set(id, relate)
                 }
-                activeRelates.push(relate)
+                this.activeRelates.push(relate)
             }
             this.separation = coll.depth
             this.setActive(true, timestamp)
@@ -117,6 +112,7 @@ export class ContactInstance implements Contact {
                 this.setActive(false, timestamp)
             }
         }
+        // console.log(`body ${coll.bodyA.id} and body ${coll.bodyB.id} collides ${this.collision.collided}, relates ${this.activeRelates.length}`);
     }
 }
 

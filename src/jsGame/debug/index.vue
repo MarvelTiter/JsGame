@@ -28,7 +28,7 @@ onMounted(async () => {
   }
   let sources = await loadSprites(images, scripts, (c, t) => percent.value = c / t)
   let g = new Game(sources, {
-    enableCollide: true, enableGravity: true
+    enableCollide: true, enableGravity: false
   });
   let ms = new MainSence(g);
   g.setSence(ms);

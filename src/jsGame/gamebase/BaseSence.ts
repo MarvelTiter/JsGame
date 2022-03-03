@@ -9,6 +9,7 @@ import { ContactManage } from "./collision/ContactManage"
 import { CollisionInfo } from "./collision/CollisionInfo"
 import { RigidBase } from "./rigid/RigidComponent"
 import { broadphase } from "./collision/broadphase"
+import { randomBetween } from "../../utils/random"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void
@@ -249,11 +250,11 @@ export class BaseSence {
             }
         }
         if (window.Debug) {
-            ctx.fillStyle = "#00ff00"
+            // ctx.fillStyle = "#00ff00"
             for (const c of this.ContactsMag.list) {
                 if (!c.collision.collided) continue
                 for (const p of c.collision.supports) {
-                    if (p === undefined) continue
+                    ctx.fillStyle = randomColor()
                     ctx.beginPath()
                     ctx.arc(p.point.x, p.point.y, 2, 0, Math.PI * 2)
                     ctx.closePath()
@@ -307,26 +308,41 @@ export class BaseSence {
         // }
         for (let ii = 0; ii < objects.length; ii++) {
             const eii = objects[ii]
-            for (let jj = 0; jj < objects.length; jj++) {
+            for (let jj = ii + 1; jj < objects.length; jj++) {
                 const ejj = objects[jj]
                 if (eii.isStatic && ejj.isStatic) continue
                 let coll = collides(this.ContactsMag, eii, ejj)
-                if (coll !== undefined) ret.push(coll)
+                // if (coll !== undefined)
+                ret.push(coll)
             }
         }
         return ret
     }
     private _rigidsCache: RigidBase[] | undefined
     get rigidsCache(): RigidBase[] {
-        if (this._rigidsCache === undefined) {
-            this._rigidsCache = Array.from(this.rigidElements.values())
-        }
-        return this._rigidsCache
+        // if (this._rigidsCache === undefined) {
+        //     this._rigidsCache = Array.from(this.rigidElements.values())
+        // }
+        // return this._rigidsCache
+        return Array.from(this.rigidElements.values())
     }
     private findCollide(): void {
         let colls = this.collitionTest(this.rigidsCache)
         this.ContactsMag.Update(colls, this.timing.timestamp)
         this.ContactsMag.removeOld(this.timing.timestamp)
+    }
+    private solvePosition(): void {
+        this.ContactsMag.preSolve()
+        for (let i = 0; i < 6; i++) {
+            this.ContactsMag.solve()
+        }
+        this.ContactsMag.postSolve(this.rigidsCache)
+    }
+    private solveVelocity(): void {
+        this.ContactsMag.preSolveVelocity()
+        for (let i = 0; i < 6; i++) {
+            this.ContactsMag.solveVelocity()
+        }
     }
     private clearForce(rigidsCache: RigidBase[]) {
         for (const ri of rigidsCache) {
@@ -352,17 +368,17 @@ export class BaseSence {
         this.update()
         //
         this.findCollide()
-        this.ContactsMag.preSolve()
-        for (let i = 0; i < 6; i++) {
-            this.ContactsMag.solve()
-        }
-        this.ContactsMag.postSolve(this.rigidsCache)
-        this.ContactsMag.preSolveVelocity()
-        for (let i = 0; i < 6; i++) {
-            this.ContactsMag.solveVelocity()
-        }
+        this.solvePosition()
+        this.solveVelocity()
         this.clearForce(this.rigidsCache)
         this.camera.trace()
         this.draw(this.game.context)
     }
+}
+
+function randomColor() {
+    let r = randomBetween(0, 255)
+    let g = randomBetween(0, 255)
+    let b = randomBetween(0, 255)
+    return `rbga(${r},${g},${b},1)`
 }

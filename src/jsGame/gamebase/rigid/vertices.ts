@@ -2,15 +2,35 @@ import { Vector2, Vertex } from "../data/Vector2"
 import { RigidBase } from "./RigidComponent"
 
 export class Vertices {
-    vertexs!: Vertex[]
+    private _vertexs: Vertex[]
+    get vertexs(): Vertex[] {
+        return this._vertexs
+    }
+    private _axes: Vector2[]
+    get axes(): Vector2[] {
+        return this._axes
+    }
     constructor(points: Vector2[], body: RigidBase) {
-        this.vertexs = []
+        this._vertexs = []
         for (let i = 0; i < points.length; i++) {
             const p = points[i]
-            this.vertexs.push(new Vertex(p, i, body))
+            this._vertexs.push(new Vertex(p, i, body))
         }
+        let temp: any = {}
+        for (var i = 0; i < this._vertexs.length; i++) {
+            var j = (i + 1) % this._vertexs.length
+            let head = this._vertexs[i].point
+            let tail = this._vertexs[j].point
+            let normal = Vector2.new(tail.y - head.y, head.x - tail.x).normalize()
+            let g: number | string = normal.y === 0 ? Infinity : normal.x / normal.y
+            // 粗略精度
+            g = g.toFixed(3).toString()
+            // 去除重复的轴
+            temp[g] = normal
+        }
+        this._axes = Object.values(temp)
     }
-    fixOrigin(){
+    fixOrigin() {
         let centreOffset = this.centre().multi(-1)
         this.translate(centreOffset)
     }
@@ -30,15 +50,25 @@ export class Vertices {
             v.point.y = pos.y + (dx * sin + dy * cos)
             // v.point.rotate(angle)
         }
+        this.axesRotate(angle)
+    }
+    axesRotate(angle: number) {
+        if (angle === 0) return
+
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle)
+
+        for (const axis of this._axes) {
+            axis.x = axis.x * cos - axis.y * sin
+            axis.y = axis.x * sin + axis.y * cos
+        }
     }
     area(signed: boolean = false): number {
         let area = 0
         let Vertexes = this.vertexs
         var j = Vertexes.length - 1
         for (let i = 0; i < this.vertexs.length; i++) {
-            area +=
-                (Vertexes[j].x - Vertexes[i].x) *
-                (Vertexes[j].y + Vertexes[i].y)
+            area += (Vertexes[j].x - Vertexes[i].x) * (Vertexes[j].y + Vertexes[i].y)
             j = i
         }
         if (signed) return area / 2
@@ -81,24 +111,17 @@ export class Vertices {
      * @param point
      * @returns
      */
-    contains(point: Vector2): boolean {
-        let vertices = this.vertexs,
-            pointX = point.x,
-            pointY = point.y,
-            verticesLength = vertices.length,
-            vertex = vertices[verticesLength - 1],
-            nextVertex
+    contains(testVertex: Vertex): boolean {
+        let vertices = this.vertexs
+        let verticesLength = vertices.length
         for (var i = 0; i < verticesLength; i++) {
-            nextVertex = vertices[i]
+            let j = i == verticesLength - 1 ? 0 : i + 1
+            let vertice = vertices[i]
+            let nextVertice = vertices[j]
             // 顶点与点的连线的向量与边的法向量的点积，如果大于0，说明是锐角，在多边形外面
-            if (
-                (pointX - vertex.x) * (vertex.y - nextVertex.y) +
-                    (pointY - vertex.y) * (nextVertex.x - vertex.x) >
-                0
-            ) {
+            if ((testVertex.x - vertice.x) * (nextVertice.y - vertice.y) + (testVertex.y - vertice.y) * (vertice.x - nextVertice.x) > 0) {
                 return false
             }
-            vertex = nextVertex
         }
         return true
     }

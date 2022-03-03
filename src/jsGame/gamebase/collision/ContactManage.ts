@@ -4,6 +4,7 @@ import { GetContactId, RigidBase } from "../rigid/RigidComponent"
 import { Vector2 } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
 import { clamp } from "../../../utils/helper"
+import { log } from "../../../utils/debug"
 
 export class ContactManage {
     private contacts: Contact[]
@@ -20,29 +21,29 @@ export class ContactManage {
     }
 
     Update(collisions: CollisionInfo[], timestamp: number): void {
-        for (const c of this.contacts) {
-            c.confirmActive = false
-        }
-        for (let i = 0; i < collisions.length; i++) {
-            const coll = collisions[i]
+        let actived: string[] = []
+        for (const coll of collisions.filter(c => c.collided)) {
             let id = GetContactId(coll.bodyA, coll.bodyB)
+            actived.push(id)
             let contact = this.contactMap.get(id)
             if (contact === undefined) {
-                let contact = createContact(coll, timestamp)
-                contact.update(coll, timestamp)
-                this.contacts.push(contact)
-                this.contactMap.set(contact.id, contact)
+                let con = createContact(coll, timestamp)
+                con.update(coll, timestamp)
+                this.contacts.push(con)
+                this.contactMap.set(con.id, con)
             } else {
                 contact.update(coll, timestamp)
-                contact.confirmActive = true
             }
+        }
+        for (const c of this.contacts.filter(c => c.isActive && actived.indexOf(c.id) == -1)) {
+            c.setActive(false, timestamp)
         }
     }
     removeOld(timestamp: number) {
         let removeIndex: number[] = []
         for (let i = 0; i < this.contacts.length; i++) {
             let c = this.contacts[i]
-            if (c.confirmActive) continue
+            if (c.isActive) continue
             let coll = c.collision
             if (coll.bodyA.isSleeping || coll.bodyB.isSleeping) {
                 c.timeUpdated = timestamp
@@ -62,42 +63,37 @@ export class ContactManage {
     }
     preSolve(): void {
         for (const c of this.contacts) {
-            if (!c.isActive) continue
             c.collision.parentA.totalRelates += c.activeRelates.length
             c.collision.parentB.totalRelates += c.activeRelates.length
         }
     }
     solve(): void {
         let positionDampen: number = 0.9
-        for (const c of this.contacts) {
-            if (!c.isActive) continue
+        for (const c of this.contacts.filter(c => c.isActive)) {
             let collision = c.collision
             let bodyA = collision.parentA
             let bodyB = collision.parentB
             let normal = collision.normal
-            let bodyBtoA = bodyB.positionImpulse
-                .copy()
-                .add(collision.penetration)
-                .sub(bodyA.positionImpulse)
+            let bodyBtoA = bodyB.positionImpulse.copy().sub(bodyA.positionImpulse).add(collision.penetration)
             c.separation = bodyBtoA.dot(normal)
         }
-        for (const c of this.contacts) {
+        for (const c of this.contacts.filter(c => c.isActive)) {
             let collision = c.collision
             let bodyA = collision.parentA
             let bodyB = collision.parentB
             let normal = collision.normal
-            let positionImpulse = c.separation - c.slop
+            let posImpulse = c.separation - c.slop
             //
-            if (bodyA.isStatic || bodyB.isStatic) positionImpulse *= 2
+            if (bodyA.isStatic || bodyB.isStatic) posImpulse *= 2
 
             if (!(bodyA.isStatic || bodyA.isSleeping)) {
                 let shared = positionDampen / bodyA.totalRelates
-                let delta = normal.copy().multi(positionImpulse * shared)
+                let delta = normal.copy().multi(posImpulse * shared)
                 bodyA.positionImpulse.add(delta)
             }
             if (!(bodyB.isStatic || bodyB.isSleeping)) {
-                let shared = positionDampen / bodyA.totalRelates
-                let delta = normal.copy().multi(positionImpulse * shared)
+                let shared = positionDampen / bodyB.totalRelates
+                let delta = normal.copy().multi(posImpulse * shared)
                 bodyB.positionImpulse.sub(delta)
             }
         }
@@ -105,28 +101,27 @@ export class ContactManage {
 
     postSolve(objects: RigidBase[]): void {
         for (const body of objects) {
-            let positionImpulse = body.positionImpulse
+            let posImpulse = body.positionImpulse
             let velocity = body.velocity
             body.totalRelates = 0
-            if (Math.sign(positionImpulse.x) !== 0 || Math.sign(positionImpulse.y) !== 0) {
+            if (Math.sign(posImpulse.x) !== 0 || Math.sign(posImpulse.y) !== 0) {
                 for (const part of body.parts) {
-                    part.vertices.translate(positionImpulse)
+                    part.vertices.translate(posImpulse)
                     body.bound.update(part.vertices, velocity)
-                    part.pos.add(positionImpulse)
+                    part.pos.add(posImpulse)
                 }
-                body.posPrev?.add(positionImpulse)
-                if (positionImpulse.copy().dot(velocity) < 0) {
-                    positionImpulse.set(0, 0)
+                body.posPrev.add(posImpulse)
+                if (posImpulse.copy().dot(velocity) < 0) {
+                    posImpulse.set(0, 0)
                 } else {
                     // positionWarming
-                    positionImpulse.multi(0.8)
+                    posImpulse.multi(0.8)
                 }
             }
         }
     }
     preSolveVelocity() {
-        for (const c of this.contacts) {
-            if (!c.isActive) continue
+        for (const c of this.contacts.filter(c => c.isActive)) {
             let relates = c.activeRelates
             let collision = c.collision
             let bodyA = collision.bodyA
@@ -137,21 +132,25 @@ export class ContactManage {
                 let relateVertex = relate.vertex
                 let normalImpulse = relate.normalImpulse
                 let tangentImpulse = relate.tangentImpulse
+                // log("preSolveVelocity tangentImpulse: ", tangentImpulse, relate.vertex.belonged.id, relate.vertex.index)
 
                 if (Math.sign(normalImpulse) !== 0 || Math.sign(tangentImpulse) !== 0) {
-                    let impulseVec = normal
-                        .copy()
-                        .multi(normalImpulse)
-                        .add(tangent.copy().multi(tangentImpulse))
+                    let impulseVec = normal.copy().multi(normalImpulse).add(tangent.copy().multi(tangentImpulse))
+                    // let impulseVecX = normal.x * normalImpulse + tangent.x * tangentImpulse
+                    // let impulseVecY = normal.y * normalImpulse + tangent.y * tangentImpulse
                     if (!(bodyA.isStatic || bodyA.isSleeping)) {
                         let offset = relateVertex.sub(bodyA.pos)
-                        bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
-                        bodyA.anglePrev! += bodyA.invInertia * offset.cross(impulseVec)
+                        // bodyA.posPrev.x += impulseVecX * bodyA.invMass
+                        // bodyA.posPrev.y += impulseVecY * bodyA.invMass
+                        bodyA.posPrev.add(impulseVec.copy().multi(bodyA.invMass))
+                        bodyA.anglePrev += bodyA.invInertia * offset.cross(impulseVec)
                     }
                     if (!(bodyB.isStatic || bodyB.isSleeping)) {
                         let offset = relateVertex.sub(bodyB.pos)
-                        bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
-                        bodyB.anglePrev! += bodyB.invInertia * offset.cross(impulseVec)
+                        // bodyB.posPrev.x += impulseVecX * bodyB.invMass
+                        // bodyB.posPrev.y += impulseVecY * bodyB.invMass
+                        bodyB.posPrev.sub(impulseVec.copy().multi(bodyB.invMass))
+                        bodyB.anglePrev -= bodyB.invInertia * offset.cross(impulseVec)
                     }
                 }
             }
@@ -160,35 +159,30 @@ export class ContactManage {
     solveVelocity() {
         let timeScaleSquared = 1
         for (const c of this.contacts) {
-            if (!c.isActive) continue
-            let collision = c.collision,
-                bodyA = collision.parentA,
-                bodyB = collision.parentB,
-                normal = collision.normal,
-                tangent = collision.tangent,
-                relates = c.activeRelates,
-                relatesLength = relates.length,
-                shared = 1 / relatesLength,
-                inverseMassTotal = bodyA.invMass + bodyB.invMass,
-                friction = c.friction * c.frictionStatic * _frictionNormalMultiplier
+            let collision = c.collision
+            let bodyA = collision.parentA
+            let bodyB = collision.parentB
+            let normal = collision.normal
+            let tangent = collision.tangent
+            let relates = c.activeRelates
+            let relatesLength = relates.length
+            let shared = 1 / relatesLength
+            let inverseMassTotal = bodyA.invMass + bodyB.invMass
+            let friction = c.friction * c.frictionStatic * _frictionNormalMultiplier
 
             // update body velocities
-            bodyA.velocity = bodyA.pos.copy().sub(bodyA.posPrev!)
-            bodyB.velocity = bodyB.pos.copy().sub(bodyB.posPrev!)
-            bodyA.angularVelocity = bodyA.angle - bodyA.anglePrev!
-            bodyB.angularVelocity = bodyB.angle - bodyB.anglePrev!
+            bodyA.velocity = bodyA.pos.copy().sub(bodyA.posPrev)
+            bodyB.velocity = bodyB.pos.copy().sub(bodyB.posPrev)
+            bodyA.angularVelocity = bodyA.angle - bodyA.anglePrev
+            bodyB.angularVelocity = bodyB.angle - bodyB.anglePrev
             for (const rel of relates) {
                 let relVertex = rel.vertex
                 //
-                let rA = relVertex.point.copy().sub(bodyA.pos)
-                let rB = relVertex.point.copy().sub(bodyB.pos)
+                let offsetA = relVertex.sub(bodyA.pos)
+                let offsetB = relVertex.sub(bodyB.pos)
                 //
-                let velocityPointA = bodyA.velocity.add(
-                    rA.copy().normal().multi(bodyA.angularVelocity)
-                )
-                let velocityPointB = bodyB.velocity.add(
-                    rB.copy().normal().multi(bodyB.angularVelocity)
-                )
+                let velocityPointA = bodyA.velocity.add(offsetA.copy().normal().multi(bodyA.angularVelocity))
+                let velocityPointB = bodyB.velocity.add(offsetB.copy().normal().multi(bodyB.angularVelocity))
                 //
                 let relativeVelocity = velocityPointA.copy().sub(velocityPointB)
                 //
@@ -207,29 +201,19 @@ export class ContactManage {
                 let frictionLimit = normalForce * friction * timeScaleSquared
                 if (tangentSpeed > frictionLimit) {
                     maxFriction = tangentSpeed
-                    tangentImpulse = clamp(
-                        c.friction * tangentVelocityDirection * timeScaleSquared,
-                        -maxFriction,
-                        maxFriction
-                    )
+                    tangentImpulse = clamp(c.friction * tangentVelocityDirection * timeScaleSquared, -maxFriction, maxFriction)
                 }
                 // 计算有效质量
-                let oAcN = rA.cross(normal)
-                let oBcN = rB.cross(normal)
-                let kNormal =
-                    inverseMassTotal +
-                    bodyA.invInertia * oAcN * oAcN +
-                    bodyB.invInertia * oBcN * oBcN
-                let effectiveMassNormal = (kNormal == 0 ? 0 : 1) / kNormal
+                let oAcN = offsetA.cross(normal)
+                let oBcN = offsetB.cross(normal)
+                let kNormal = inverseMassTotal + bodyA.invInertia * oAcN * oAcN + bodyB.invInertia * oBcN * oBcN
+                // let effectiveMassNormal = (kNormal == 0 ? 0 : 1) / kNormal
                 let share = shared / kNormal
 
                 normalImpulse *= share
                 tangentImpulse *= share
                 // handle high velocity and resting collisions separately
-                if (
-                    normalVelocity * normalVelocity > _restingThresh * timeScaleSquared &&
-                    normalVelocity < 0
-                ) {
+                if (normalVelocity * normalVelocity > _restingThresh * timeScaleSquared && normalVelocity < 0) {
                     // high normal velocity so clear cached contact normal impulse
                     rel.normalImpulse = 0
                 } else {
@@ -248,28 +232,22 @@ export class ContactManage {
                     // solve resting collision constraints using Erin Catto's method (GDC08)
                     // tangent impulse tends to -tangentSpeed or +tangentSpeed
                     let contactTangentImpulse = rel.tangentImpulse
-                    rel.tangentImpulse = clamp(
-                        rel.tangentImpulse + tangentImpulse,
-                        -maxFriction,
-                        maxFriction
-                    )
+                    rel.tangentImpulse = clamp(rel.tangentImpulse + tangentImpulse, -maxFriction, maxFriction)
                     tangentImpulse = rel.tangentImpulse - contactTangentImpulse
                 }
+                // log("solveVelocity tangentImpulse: ", rel.tangentImpulse, rel.vertex.belonged.id, rel.vertex.index)
 
                 // total impulse from contact
-                let impulseVec = normal
-                    .copy()
-                    .multi(normalImpulse)
-                    .add(tangent.copy().multi(tangentImpulse))
+                let impulseVec = normal.copy().multi(normalImpulse).add(tangent.copy().multi(tangentImpulse))
 
                 // apply impulse from contact
                 if (!(bodyA.isStatic || bodyA.isSleeping)) {
-                    bodyA.posPrev!.add(impulseVec.copy().multi(bodyA.invMass))
-                    bodyA.anglePrev! += rA.cross(impulseVec) * bodyA.invInertia
+                    bodyA.posPrev.add(impulseVec.copy().multi(bodyA.invMass))
+                    bodyA.anglePrev += offsetA.cross(impulseVec) * bodyA.invInertia
                 }
                 if (!(bodyB.isStatic || bodyB.isSleeping)) {
-                    bodyB.posPrev!.sub(impulseVec.copy().multi(bodyB.invMass))
-                    bodyB.anglePrev! -= rB.cross(impulseVec) * bodyB.invInertia
+                    bodyB.posPrev.sub(impulseVec.copy().multi(bodyB.invMass))
+                    bodyB.anglePrev -= offsetB.cross(impulseVec) * bodyB.invInertia
                 }
             }
         }

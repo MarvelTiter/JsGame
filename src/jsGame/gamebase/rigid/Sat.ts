@@ -13,7 +13,11 @@ interface ProjectResult {
  * @param rA
  * @param rB
  */
-export function calcProjectionAxes(pointsA: Vertex[], pointsB: Vertex[], axes: Vector2[]): ProjectResult {
+export function calcProjectionAxes(
+    pointsA: Vertex[],
+    pointsB: Vertex[],
+    axes: Vector2[]
+): ProjectResult {
     let min = Number.MAX_VALUE
     let cur!: Vector2
     for (const axis of axes) {
@@ -23,10 +27,10 @@ export function calcProjectionAxes(pointsA: Vertex[], pointsB: Vertex[], axes: V
         if (overlap < min) {
             min = overlap
             cur = axis
-            // 没有相交的部分
-            if (overlap <= 0) {
-                break
-            }
+        }
+        // 没有相交的部分
+        if (overlap <= 0) {
+            break
         }
     }
 
@@ -38,7 +42,9 @@ export function calcProjectionAxes(pointsA: Vertex[], pointsB: Vertex[], axes: V
 
 function calcProj(axis: Vector2, path: Vertex[]): ProjectionInfo {
     let v: Vector2 = path[0].point
-    let d: number, min: number, max: number
+    let min: number = 0
+    let max: number = 0
+    let d: number = 0
     min = max = axis.dot(v) //计算投影轴与第一个坐标点的点积
     for (var i = 1; i < path.length; i++) {
         v = path[i].point
@@ -49,6 +55,7 @@ function calcProj(axis: Vector2, path: Vertex[]): ProjectionInfo {
             min = d
         }
     }
+
     return {
         min: min,
         max: max

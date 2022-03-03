@@ -15,13 +15,13 @@ export class Bound {
         this.max.set(-Infinity, -Infinity)
         this.min.set(Infinity, Infinity)
         for (const vertex of vertices.vertexs) {
-            this.max.max(vertex.point)
-            this.min.min(vertex.point)
+            // this.max.max(vertex.point)
+            // this.min.min(vertex.point)
             // console.log(this.max, this.min)
-            // if (vertex.point.x > this.max.x) this.max.x = vertex.point.x
-            // if (vertex.point.y > this.max.y) this.max.y = vertex.point.y
-            // if (vertex.point.x < this.min.x) this.min.x = vertex.point.x
-            // if (vertex.point.y < this.min.y) this.min.y = vertex.point.y
+            if (vertex.point.x > this.max.x) this.max.x = vertex.point.x
+            if (vertex.point.y > this.max.y) this.max.y = vertex.point.y
+            if (vertex.point.x < this.min.x) this.min.x = vertex.point.x
+            if (vertex.point.y < this.min.y) this.min.y = vertex.point.y
         }
         if (velocity.x > 0) {
             this.max.x += velocity.x
@@ -33,6 +33,14 @@ export class Bound {
         } else {
             this.min.y += velocity.y
         }
+    }
+    get paths(): Vector2[] {
+        return [
+            Vector2.new(this.min.x, this.min.y),
+            Vector2.new(this.max.x, this.min.y),
+            Vector2.new(this.max.x, this.max.y),
+            Vector2.new(this.min.x, this.max.y)
+        ]
     }
     div(p: number): Bound {
         this.w = this.w * p

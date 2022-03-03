@@ -2,14 +2,21 @@ import { BaseSence } from "../../gamebase/BaseSence"
 import { Bound } from "../../gamebase/data/Bound"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
+import { RigidBase } from "../../gamebase/rigid/RigidComponent"
 import { TestObject } from "./TestObject"
 
 export class TestRect extends TestObject {
-    constructor(game: Game, sence: BaseSence, size: Bound, pos: Vector2, angle?: number) {
+    constructor(
+        game: Game,
+        sence: BaseSence,
+        size: Bound,
+        pos: Vector2,
+        options?: Partial<RigidBase>
+    ) {
         super(game, sence)
         this.size = size
         this.pos = pos
-        this.addRectRigid(size)
+        this.addRectRigid(size, undefined, options)
     }
     checkFocu(x: number, y: number): boolean {
         let isfocus =

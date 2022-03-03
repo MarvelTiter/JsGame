@@ -7,6 +7,7 @@ import { Axes } from "./axes"
 import { Bound } from "../data/Bound"
 import { Game } from "../Game"
 import { BaseSence } from "../BaseSence"
+import { log } from "../../../utils/debug"
 
 const gravity = 10
 type ShapeType = "Circle" | "Rect" | "Triangle"
@@ -85,7 +86,7 @@ export abstract class RigidBase {
     /**
      * 最大静摩擦力
      */
-    frictionStatic: number = 0.3
+    frictionStatic: number = 0.5
     /**
      * 空气摩擦力
      * 默认值 0.01
@@ -94,7 +95,7 @@ export abstract class RigidBase {
     /**
      * 恢复系数（e）是碰撞前后两物体沿接触处法线方向上的分离速度与接近速度之比，只与碰撞物体的材料有关。弹性碰撞时e=1；完全非弹性碰撞时e=0
      */
-    restitution: number = 0.3
+    restitution: number = 0
     /**
      * 指定允许物体“下沉”或旋转到其他物体的距离的公差
      */
@@ -106,7 +107,14 @@ export abstract class RigidBase {
     /**
      * 是否静态
      */
-    isStatic: boolean = false
+    private _isStatic: boolean = false
+    public get isStatic(): boolean {
+        return this._isStatic
+    }
+    public set isStatic(v: boolean) {
+        this._isStatic = v
+    }
+
     /**
      * 是否已休眠
      */
@@ -134,7 +142,7 @@ export abstract class RigidBase {
         // this.angle = v
         this.target.angle = v
     }
-    anglePrev: number | undefined
+    anglePrev: number = 0
 
     public get pos(): Vector2 {
         return this.target.pos
@@ -160,14 +168,13 @@ export abstract class RigidBase {
     get vertexs(): Vertex[] {
         return this.vertices.vertexs
     }
-    get axes(): Vector2[] {
-        return this.axesMg.axes
-    }
-    vertices!: Vertices
     /**
      * 凸多边形各边的法向量（投影轴
      */
-    axesMg!: Axes
+    get axes(): Vector2[] {
+        return this.vertices.axes
+    }
+    vertices!: Vertices
 
     bind(obj: GameObject) {
         this.target = obj
@@ -175,7 +182,6 @@ export abstract class RigidBase {
 
     init() {
         this.vertices = new Vertices(this.points, this)
-        this.axesMg = new Axes(this.vertices)
         this.area = this.vertices.area()
         this.mass = this.density * this.area
         this.vertices.fixOrigin()
@@ -189,14 +195,28 @@ export abstract class RigidBase {
         this.parts.push(part)
     }
 
-    setStatis() {
-        this.isStatic = true
-        this.restitution = 1
-        this.friction = 1
-        this.mass = this.inertia = this.density = Infinity
-        this.posPrev = this.pos
-        this.anglePrev = this.angle
-        this.angularVelocity = 0
+    setStatis(value: boolean) {
+        if (value) {
+            this._isStatic = true
+            for (const part of this.parts) {
+                part._isStatic = true
+                part.restitution = 0
+                part.friction = 1
+                part.mass = part.inertia = part.density = Infinity
+                part.posPrev.x = part.pos.x
+                part.posPrev.y = part.pos.y
+                part.anglePrev = part.angle
+                part.angularVelocity = 0
+                part.speed = 0
+                part.angularSpeed = 0
+                part.motion = 0
+            }
+        } else {
+            this._isStatic = false
+            for (const part of this.parts) {
+                part._isStatic = false
+            }
+        }
     }
 
     /**
@@ -214,19 +234,7 @@ export abstract class RigidBase {
      */
     abstract get points(): Vector2[]
 
-    drawDebug(ctx: CanvasRenderingContext2D): void {
-        let pos = this.pos.copy().add(this.offset)
-        let bw = this.bound.max.x - this.bound.min.x
-        let bh = this.bound.max.y - this.bound.min.y
-        ctx.save()
-        ctx.strokeStyle = "#a9a9a9"
-        ctx.translate(pos.x, pos.y)
-        ctx.beginPath()
-        ctx.strokeRect(-bw / 2, -bh / 2, bw, bh)
-        ctx.closePath()
-        ctx.translate(-pos.x, -pos.y)
-        ctx.restore()
-    }
+    drawDebug(ctx: CanvasRenderingContext2D): void {}
 
     update(delta: number, timeScale: number, correction: number): void {
         if (this.isStatic) return
@@ -236,20 +244,17 @@ export abstract class RigidBase {
         let frictionAir = 1 - this.frictionAir * timeScale * this.timeScale
         let velocityPrev = this.pos.copy().sub(this.posPrev)
         // update velocity with Verlet integration
-        velocityPrev
-            .multi(frictionAir * correction)
-            .add(this.force.copy().multi(this.invMass * deltaTimeSquared))
+        velocityPrev.multi(frictionAir * correction).add(this.force.copy().multi(this.invMass * deltaTimeSquared))
         this.velocity.x = velocityPrev.x
         this.velocity.y = velocityPrev.y
         this.posPrev.set(this.pos.x, this.pos.y)
         this.pos.add(this.velocity)
+        // console.log("this.velocity: ", this.velocity)
 
-        this.angularVelocity =
-            (this.angle - (this.anglePrev ?? this.angle)) * frictionAir * correction +
-            this.torque * this.invInertia * deltaTimeSquared
+        this.angularVelocity = (this.angle - (this.anglePrev ?? this.angle)) * frictionAir * correction + this.torque * this.invInertia * deltaTimeSquared
+
         this.anglePrev = this.angle
         this.angle += this.angularVelocity
-
         // track speed and acceleration
         this.speed = this.velocity.length()
         this.angularSpeed = Math.abs(this.angularVelocity)
@@ -261,7 +266,6 @@ export abstract class RigidBase {
                 part.pos.add(this.velocity)
             }
             part.vertices.rotate(this.angularVelocity, this.pos)
-            part.axesMg.rotate(this.angularVelocity)
             if (i > 0) {
                 part.pos.rotateAbout(this.angularVelocity, this.pos)
             }

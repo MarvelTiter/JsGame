@@ -4,6 +4,7 @@ import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CircleRigid } from "../rigid/CircleRigid"
 import { RectRigid } from "../rigid/RectRigid"
+import { RigidBase } from "../rigid/RigidComponent"
 import { TriangleRigid } from "../rigid/TriangleRigid"
 import { GameObject } from "./GameObject"
 
@@ -14,8 +15,9 @@ export class CustomObject extends GameObject {
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
     }
-    public addRectRigid(size: Bound, offset?: Vector2, name?: string): void {
+    public addRectRigid(size: Bound, offset?: Vector2, options?: Partial<RigidBase>): void {
         let rg = new RectRigid(size.w, size.h, offset)
+        Object.assign(rg, options)
         rg.bind(this)
         rg.init()
         this.addComponent(rg)

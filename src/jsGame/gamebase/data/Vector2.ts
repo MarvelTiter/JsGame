@@ -157,8 +157,12 @@ export class Vertex {
     cross(ver: Vertex): number {
         return this.point.cross(ver.point)
     }
-    dot(ver: Vertex): number {
-        return this.point.dot(ver.point)
+    dot(ver: Vertex | Vector2): number {
+        if (ver instanceof Vertex) {
+            return this.point.dot(ver.point)
+        } else {
+            return this.point.dot(ver)
+        }
     }
     add(ver: Vertex | Vector2): Vector2 {
         if (ver instanceof Vertex) {
