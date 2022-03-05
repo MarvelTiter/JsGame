@@ -4,7 +4,7 @@ import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CircleRigid } from "../rigid/CircleRigid"
 import { RectRigid } from "../rigid/RectRigid"
-import { RigidBase } from "../rigid/RigidComponent"
+import { RigidBase } from "../rigid/RigidBase"
 import { TriangleRigid } from "../rigid/TriangleRigid"
 import { GameObject } from "./GameObject"
 
@@ -15,21 +15,23 @@ export class CustomObject extends GameObject {
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
     }
-    public addRectRigid(size: Bound, offset?: Vector2, options?: Partial<RigidBase>): void {
-        let rg = new RectRigid(size.w, size.h, offset)
-        Object.assign(rg, options)
+    afterCollide() {}
+    public addRectRigid(w: number, h: number, options?: Partial<RigidBase>): void {
+        let rg = new RectRigid(w, h)
         rg.bind(this)
-        rg.init()
+        Object.assign(rg, options)
         this.addComponent(rg)
     }
-    public addCircleRigid(radius: number, name?: string): void {
-        let cg = new CircleRigid(radius, 0)
+    public addCircleRigid(radius: number, options?: Partial<RigidBase>): void {
+        let cg = new CircleRigid(radius)
         cg.bind(this)
+        Object.assign(cg, options)
         this.addComponent(cg)
     }
-    public addTriangleRigid(len: number, theta: number, name?: string): void {
+    public addTriangleRigid(len: number, theta: number, options?: Partial<RigidBase>): void {
         let tg = new TriangleRigid(len, theta)
         tg.bind(this)
+        Object.assign(tg, options)
         this.addComponent(tg)
     }
 }

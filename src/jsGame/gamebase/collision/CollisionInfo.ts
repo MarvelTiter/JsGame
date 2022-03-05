@@ -1,6 +1,6 @@
 import { Vector2, Vertex } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
-import { RigidBase } from "../rigid/RigidComponent"
+import { RigidBase } from "../rigid/RigidBase"
 import { Contact } from "./Contact"
 
 export interface CollisionInfo {

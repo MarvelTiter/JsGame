@@ -1,4 +1,4 @@
-import { get } from "../../utils/fetchHelper"
+import { httpGet } from "../../utils/fetchHelper"
 import { GameImage } from "./Source"
 
 export interface Source {
@@ -23,8 +23,12 @@ export function loadSprites(sources: any, script?: any, stepCallback?: (loaded: 
                 let i = new GameImage(k, img)
                 let s = tryGetProp(script, k)
                 if (s !== undefined) {
-                    let frames = await get(s)
-                    i.frames = frames
+                    let scripts = await httpGet(s)
+                    if (scripts instanceof Array) {
+                        i.frames = scripts
+                    } else {
+                        i.sprites = scripts
+                    }
                 }
                 images.set(k, i)
                 count++

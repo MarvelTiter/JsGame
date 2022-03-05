@@ -1,14 +1,13 @@
+
 /**
  * 动画帧定义
  */
 export interface SpriteDefinition {
-    filename: string
-    frame: {
-        x: number
-        y: number
-        w: number
-        h: number
-    }
+    name: string
+    x: number
+    y: number
+    w: number
+    h: number
 }
 export interface FrameDefinition {
     filename: string

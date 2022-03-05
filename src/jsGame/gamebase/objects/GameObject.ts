@@ -3,9 +3,9 @@ import { Game } from "../Game"
 import { Vector2 } from "../data/Vector2"
 import { MouseArgs } from "../MouseArgs"
 import { Bound } from "../data/Bound"
-import { RigidBase } from "../rigid/RigidComponent"
+import { RigidBase } from "../rigid/RigidBase"
 import { Contact } from "../collision/Contact"
-import { IRectangle, Rect } from "../data/Rect"
+import { IRectangle, IRect } from "../data/Rect"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
 //         return
@@ -34,7 +34,6 @@ import { IRectangle, Rect } from "../data/Rect"
  * 所有对象的基类
  */
 export abstract class GameObject implements IRectangle {
-
     //#region props
 
     private _id: string
@@ -44,6 +43,10 @@ export abstract class GameObject implements IRectangle {
     protected set id(v: string) {
         this._id = v
     }
+    /**
+     * 用于碰撞检测，属于相同的组的对象不检测
+     */
+    group: string = ""
 
     private _game: Game
     public get game(): Game {
@@ -61,11 +64,13 @@ export abstract class GameObject implements IRectangle {
         this._sence = v
     }
 
+    posPrev: Vector2 = new Vector2()
     private _pos: Vector2
     public get pos(): Vector2 {
         return this._pos
     }
     public set pos(v: Vector2) {
+        this.posPrev = this._pos
         this._pos = v
     }
 
@@ -79,12 +84,12 @@ export abstract class GameObject implements IRectangle {
         this._offset = v
     }
 
-    private _size: Bound
-    public get size(): Bound {
-        return this._size
+    private _rect: IRect
+    public get rect(): IRect {
+        return this._rect
     }
-    public set size(v: Bound) {
-        this._size = v
+    public set rect(v: IRect) {
+        this._rect = v
     }
 
     private _radius: number | undefined
@@ -135,25 +140,26 @@ export abstract class GameObject implements IRectangle {
         this._sence = sence
         this._pos = new Vector2()
         this._offset = new Vector2()
-        this._size = new Bound()
+        this._rect = {
+            x: 0,
+            y: 0,
+            w: 0,
+            h: 0
+        }
         this._focus = false
         this._hasChanged = true
     }
-    getRect(): Rect {
+    getRect(): IRect {
         return {
             x: this.pos.x,
             y: this.pos.y,
-            w: this.size.w,
-            h: this.size.h
+            w: this.rect.w,
+            h: this.rect.h
         }
     }
 
     checkFocu(x: number, y: number) {
-        let isfocus =
-            x - this.offset.x > this.pos.x &&
-            x - this.offset.x < this.pos.x + this.size.w &&
-            y - this.offset.y > this.pos.y &&
-            y - this.offset.y < this.pos.y + this.size.h
+        let isfocus = x - this.offset.x > this.pos.x && x - this.offset.x < this.pos.x + this.rect.w && y - this.offset.y > this.pos.y && y - this.offset.y < this.pos.y + this.rect.h
         if (isfocus !== this.focus) {
             this.focus = isfocus
         }
@@ -168,7 +174,7 @@ export abstract class GameObject implements IRectangle {
         this._components = com
     }
 
-    public getComponent(): RigidBase {
+    public get rigidBody(): RigidBase {
         if (this._components === undefined) {
             throw new Error(`${this.id} did not set component`)
         }
@@ -186,6 +192,7 @@ export abstract class GameObject implements IRectangle {
     canDraw(): boolean {
         return true
     }
+    onCollide(other: GameObject) {}
     updateRequest() {
         return this.hasChanged
     }
@@ -199,7 +206,7 @@ export abstract class GameObject implements IRectangle {
     elementUpdate(delta: number, timeScale: number, correction: number) {
         // if (!this.updateRequest()) return
         this.update(delta, timeScale, correction)
-        if (this.IsRigid) this.getComponent().update(delta, timeScale, correction)
+        if (this.IsRigid) this.rigidBody.update(delta, timeScale, correction)
         if (this._onTick) this.onTick(this)
         // this.hasChanged = false
     }

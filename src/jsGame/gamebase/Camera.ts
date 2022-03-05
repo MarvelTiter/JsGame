@@ -1,25 +1,30 @@
+import { clamp } from "../../utils/helper"
 import { BaseSence } from "./BaseSence"
 import { Bound } from "./data/Bound"
+import { IRect } from "./data/Rect"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
 import { GameObject } from "./objects/GameObject"
 type Direction = "Horizontal" | "Vertical" | "Both" | "Static"
-
+export interface ITraceable {
+    getPosInfo(): {
+        velocity: Vector2
+        pos: Vector2
+    }
+}
 export class Camera {
-    target: GameObject | undefined
+    target: ITraceable | undefined
     pos: Vector2
     direction: Direction
-    ctx: CanvasRenderingContext2D
-    window: Bound
+    window: IRect
     sence: BaseSence
-    constructor(sence: BaseSence, ctx: CanvasRenderingContext2D, window: Bound, direction?: Direction) {
+    constructor(sence: BaseSence, window: IRect, direction?: Direction) {
         this.sence = sence
-        this.ctx = ctx
-        this.pos = new Vector2()
         this.direction = direction ?? "Static"
         this.window = window
+        this.pos = new Vector2()
     }
-    public bind<T extends GameObject>(gameObj: T): void {
+    public bind<T extends ITraceable>(gameObj: T): void {
         this.target = gameObj
     }
 
@@ -31,42 +36,60 @@ export class Camera {
         return this.pos.copy()
     }
 
-    public trace(): void {
+    private _max: Vector2 | undefined
+    get max(): Vector2 {
+        if (this._max === undefined) {
+            this._max = Vector2.new(this.sence.maxX, this.sence.maxY)
+        }
+        return this._max
+    }
+
+    private _min: Vector2 | undefined
+    get min(): Vector2 {
+        if (this._min === undefined) {
+            this._min = Vector2.new(this.sence.minX, this.sence.minY)
+        }
+        return this._min
+    }
+
+    private getNewPos(velocity: Vector2, targetPos: Vector2): Vector2 {
+        let newPos = this.pos.copy().add(velocity)
+        let { w, h } = this.window
+        if (targetPos.x < this.min.x + w / 2) {
+            newPos.x = this.min.x
+        } else if (targetPos.x > this.max.x - w / 2) {
+            newPos.x = this.max.x - w
+        }
+        if (targetPos.y < this.min.y + h / 2) {
+            newPos.y = this.min.y
+        } else if (targetPos.y > this.max.y - h / 2) {
+            console.log(2)
+            newPos.y = this.max.y - h
+        }
+        return newPos
+    }
+
+    public trace(ctx: CanvasRenderingContext2D): void {
         if (this.target !== undefined) {
+            let { velocity, pos } = this.target.getPosInfo()
+            let newPos = this.getNewPos(velocity, pos)
+            let delta = newPos.sub(this.pos)
             switch (this.direction) {
                 case "Static":
+                    delta.set(0, 0)
                     break
                 case "Horizontal":
-                    this.ctx.translate(-this.target.offset.x, 0)
-                    this.pos.add(new Vector2(this.target.offset.x, 0))
+                    delta.y = 0
                     break
                 case "Vertical":
-                    this.ctx.translate(0, -this.target.offset.y)
-                    this.pos.add(new Vector2(0, this.target.offset.y))
+                    delta.x = 0
                     break
                 case "Both":
-                    this.ctx.translate(-this.target.offset.x, -this.target.offset.y)
-                    this.pos.add(this.target.offset)
                     break
             }
+            ctx.translate(-delta.x, -delta.y)
+            this.pos.add(delta)
         }
-        let { maxX, minX, maxY, minY } = this.sence
-        let { x, y } = this.pos
-        let { w, h } = this.window
-        if (maxX !== undefined) {
-            if (x + w > maxX) x = maxX - w
-        }
-        if (minX !== undefined) {
-            if (x < minX) x = minX
-        }
-        if (maxY !== undefined) {
-            if (y + h > maxY) y = maxY - h
-        }
-        if (minY !== undefined) {
-            if (y < minY) y = minY
-        }
-        // console.log(x, y, w, h)
-
-        this.ctx.clearRect(x, y, w, h)
+        ctx.clearRect(this.pos.x, this.pos.y, this.window.w, this.window.h)
     }
 }

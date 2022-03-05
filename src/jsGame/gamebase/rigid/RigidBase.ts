@@ -3,14 +3,10 @@ import { Vector2, Vertex } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
 import { Contact } from "../collision/Contact"
 import { Vertices } from "./vertices"
-import { Axes } from "./axes"
 import { Bound } from "../data/Bound"
 import { Game } from "../Game"
 import { BaseSence } from "../BaseSence"
 import { log } from "../../../utils/debug"
-
-const gravity = 10
-type ShapeType = "Circle" | "Rect" | "Triangle"
 
 const nextId = (function (): Function {
     let count = 1
@@ -139,7 +135,6 @@ export abstract class RigidBase {
         return this.target.angle
     }
     public set angle(v: number) {
-        // this.angle = v
         this.target.angle = v
     }
     anglePrev: number = 0
@@ -148,18 +143,20 @@ export abstract class RigidBase {
         return this.target.pos
     }
 
-    // public set pos(p: Vector2) {
-
-    //     this.target.pos.set(p.x, p.y)
-    // }
     posPrev: Vector2 = new Vector2()
     bound: Bound = new Bound()
 
+    limit: (v: Vector2, a: number) => { nv: Vector2; na: number }
+    onRigidUpdated: (v: Vector2, a: number) => void
     constructor(density?: number) {
         this.density = density || 0.001
         this.id = nextId().toString()
         this.parts = []
         this.parts.push(this)
+        this.limit = (v, a) => {
+            return { nv: v, na: a }
+        }
+        this.onRigidUpdated = (v, a) => {}
     }
 
     /**
@@ -178,13 +175,14 @@ export abstract class RigidBase {
 
     bind(obj: GameObject) {
         this.target = obj
+        this.init()
     }
 
     init() {
         this.vertices = new Vertices(this.points, this)
         this.area = this.vertices.area()
         this.mass = this.density * this.area
-        this.vertices.fixOrigin()
+        this.vertices.fixOrigin(this.offset)
         this.inertia = this.vertices.inertia(this.mass) * 4
         this.vertices.translate(this.pos)
         this.posPrev.set(this.pos.x, this.pos.y)
@@ -219,11 +217,20 @@ export abstract class RigidBase {
         }
     }
 
+    // public applyForce(f:Vector2):void{
+
+    // }
+    public applyForce(f: Vector2): void {
+        this.force.add(f)
+        this.forceUpdate = true
+    }
     /**
      * 更新重力
+     * @param g 重力加速度
      */
     applyGravity(g: Vector2) {
         this.force.add(g.copy().multi(this.mass))
+        this.forceUpdate = true
     }
     clearForce() {
         this.force.set(0, 0)
@@ -234,8 +241,28 @@ export abstract class RigidBase {
      */
     abstract get points(): Vector2[]
 
-    drawDebug(ctx: CanvasRenderingContext2D): void {}
-
+    drawDebug(ctx: CanvasRenderingContext2D): void {
+        ctx.save()
+        ctx.strokeStyle = "#ff0000"
+        ctx.beginPath()
+        for (const p of this.vertexs) {
+            ctx.lineTo(p.x, p.y)
+        }
+        ctx.closePath()
+        ctx.stroke()
+        // draw bound
+        if (!this.isStatic) {
+            ctx.strokeStyle = "#a9a9a9"
+            ctx.beginPath()
+            for (const v of this.bound.paths) {
+                ctx.lineTo(v.x, v.y)
+            }
+            ctx.closePath()
+            ctx.stroke()
+        }
+        ctx.restore()
+    }
+    forceUpdate: boolean = false
     update(delta: number, timeScale: number, correction: number): void {
         if (this.isStatic) return
         let deltaTimeSquared = Math.pow(delta * timeScale * this.timeScale, 2)
@@ -245,20 +272,20 @@ export abstract class RigidBase {
         let velocityPrev = this.pos.copy().sub(this.posPrev)
         // update velocity with Verlet integration
         velocityPrev.multi(frictionAir * correction).add(this.force.copy().multi(this.invMass * deltaTimeSquared))
-        this.velocity.x = velocityPrev.x
-        this.velocity.y = velocityPrev.y
+        let angularVelocity = (this.angle - (this.anglePrev ?? this.angle)) * frictionAir * correction + this.torque * this.invInertia * deltaTimeSquared
+        let { nv, na } = this.limit(velocityPrev, angularVelocity)
+        this.angularVelocity = na
+        this.velocity.x = nv.x
+        this.velocity.y = nv.y
+        this.onRigidUpdated(this.velocity, this.angularVelocity)
+        // console.log("this.velocity: ", this.velocity)
         this.posPrev.set(this.pos.x, this.pos.y)
         this.pos.add(this.velocity)
-        // console.log("this.velocity: ", this.velocity)
-
-        this.angularVelocity = (this.angle - (this.anglePrev ?? this.angle)) * frictionAir * correction + this.torque * this.invInertia * deltaTimeSquared
-
         this.anglePrev = this.angle
-        this.angle += this.angularVelocity
+        this.angle = this.angle + this.angularVelocity
         // track speed and acceleration
         this.speed = this.velocity.length()
         this.angularSpeed = Math.abs(this.angularVelocity)
-
         for (var i = 0; i < this.parts.length; i++) {
             const part = this.parts[i]
             part.vertices.translate(this.velocity)
@@ -271,5 +298,6 @@ export abstract class RigidBase {
             }
             part.bound.update(this.vertices, this.velocity)
         }
+        // this.motion = this.speed * this.speed + this.angularSpeed * this.angularSpeed
     }
 }

@@ -9,14 +9,17 @@ export class Tree extends GameEntity {
     treeCollection!: Map<string, Tree>
     constructor(game: Game, sence: BaseSence, collection: Map<string, Tree>) {
         super(game, sence, "tree")
-        this.size.div(0.2)
+        this.rect.w *= 0.2
+        this.rect.h *= 0.2
         this.treeCollection = collection
         let { w, h } = this.sence.camera.window
         this.pos = new Vector2(randomBetween(0, w), randomBetween(h / 2, 2 * h))
-
         let offsetPos = this.sence.camera.pos.copy()
-
         this.pos.add(offsetPos)
+        this.addRectRigid(8, 35, {
+            offset: new Vector2(0, 35),
+            isStatic: true
+        })
     }
 
     update(): void {

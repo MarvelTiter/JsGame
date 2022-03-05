@@ -1,5 +1,6 @@
 import { Bound } from "../data/Bound"
-import { RigidBase } from "../rigid/RigidComponent"
+import { IRect } from "../data/Rect"
+import { RigidBase } from "../rigid/RigidBase"
 import { CollisionInfo } from "./CollisionInfo"
 export interface tempContact {
     bodyA: RigidBase
@@ -7,7 +8,7 @@ export interface tempContact {
 }
 export function broadphase(
     rigids: RigidBase[],
-    worldBound: Bound,
+    window: IRect,
     forceUpdate: boolean
 ): tempContact[] {
     if (!forceUpdate) return []

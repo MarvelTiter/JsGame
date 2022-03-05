@@ -1,6 +1,6 @@
 import { Contact, createContact } from "./Contact"
 import { CollisionInfo } from "./CollisionInfo"
-import { GetContactId, RigidBase } from "../rigid/RigidComponent"
+import { GetContactId, RigidBase } from "../rigid/RigidBase"
 import { Vector2 } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
 import { clamp } from "../../../utils/helper"
@@ -59,6 +59,14 @@ export class ContactManage {
             let c = this.contacts[fixedIndex]
             this.contacts.splice(i, 1)
             this.contactMap.delete(c.id)
+        }
+    }
+    afterElementRemoved(id: string) {
+        for (const c of this.contacts) {
+            if (c.bodyA.target.id === id || c.bodyB.target.id === id) {
+                c.isActive = false
+                c.timeUpdated = -1e7
+            }
         }
     }
     preSolve(): void {
@@ -158,7 +166,7 @@ export class ContactManage {
     }
     solveVelocity() {
         let timeScaleSquared = 1
-        for (const c of this.contacts) {
+        for (const c of this.contacts.filter(c => c.isActive)) {
             let collision = c.collision
             let bodyA = collision.parentA
             let bodyB = collision.parentB

@@ -1,4 +1,4 @@
-import { RigidBase } from "../rigid/RigidComponent"
+import { RigidBase } from "../rigid/RigidBase"
 
 /**
  * 二维向量

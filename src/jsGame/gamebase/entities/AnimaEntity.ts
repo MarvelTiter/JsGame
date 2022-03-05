@@ -44,7 +44,8 @@ export class AnimaEntity extends GameEntity {
     }
 
     private updateSize() {
-        this.size.set(this.currentFrame.frame.w, this.currentFrame.frame.h)
+        this.rect.w = this.currentFrame.frame.w
+        this.rect.h = this.currentFrame.frame.h
         this.radius = (this.currentFrame.frame.w + this.currentFrame.frame.h) / 2
     }
 

@@ -95,8 +95,8 @@ export class MineSence extends BaseSence {
         // this.addElement(over);
         let { w, h } = this.getWindowSize()
         let restartButton = new Button(this.game, this, "button", "重新开始")
-        restartButton.pos.x = w - restartButton.size.w / 2 - 20
-        restartButton.pos.y = h - restartButton.size.h / 2 - 20
+        restartButton.pos.x = w - restartButton.rect.w / 2 - 20
+        restartButton.pos.y = h - restartButton.rect.h / 2 - 20
         restartButton.canDraw = () => {
             return grid.gameOver
         }

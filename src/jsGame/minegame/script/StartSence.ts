@@ -30,7 +30,7 @@ export class StartSence extends BaseSence {
         let { w } = this.getWindowSize()
         let btnMiddleLevel = new Button(this.game, this, "button", "中级")
         btnMiddleLevel.pos.x = w / 2
-        btnMiddleLevel.pos.y = 100 + btnMiddleLevel.size.h
+        btnMiddleLevel.pos.y = 100 + btnMiddleLevel.rect.h
         this.addElement(btnMiddleLevel)
         btnMiddleLevel.onClick = () => {
             let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? middle_m : middle)
@@ -48,7 +48,7 @@ export class StartSence extends BaseSence {
 
         let btnProLevel = new Button(this.game, this, "button", "专家")
         btnProLevel.pos.x = w / 2
-        btnProLevel.pos.y = 100 + btnMiddleLevel.size.h * 2
+        btnProLevel.pos.y = 100 + btnMiddleLevel.rect.h * 2
         this.addElement(btnProLevel)
         btnProLevel.onClick = () => {
             let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? professional_m : professional)

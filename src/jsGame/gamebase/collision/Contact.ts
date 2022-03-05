@@ -1,7 +1,7 @@
 import { readonly } from "vue"
 import { Vector2, Vertex } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
-import { GetContactId, RigidBase } from "../rigid/RigidComponent"
+import { GetContactId, RigidBase } from "../rigid/RigidBase"
 import { CollisionInfo } from "./CollisionInfo"
 
 export interface Relate {

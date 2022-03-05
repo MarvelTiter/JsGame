@@ -3,8 +3,10 @@ import { Game } from "../../gamebase/Game"
 import { Grid } from "./Grid"
 import { Bound } from "../../gamebase/data/Bound"
 import { GameStatisEntity } from "../../gamebase/entities/GameStatisEntity"
+import { createBoxRect } from "../../gamebase/data/Rect"
+import { GameEntity } from "../../gamebase/entities/GameEntity"
 
-export class Cell extends GameStatisEntity {
+export class Cell extends GameEntity {
     gutter: number
     grid: Grid
     row: number
@@ -22,9 +24,9 @@ export class Cell extends GameStatisEntity {
         this.row = rowIndex
         this.column = columnIndex
         this.flag = 0
-        this.size = new Bound(len, len)
-        this.pos.x = this.column * this.size.w + (this.column + 1) * this.gutter
-        this.pos.y = this.row * this.size.h + (this.row + 1) * this.gutter
+        this.rect = createBoxRect(len, len)
+        this.pos.x = this.column * this.rect.w + (this.column + 1) * this.gutter
+        this.pos.y = this.row * this.rect.h + (this.row + 1) * this.gutter
         this.isOpen = false
         this.isMine = false
         this.count = 0
@@ -122,17 +124,17 @@ export class Cell extends GameStatisEntity {
     }
     draw(ctx: CanvasRenderingContext2D): void {
         if (this.image !== undefined) {
-            ctx.drawImage(this.image.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
+            ctx.drawImage(this.image.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
         }
         this.drawFlag(ctx)
     }
     private drawFlag(ctx: CanvasRenderingContext2D) {
         let img = this.game.getTextureByName("flag")
         if (this.flag == 1) {
-            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
+            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
         }
         if (this.grid.gameOver && this.isMine && !this.isOpen) {
-            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
+            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
         }
     }
 }

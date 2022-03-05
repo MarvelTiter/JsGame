@@ -19,6 +19,18 @@ const routes = [
     {
         path: '/debug',
         component: () => import("@/jsGame/debug/index.vue")
+    },
+    {
+        path: '/tank',
+        component: () => import("@/jsGame/tank/index.vue")
+    },
+    {
+        path: '/plane',
+        component: () => import("@/jsGame/plane/index.vue")
+    },
+    {
+        path: '/vxplane',
+        component: () => import("@/jsGame/vxplane/index.vue")
     }
 ]
 const router = createRouter({

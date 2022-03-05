@@ -47,7 +47,6 @@ onMounted(async () => {
 
   let sources = await loadSprites(images, scripts, (c, t) => {
     percent.value = c / t
-    console.log(percent.value);
 
   })
   let g = new Game(sources);

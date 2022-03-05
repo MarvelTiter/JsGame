@@ -36,8 +36,8 @@ export class Grid extends CustomObject {
             level.len = document.body.clientWidth / 12
         }
         this.cellLen = level.len
-        this.size.w = this.column * level.len
-        this.size.h = this.row * level.len
+        this.rect.w = this.column * level.len
+        this.rect.h = this.row * level.len
         let { w, h } = this.sence.getWindowSize()
         this.offset.x = (w - this.column * this.cellLen) / 2
         let marginTop = (h - this.row * this.cellLen) / 2
@@ -272,6 +272,6 @@ export class Grid extends CustomObject {
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = "rgba(0,0,0,0)"
-        ctx.fillRect(this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.size.w, this.size.h)
+        ctx.fillRect(this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
     }
 }

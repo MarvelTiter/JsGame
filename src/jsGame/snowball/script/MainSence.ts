@@ -13,7 +13,6 @@ export class MainSence extends BaseSence {
     constructor(game: Game) {
         super(game)
         this.minX = 0
-        this.maxX = this.size.w
         this.setup()
     }
     ball!: Ball
@@ -31,7 +30,6 @@ export class MainSence extends BaseSence {
         this.treeCollection = new Map<string, Tree>()
         for (let index = 0; index < 20; index++) {
             let tree = new Tree(this.game, this, this.treeCollection)
-            tree.addRectRigid(new Bound(8, 35), new Vector2(0, 35))
             this.treeCollection.set(tree.id, tree)
             this.addElement(tree)
         }
@@ -64,7 +62,6 @@ export class MainSence extends BaseSence {
         if (num === 0) return trees
         while (num > 0) {
             let tree = new Tree(this.game, this, this.treeCollection)
-            tree.addRectRigid(new Bound(8, 35), new Vector2(0, 35))
             trees.push(tree)
             num--
         }

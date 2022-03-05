@@ -4,7 +4,7 @@ import { Vector2 } from "../data/Vector2"
 import { CircleRigid } from "./CircleRigid"
 import { Contact } from "../collision/Contact"
 import { RectRigid } from "./RectRigid"
-import { RigidBase } from "./RigidComponent"
+import { RigidBase } from "./RigidBase"
 
 export class TriangleRigid extends RigidBase {
     private _dLength: number
@@ -17,18 +17,8 @@ export class TriangleRigid extends RigidBase {
     }
 
     private _deltaY!: number
-    private _points: Vector2[] | undefined
+    private _points: Vector2[]
     public get points(): Vector2[] {
-        if (this._points === undefined) {
-            let cos = Math.cos(this.dTheta)
-            let sin = Math.sin(this.dTheta)
-            let top = new Vector2(0, -this.dLength)
-            this._deltaY = (2 * cos * cos - 1) * this.dLength
-            let deltaX = 2 * cos * this.dLength * sin
-            let bottomLeft = new Vector2(-deltaX, +this._deltaY)
-            let bottomRight = new Vector2(+deltaX, +this._deltaY)
-            this._points = [top, bottomRight, bottomLeft]
-        }
         return this._points
     }
 
@@ -44,18 +34,15 @@ export class TriangleRigid extends RigidBase {
         this._dLength = len
         this._dTheta = theta
         this.offset = offset || new Vector2()
-        this.cache = {}
-        this.cache["LP1"] = this.points[1].copy().rotate(Math.PI / 2 - this.dTheta)
-        this.cache["LP0"] = this.points[0].copy().rotate(Math.PI / 2 - this.dTheta)
-        this.cache["RP0"] = this.points[0].copy().rotate(this.dTheta - Math.PI / 2)
-        this.cache["RP2"] = this.points[2].copy().rotate(this.dTheta - Math.PI / 2)
-        this.calcMass()
-        this.calcInertia()
-    }
-    calcMass(): void {
-        let w = this.points[1].x - this.points[2].x
-        let h = this.points[0].y - this.points[1].y
-        this.mass = ((Math.abs(w) * Math.abs(h)) / 2) * this.density
+        this._points = []
+        let cos = Math.cos(this.dTheta)
+        let sin = Math.sin(this.dTheta)
+        let top = new Vector2(0, -this.dLength)
+        this._deltaY = (2 * cos * cos - 1) * this.dLength
+        let deltaX = 2 * cos * this.dLength * sin
+        let bottomLeft = new Vector2(-deltaX, +this._deltaY)
+        let bottomRight = new Vector2(+deltaX, +this._deltaY)
+        this._points = [top, bottomRight, bottomLeft]
     }
 
     drawDebug(ctx: CanvasRenderingContext2D): void {

@@ -1,5 +1,5 @@
 import { Vertices } from "../rigid/vertices"
-import { Rect } from "./Rect"
+import { IRect } from "./Rect"
 import { Vector2 } from "./Vector2"
 
 export class Bound {

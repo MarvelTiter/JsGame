@@ -1,14 +1,14 @@
-import { IRectangle, Rect } from "./Rect"
+import { IRectangle, IRect } from "./Rect"
 
 const MAX_OBJECTS: number = 1
 const MAX_LEVELS: number = 3
 export class QuadTree<T extends IRectangle> {
     private objects!: T[]
     private level: number = 0
-    private bounds!: Rect
+    private bounds!: IRect
     private nodes!: QuadTree<T>[] | undefined[]
 
-    constructor(level: number, pBounds: Rect) {
+    constructor(level: number, pBounds: IRect) {
         this.level = level
         this.bounds = pBounds
         this.objects = new Array<T>()
@@ -31,7 +31,7 @@ export class QuadTree<T extends IRectangle> {
         this.nodes[2] = new QuadTree<T>(this.level + 1, { x, y: y + subH, w: subW, h: subH })
         this.nodes[3] = new QuadTree<T>(this.level + 1, { x: x + subW, y: y + subH, w: subW, h: subH })
     }
-    getIndexes(pRect: Rect): number[] {
+    getIndexes(pRect: IRect): number[] {
         let indexes: number[] = []
         let centerX = this.bounds.x + this.bounds.w / 2
         let centerY = this.bounds.y + this.bounds.h / 2
@@ -87,7 +87,7 @@ export class QuadTree<T extends IRectangle> {
     }
     insert(obj: T): void {
         let first: T = obj
-        let pRect: Rect = first.getRect()
+        let pRect: IRect = first.getRect()
 
         if (this.nodes[0] != undefined) {
             let indexes: number[] = this.getIndexes(pRect)
@@ -110,7 +110,7 @@ export class QuadTree<T extends IRectangle> {
             let i = 0
             while (i < this.objects.length) {
                 let sqaureOne: T = this.objects[i]
-                let oRect: Rect = sqaureOne.getRect()
+                let oRect: IRect = sqaureOne.getRect()
                 let indexes = this.getIndexes(oRect)
                 for (let ii = 0; ii < indexes.length; ii++) {
                     let index = indexes[ii]
@@ -125,7 +125,7 @@ export class QuadTree<T extends IRectangle> {
             }
         }
     }
-    retrieve(fSpriteList: T[], pRect: Rect): T[] {
+    retrieve(fSpriteList: T[], pRect: IRect): T[] {
         let indexes = this.getIndexes(pRect)
         for (let ii = 0; ii < indexes.length; ii++) {
             let index = indexes[ii]

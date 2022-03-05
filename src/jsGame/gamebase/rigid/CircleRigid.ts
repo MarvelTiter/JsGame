@@ -2,7 +2,7 @@ import { AxisInfo } from "../data/AxisInfo"
 import { Vector2 } from "../data/Vector2"
 import { Contact } from "../collision/Contact"
 import { RectRigid } from "./RectRigid"
-import { RigidBase } from "./RigidComponent"
+import { RigidBase } from "./RigidBase"
 import { TriangleRigid } from "./TriangleRigid"
 
 export class CircleRigid extends RigidBase {
@@ -10,56 +10,25 @@ export class CircleRigid extends RigidBase {
     public get radius() {
         return this._radius
     }
+    private _points: Vector2[]
     public get points(): Vector2[] {
-        throw new Error("Method not implemented.")
+        return this._points
     }
-    constructor(radius: number, mass?: number) {
-        super(mass)
+    constructor(radius: number, density?: number) {
+        super(density)
         this._radius = radius
-    }
-
-    getClosestPoint(rigid: RigidBase): Contact[] {
-        // let ball = this
-        // if (rigid instanceof RectRigid) {
-        //     return rigid.getClosestPoint(ball)
-        // } else if (rigid instanceof TriangleRigid) {
-        //     return rigid.getClosestPoint(ball)
-        // } else if (rigid instanceof CircleRigid) {
-        //     let ballB = rigid
-        //     let delata = new Vector2(ballB.pos.x - ball.pos.x, ballB.pos.y - ball.pos.y)
-        //     let n: Vector2
-        //     if (delata.length()) {
-        //         n = delata.normalize()
-        //     } else {
-        //         n = new Vector2(1, 0)
-        //     }
-        //     let closestPointOnSelf = new Vector2()
-        //     closestPointOnSelf.x = ball.pos.x + n.x * ball.radius
-        //     closestPointOnSelf.y = ball.pos.y + n.y * ball.radius
-
-        //     let closestPointOnOther = new Vector2()
-        //     closestPointOnOther.x = ballB.pos.x - n.x * ballB.radius
-        //     closestPointOnOther.y = ballB.pos.y - n.y * ballB.radius
-
-        //     // getdistance
-        //     var dist = delata.length() - (ball.radius + ball.radius)
-
-        //     return [
-        //         {
-        //             gA: ball.target,
-        //             gB: ballB.target,
-        //             mPa: closestPointOnSelf,
-        //             mPb: closestPointOnOther,
-        //             normal: n,
-        //             distance: dist
-        //         }
-        //     ]
-        // }
-        throw new Error("unknow RigidType")
-    }
-
-    calcMass(): void {
-        this.mass = this.radius * this.radius * Math.PI
+        let maxSides = 25
+        let sides = Math.ceil(Math.max(10, Math.min(maxSides, radius)))
+        if (sides % 2 === 1) sides += 1
+        let theta = (2 * Math.PI) / sides
+        this._points = []
+        let offset = theta * 0.5
+        for (let i = 0; i < sides; i++) {
+            let angle = offset + i * theta
+            let xx = Math.cos(angle) * radius
+            let yy = Math.sin(angle) * radius
+            this._points.push(Vector2.new(Number(xx.toFixed(3)), Number(yy.toFixed(3))))
+        }
     }
 
     drawDebug(ctx: CanvasRenderingContext2D): void {

@@ -1,19 +1,31 @@
 import { Bound } from "./data/Bound"
+import { createBoxRect, IRect } from "./data/Rect"
 import { FrameDefinition, SpriteDefinition } from "./FrameDefinition"
 
 export class GameImage {
     name: string
-    size: Bound
+    // rect: IRect
     frames!: FrameDefinition[]
-    areas: any = undefined
+    sprites: any | undefined
     texture: HTMLImageElement
     constructor(name: string, texture: HTMLImageElement) {
         this.name = name
         this.texture = texture
-        this.size = new Bound(texture.width, texture.height)
     }
-    getRectByName(name: string): SpriteDefinition {
-        if (this.areas === undefined) throw new Error("this image unsupported getRectByName")
-        return this.areas[name] as SpriteDefinition
+    getSprite(name?: string): SpriteDefinition {
+        if (name === undefined) {
+            return {
+                name: this.name,
+                x: 0,
+                y: 0,
+                w: this.texture.width,
+                h: this.texture.height
+            }
+        } else {
+            if (this.sprites[name]) {
+                return this.sprites[name]
+            }
+            throw new Error(`${name} did not exit`)
+        }
     }
 }

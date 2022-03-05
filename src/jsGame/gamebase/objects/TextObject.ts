@@ -24,9 +24,9 @@ export class TextObject extends GameObject {
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
         ctx.fillStyle = this.background
-        ctx.fillRect(this.pos.x, this.pos.y, this.size.w, this.size.h)
+        ctx.fillRect(this.pos.x, this.pos.y, this.rect.w, this.rect.h)
         if (this.font) ctx.font = this.font
         ctx.fillStyle = this.color
-        ctx.fillText(this.text, this.size.w / 2, this.pos.y + this.size.h / 2)
+        ctx.fillText(this.text, this.rect.w / 2, this.pos.y + this.rect.h / 2)
     }
 }

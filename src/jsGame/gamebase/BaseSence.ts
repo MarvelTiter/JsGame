@@ -7,9 +7,10 @@ import { GameObject } from "./objects/GameObject"
 import { Contact } from "./collision/Contact"
 import { ContactManage } from "./collision/ContactManage"
 import { CollisionInfo } from "./collision/CollisionInfo"
-import { RigidBase } from "./rigid/RigidComponent"
+import { RigidBase } from "./rigid/RigidBase"
 import { broadphase } from "./collision/broadphase"
 import { randomBetween } from "../../utils/random"
+import { IRect } from "./data/Rect"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void
@@ -24,11 +25,12 @@ export interface KeyStatus {
  * 负责渲染场景元素，
  * 注册、分发事件
  */
-export class BaseSence {
+export abstract class BaseSence {
     game: Game
     protected elements: GameObject[] = []
     private rigidElements: Map<string, RigidBase>
     private elementMap: Map<string, GameObject>
+    private requiredUpdateCache: boolean = false
     private keys: Map<string, KeyStatus>
     private actions: Map<string, ObjectAction>
     // onceAction: Map<string, ObjectAction>;
@@ -44,18 +46,14 @@ export class BaseSence {
     private _camera: Camera | undefined
     public get camera(): Camera {
         if (this._camera === undefined) {
-            this._camera = new Camera(this, this.game.context, this.game.area)
+            this._camera = new Camera(this, this.game.area)
         }
         return this._camera
     }
-    // public set camera(v: Camera) {
-    //     this._camera = v
-    // }
-    size: Bound
-    minX: number | undefined
-    maxX: number | undefined
-    minY: number | undefined
-    maxY: number | undefined
+    minX: number = 0
+    maxX: number = 0
+    minY: number = Infinity
+    maxY: number = Infinity
     private keydown: boolean = false
     private aidElement: GameObject | undefined
     // game:Game;
@@ -66,14 +64,14 @@ export class BaseSence {
         this.rigidElements = new Map<string, RigidBase>()
         this.keys = new Map<string, KeyStatus>()
         this.actions = new Map<string, ObjectAction>()
-        this.size = game.area
     }
 
     public addElement<T extends GameObject>(e: T): void {
         this.elements.push(e)
         this.elementMap.set(e.id, e)
         if (e.IsRigid) {
-            this.rigidElements.set(e.id, e.getComponent())
+            this.requiredUpdateCache = true
+            this.rigidElements.set(e.id, e.rigidBody)
         }
     }
 
@@ -82,6 +80,8 @@ export class BaseSence {
         this.elements.splice(index, 1)
         this.elementMap.delete(e.id)
         this.rigidElements.delete(e.id)
+        this.requiredUpdateCache = true
+        this.ContactsMag.afterElementRemoved(e.id)
     }
 
     //#region Dom事件注册和处理
@@ -192,11 +192,7 @@ export class BaseSence {
      * @param element 函数调用的对象(函数内部有this)
      * @param callback 按键回调函数
      */
-    public registerKeyAction(
-        key: string,
-        callback: (status: KeyStatus) => void,
-        times?: actionTimes
-    ): void {
+    public registerKeyAction(key: string, callback: (status: KeyStatus) => void, times?: actionTimes): void {
         this.keys.set(key, {
             status: false,
             times: times ?? 0,
@@ -211,31 +207,14 @@ export class BaseSence {
         return this.camera.getCenter()
     }
 
-    public getWindowSize(): Bound {
+    public getWindowSize(): IRect {
         return this.camera.window
-    }
-
-    public findElement<T extends GameObject>(id: string): T {
-        // for (const e of this.elements.values()) {
-        //     if (e.id === id) return e as T
-        // }
-        let e = this.elementMap.get(id)
-        if (e === undefined) {
-            throw new Error(`element [${id}] not found`)
-        }
-        return e as T
     }
 
     public outOfWindow(obj: GameObject): boolean {
         let { w, h } = this.camera.window
         let { x, y } = this.camera.pos
-        if (
-            obj.pos.x + obj.size.w < x ||
-            obj.pos.x > x + w ||
-            obj.pos.y + obj.size.h < y ||
-            obj.pos.y > y + h
-        )
-            return true
+        if (obj.pos.x + obj.rect.w < x || obj.pos.x > x + w || obj.pos.y + obj.rect.h < y || obj.pos.y > y + h) return true
         else return false
     }
 
@@ -244,13 +223,12 @@ export class BaseSence {
     public draw(ctx: CanvasRenderingContext2D): void {
         for (const e of this.elements.values()) {
             e.elementDraw(ctx)
-            if (window.Debug) {
-                let c = e.getComponent()
-                c?.drawDebug(ctx)
-            }
+            // if (window.Debug && e.IsRigid) {
+            //     let c = e.rigidBody
+            //     c.drawDebug(ctx)
+            // }
         }
         if (window.Debug) {
-            // ctx.fillStyle = "#00ff00"
             for (const c of this.ContactsMag.list) {
                 if (!c.collision.collided) continue
                 for (const p of c.collision.supports) {
@@ -295,42 +273,42 @@ export class BaseSence {
             }
         }
     }
+    canCollide(objectA: GameObject, objectB: GameObject): boolean {
+        return true
+    }
     private collitionTest(objects: RigidBase[]): CollisionInfo[] {
         if (!this.game.options.enableCollide) {
             return []
         }
         let ret: CollisionInfo[] = []
-        // let temp = broadphase(objects, this.getWindowSize(), true)
-        // // console.log("temp: ", temp)
-        // for (const t of temp) {
-        //     let coll = collides(this.ContactsMag, t.bodyA, t.bodyB)
-        //     if (coll !== undefined) ret.push(coll)
-        // }
-        for (let ii = 0; ii < objects.length; ii++) {
-            const eii = objects[ii]
-            for (let jj = ii + 1; jj < objects.length; jj++) {
-                const ejj = objects[jj]
-                if (eii.isStatic && ejj.isStatic) continue
-                let coll = collides(this.ContactsMag, eii, ejj)
-                // if (coll !== undefined)
+        let temp = broadphase(objects, this.getWindowSize(), true)
+        for (const t of temp) {
+            if (this.canCollide(t.bodyA.target, t.bodyB.target)) {
+                let coll = collides(this.ContactsMag, t.bodyA, t.bodyB)
                 ret.push(coll)
             }
         }
+        // for (let ii = 0; ii < objects.length; ii++) {
+        //     const eii = objects[ii]
+        //     for (let jj = ii + 1; jj < objects.length; jj++) {
+        //         const ejj = objects[jj]
+        //         if (eii.isStatic && ejj.isStatic) continue
+        //         let coll = collides(this.ContactsMag, eii, ejj)
+        //         // if (coll !== undefined)
+        //         ret.push(coll)
+        //     }
+        // }
         return ret
     }
     private _rigidsCache: RigidBase[] | undefined
     get rigidsCache(): RigidBase[] {
-        // if (this._rigidsCache === undefined) {
-        //     this._rigidsCache = Array.from(this.rigidElements.values())
-        // }
-        // return this._rigidsCache
-        return Array.from(this.rigidElements.values())
+        if (this.requiredUpdateCache || this._rigidsCache === undefined) {
+            this._rigidsCache = Array.from(this.rigidElements.values())
+            this.requiredUpdateCache = false
+        }
+        return this._rigidsCache
     }
-    private findCollide(): void {
-        let colls = this.collitionTest(this.rigidsCache)
-        this.ContactsMag.Update(colls, this.timing.timestamp)
-        this.ContactsMag.removeOld(this.timing.timestamp)
-    }
+    private findCollide(): void {}
     private solvePosition(): void {
         this.ContactsMag.preSolve()
         for (let i = 0; i < 6; i++) {
@@ -367,11 +345,19 @@ export class BaseSence {
         }
         this.update()
         //
-        this.findCollide()
+        let colls = this.collitionTest(this.rigidsCache)
+        this.ContactsMag.Update(colls, this.timing.timestamp)
+        this.ContactsMag.removeOld(this.timing.timestamp)
         this.solvePosition()
         this.solveVelocity()
+        for (const coll of colls) {
+            if (coll.collided) {
+                coll.targetA.onCollide(coll.targetB)
+                coll.targetB.onCollide(coll.targetA)
+            }
+        }
         this.clearForce(this.rigidsCache)
-        this.camera.trace()
+        this.camera.trace(this.game.context)
         this.draw(this.game.context)
     }
 }

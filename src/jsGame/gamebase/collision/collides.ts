@@ -1,7 +1,7 @@
 import { Vector2, Vertex } from "../data/Vector2"
 import { CollisionInfo, createCollision } from "./CollisionInfo"
-import { GetContactId, RigidBase } from "../rigid/RigidComponent"
-import { calcProjectionAxes } from "../rigid/Sat"
+import { GetContactId, RigidBase } from "../rigid/RigidBase"
+import { calcProjectionAxes } from "./Sat"
 import { ContactManage } from "./ContactManage"
 
 export function collides(cmg: ContactManage, rigidA: RigidBase, rigidB: RigidBase): CollisionInfo {

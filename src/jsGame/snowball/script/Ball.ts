@@ -2,6 +2,7 @@ import { BaseSence } from "../../gamebase/BaseSence"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
+import { CircleRigid } from "../../gamebase/rigid/CircleRigid"
 interface SnowBallTail {
     x: number
     y: number
@@ -13,16 +14,33 @@ export class Ball extends CustomObject {
     degree: number = 0
     maxDegree: number = 50
     minDegree: number = -50
-    distance: number = 2
+    distance: number = 0.1
     tailMaxLength: number = 50
     color: string = "#d2fdff"
     tailList: Array<SnowBallTail> = []
+    maxVelocity: Vector2 = Vector2.new(1, 1)
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
         this.radius = 10
+        this.addCircleRigid(10)
+        this.rigidBody.limit = (v, a) => {
+            return {
+                nv: v.min(this.maxVelocity),
+                na: a
+            }
+        }
     }
 
     move() {
+        // 记录小球移动的位置以及角度
+        this.tailList.unshift({
+            x: this.pos.x,
+            y: this.pos.y,
+            degree: this.degree
+        })
+        if (this.tailList.length > this.tailMaxLength) {
+            this.tailList.splice(this.tailMaxLength)
+        }
         // 小球正在转向
         if (this.turnTo && this.direction) {
             // 递增旋转角度
@@ -36,36 +54,25 @@ export class Ball extends CustomObject {
         }
 
         const radian = (this.degree * Math.PI) / 180
-        const offsetX = Math.sin(radian) * this.distance
-        const offsetY = Math.cos(radian) * this.distance
+        const offsetX = Math.sin(radian) * this.distance * this.game.options.speedScale
+        const offsetY = Math.cos(radian) * this.distance * this.game.options.speedScale
 
-        // const offsetX = 0
-        // const offsetY = 0
-        this.pos.x += offsetX
-        this.pos.y += offsetY
+        this.rigidBody.applyForce(Vector2.new(offsetX, offsetY))
 
-        // 记录小球移动的位置以及角度
-        this.tailList.unshift({
-            x: this.pos.x,
-            y: this.pos.y,
-            degree: this.degree
-        })
-        if (this.tailList.length > this.tailMaxLength) {
-            this.tailList.splice(this.tailMaxLength)
-        }
-        this.offset = new Vector2(offsetX, offsetY)
+        this.offset = this.rigidBody.velocity
         this.turnTo = false
     }
     interval: number = 100
-    update(): void {
-        this.move()
 
+    update(delta: number, timeScale: number, correction: number): void {
+        this.move()
         let { w } = this.sence.camera.window
         let { x } = this.sence.camera.pos
         if (this.pos.x - this.radius < x - this.radius * 2 || this.pos.x - this.radius > x + w) {
             console.log("game over")
         }
     }
+
     draw(ctx: CanvasRenderingContext2D): void {
         {
             // 绘制小球尾巴

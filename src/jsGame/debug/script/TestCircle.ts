@@ -3,8 +3,9 @@ import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { TestObject } from "./TestObject"
 export class TestCircle extends TestObject {
-    constructor(game: Game, sence: BaseSence, radius: number) {
+    constructor(game: Game, sence: BaseSence, x: number, y: number, radius: number) {
         super(game, sence)
+        this.pos = new Vector2(x, y)
         this.radius = radius
         this.addCircleRigid(radius)
     }
@@ -18,4 +19,3 @@ export class TestCircle extends TestObject {
         return this.focus
     }
 }
-

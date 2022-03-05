@@ -1,5 +1,5 @@
 import { Vector2, Vertex } from "../data/Vector2"
-import { RigidBase } from "./RigidComponent"
+import { RigidBase } from "./RigidBase"
 
 export class Vertices {
     private _vertexs: Vertex[]
@@ -30,8 +30,8 @@ export class Vertices {
         }
         this._axes = Object.values(temp)
     }
-    fixOrigin() {
-        let centreOffset = this.centre().multi(-1)
+    fixOrigin(offset: Vector2) {
+        let centreOffset = this.centre().multi(-1).add(offset)
         this.translate(centreOffset)
     }
     translate(offset: Vector2) {
