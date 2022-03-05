@@ -5,13 +5,14 @@
         <div>
           <span>第{{ r.sequence }}局</span>
         </div>
-        <div v-if="r.winner != ''">
-          <span>Winner:{{ r.winner }}</span>
+        <div v-if="r.game == '斗牛'">
+          <span>(斗牛)庄家:{{ r.winner }}</span>
+        </div>
+        <div v-if="r.game == '跑得快'">
+          <span>(走得快)Winner:{{ r.winner }}</span>
         </div>
         <div v-for="i of r.members" :key="i.name">
-          <el-tag :type="calcType(i.value)">
-            {{ i.name }} | {{ i.value }}
-          </el-tag>
+          <el-tag :type="calcType(i.value)">{{ i.name }} | {{ i.value }}</el-tag>
         </div>
       </el-space>
     </el-card>

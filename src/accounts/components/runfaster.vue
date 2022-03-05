@@ -7,16 +7,9 @@
       </el-form-item>
       <el-form-item v-for="m of newRecord" class="record-item">
         <template v-slot:label>
-          <span v-if="m.name == winner" style="color: red; font-size: 18px"
-            >Winner |
-          </span>
+          <span v-if="m.name == winner" style="color: red; font-size: 18px">Winner |</span>
           <span>{{ m.name }} : {{ m.value }}</span>
-          <el-tag
-            v-if="winner !== m.name"
-            @click="winner = m.name"
-            style="margin-left: 10px"
-            >获胜</el-tag
-          >
+          <el-tag v-if="winner !== m.name" @click="winner = m.name" style="margin-left: 10px">获胜</el-tag>
         </template>
         <div v-if="m.name !== winner">
           <el-button type="danger" @click="updateValue(m, -5)">5</el-button>
@@ -27,9 +20,7 @@
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button @click="handleRecordAdd" type="primary" style="width: 100%"
-          >确定</el-button
-        >
+        <el-button @click="handleRecordAdd" type="primary" style="width: 100%">确定</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -82,12 +73,12 @@ const handleRecordAdd = () => {
   let records = prop.records;
   let members = prop.members;
   if (total == 0) {
-    const nr = {
+    records.unshift({
       winner: winner.value,
       sequence: records.length + 1,
+      game: "跑得快",
       members: [...newRecord],
-    };
-    records.unshift(nr);
+    });
     emits("update:records", records);
     localStorage.setItem("records", JSON.stringify(records));
     // 更新参与者总分

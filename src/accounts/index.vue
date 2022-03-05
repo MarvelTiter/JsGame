@@ -63,12 +63,6 @@ const reset = () => {
   localStorage.setItem("records", "[]");
 };
 
-// let rr = new runRecord("测试", 10);
-// let json = JSON.stringify(rr)
-// console.log(json);
-// let rtds  = <runRecord>JSON.parse(json)
-// console.log(rtds);
-
 </script>
 <style>
 .records {
