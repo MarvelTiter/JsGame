@@ -1,3 +1,4 @@
+import { getActualPixel } from "../../utils/helper"
 import { BaseSence } from "./BaseSence"
 import { Bound } from "./data/Bound"
 import { createBoxRect, IRect } from "./data/Rect"
@@ -14,7 +15,7 @@ export const MOUSE_PRESS = "PRESS"
 export const MOUSE_RELEASE = "RELEASE"
 export const DEVICE_MOBILE = "MOBILE"
 export const DEVICE_PC = "PC"
-
+type DEVICE = "PC" | "MOBILE"
 /**
  * Window Attach
  */
@@ -33,7 +34,7 @@ export class Game {
     images: Map<string, GameImage>
     sence!: BaseSence
     area!: IRect
-    device: string = DEVICE_PC
+    device: DEVICE = DEVICE_PC
     options: options
     constructor(images: Map<string, GameImage>, opts?: Partial<options>, area?: IRect) {
         this.canvas = document.querySelector("#canvas") as HTMLCanvasElement
@@ -56,8 +57,8 @@ export class Game {
         let w: number = 0
         let h: number = 0
         if (!area) {
-            w = window.document.body.clientWidth
-            h = window.document.body.clientHeight
+            w = getActualPixel(window.document.body.clientWidth)
+            h = getActualPixel(window.document.body.clientHeight)
         }
         this.area = area ?? createBoxRect(w, h)
         this.canvas.width = this.area.w
@@ -89,7 +90,6 @@ export class Game {
         })
 
         this.canvas.addEventListener("touchstart", (e: TouchEvent) => {
-            // e.preventDefault()
             if (this.sence) this.sence.handleTouchStart(e)
         })
         this.canvas.addEventListener("touchmove", (e: TouchEvent) => {
@@ -162,5 +162,9 @@ export class Game {
         window.requestAnimationFrame(() => {
             this.loop(Date.now())
         })
+    }
+
+    clear() {
+        this.sence.clear()
     }
 }

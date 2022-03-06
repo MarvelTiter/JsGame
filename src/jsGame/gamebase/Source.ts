@@ -19,11 +19,15 @@ export class GameImage {
                 x: 0,
                 y: 0,
                 w: this.texture.width,
-                h: this.texture.height
+                h: this.texture.height,
+                scale: 1
             }
         } else {
             if (this.sprites[name]) {
-                return this.sprites[name]
+                return {
+                    ...this.sprites[name],
+                    scale: 1
+                }
             }
             throw new Error(`${name} did not exit`)
         }

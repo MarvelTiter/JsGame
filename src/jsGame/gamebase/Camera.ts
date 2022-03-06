@@ -63,7 +63,6 @@ export class Camera {
         if (targetPos.y < this.min.y + h / 2) {
             newPos.y = this.min.y
         } else if (targetPos.y > this.max.y - h / 2) {
-            console.log(2)
             newPos.y = this.max.y - h
         }
         return newPos

@@ -20,18 +20,21 @@ export class CustomObject extends GameObject {
         let rg = new RectRigid(w, h)
         rg.bind(this)
         Object.assign(rg, options)
+        rg.init()
         this.addComponent(rg)
     }
     public addCircleRigid(radius: number, options?: Partial<RigidBase>): void {
         let cg = new CircleRigid(radius)
         cg.bind(this)
         Object.assign(cg, options)
+        cg.init()
         this.addComponent(cg)
     }
     public addTriangleRigid(len: number, theta: number, options?: Partial<RigidBase>): void {
         let tg = new TriangleRigid(len, theta)
         tg.bind(this)
         Object.assign(tg, options)
+        tg.init()
         this.addComponent(tg)
     }
 }

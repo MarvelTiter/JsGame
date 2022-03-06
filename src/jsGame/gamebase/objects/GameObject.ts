@@ -5,7 +5,7 @@ import { MouseArgs } from "../MouseArgs"
 import { Bound } from "../data/Bound"
 import { RigidBase } from "../rigid/RigidBase"
 import { Contact } from "../collision/Contact"
-import { IRectangle, IRect } from "../data/Rect"
+import { IRectangle, IRect, createBoxRect } from "../data/Rect"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
 //         return
@@ -30,6 +30,14 @@ import { IRectangle, IRect } from "../data/Rect"
 //         configurable: false // 不能再define
 //     })
 // }
+
+const zIndex = (function (): Function {
+    let count = 1
+    return function () {
+        return count++
+    }
+})()
+
 /**
  * 所有对象的基类
  */
@@ -46,7 +54,9 @@ export abstract class GameObject implements IRectangle {
     /**
      * 用于碰撞检测，属于相同的组的对象不检测
      */
-    group: string = ""
+    group: string = "All"
+
+    zIndex: number
 
     private _game: Game
     public get game(): Game {
@@ -140,22 +150,13 @@ export abstract class GameObject implements IRectangle {
         this._sence = sence
         this._pos = new Vector2()
         this._offset = new Vector2()
-        this._rect = {
-            x: 0,
-            y: 0,
-            w: 0,
-            h: 0
-        }
+        this._rect = createBoxRect(0, 0)
         this._focus = false
         this._hasChanged = true
+        this.zIndex = zIndex()
     }
     getRect(): IRect {
-        return {
-            x: this.pos.x,
-            y: this.pos.y,
-            w: this.rect.w,
-            h: this.rect.h
-        }
+        return this.rect
     }
 
     checkFocu(x: number, y: number) {

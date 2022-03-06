@@ -23,7 +23,7 @@ export function loadSprites(sources: any, script?: any, stepCallback?: (loaded: 
                 let i = new GameImage(k, img)
                 let s = tryGetProp(script, k)
                 if (s !== undefined) {
-                    let scripts = await httpGet(s)
+                    let scripts = (await httpGet(s)).json()
                     if (scripts instanceof Array) {
                         i.frames = scripts
                     } else {

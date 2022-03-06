@@ -13,8 +13,8 @@ export class ContactManage {
         this.contacts = []
         this.contactMap = new Map<string, Contact>()
     }
-    get list(): Contact[] {
-        return this.contacts
+    get list(): IterableIterator<Contact> {
+        return this.contactMap.values()
     }
     getContact(id: string): Contact | undefined {
         return this.contactMap.get(id)
@@ -40,7 +40,7 @@ export class ContactManage {
         }
     }
     removeOld(timestamp: number) {
-        let removeIndex: number[] = []
+        let removeIndex: string[] = []
         for (let i = 0; i < this.contacts.length; i++) {
             let c = this.contacts[i]
             if (c.isActive) continue
@@ -50,16 +50,13 @@ export class ContactManage {
                 continue
             }
             if (timestamp - c.timeUpdated > 1e7) {
-                removeIndex.push(i)
+                removeIndex.push(c.id)
             }
         }
-        let fixedIndex = 0
-        for (let i = 0; i < removeIndex.length; i++) {
-            fixedIndex = removeIndex[i] - i
-            let c = this.contacts[fixedIndex]
-            this.contacts.splice(i, 1)
-            this.contactMap.delete(c.id)
+        for (const id of removeIndex) {
+            this.contactMap.delete(id)
         }
+        this.contacts = Array.from(this.contactMap.values())
     }
     afterElementRemoved(id: string) {
         for (const c of this.contacts) {
@@ -247,7 +244,6 @@ export class ContactManage {
 
                 // total impulse from contact
                 let impulseVec = normal.copy().multi(normalImpulse).add(tangent.copy().multi(tangentImpulse))
-
                 // apply impulse from contact
                 if (!(bodyA.isStatic || bodyA.isSleeping)) {
                     bodyA.posPrev.add(impulseVec.copy().multi(bodyA.invMass))

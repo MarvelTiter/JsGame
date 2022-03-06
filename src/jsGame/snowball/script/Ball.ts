@@ -1,4 +1,6 @@
+import { getActualPixel } from "../../../utils/helper"
 import { BaseSence } from "../../gamebase/BaseSence"
+import { ITraceable } from "../../gamebase/Camera"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
@@ -8,39 +10,36 @@ interface SnowBallTail {
     y: number
     degree: number
 }
-export class Ball extends CustomObject {
+export class Ball extends CustomObject implements ITraceable {
     direction: number = -1
     turnTo: boolean = false
     degree: number = 0
     maxDegree: number = 50
     minDegree: number = -50
-    distance: number = 0.1
+    distance: number = 0.05
     tailMaxLength: number = 50
     color: string = "#d2fdff"
     tailList: Array<SnowBallTail> = []
     maxVelocity: Vector2 = Vector2.new(1, 1)
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
-        this.radius = 10
-        this.addCircleRigid(10)
-        this.rigidBody.limit = (v, a) => {
-            return {
-                nv: v.min(this.maxVelocity),
-                na: a
-            }
+        this.radius = getActualPixel(10)
+        this.addCircleRigid(getActualPixel(10))
+        // this.rigidBody.limit = (v, a) => {
+        //     return {
+        //         nv: v.min(this.maxVelocity),
+        //         na: a
+        //     }
+        // }
+    }
+    getPosInfo(): { velocity: Vector2; pos: Vector2 } {
+        return {
+            velocity: this.rigidBody.velocity,
+            pos: this.pos
         }
     }
 
     move() {
-        // 记录小球移动的位置以及角度
-        this.tailList.unshift({
-            x: this.pos.x,
-            y: this.pos.y,
-            degree: this.degree
-        })
-        if (this.tailList.length > this.tailMaxLength) {
-            this.tailList.splice(this.tailMaxLength)
-        }
         // 小球正在转向
         if (this.turnTo && this.direction) {
             // 递增旋转角度
@@ -56,10 +55,16 @@ export class Ball extends CustomObject {
         const radian = (this.degree * Math.PI) / 180
         const offsetX = Math.sin(radian) * this.distance * this.game.options.speedScale
         const offsetY = Math.cos(radian) * this.distance * this.game.options.speedScale
-
         this.rigidBody.applyForce(Vector2.new(offsetX, offsetY))
-
-        this.offset = this.rigidBody.velocity
+        // 记录小球移动的位置以及角度
+        this.tailList.unshift({
+            x: this.pos.x,
+            y: this.pos.y,
+            degree: this.degree
+        })
+        if (this.tailList.length > this.tailMaxLength) {
+            this.tailList.splice(this.tailMaxLength)
+        }
         this.turnTo = false
     }
     interval: number = 100

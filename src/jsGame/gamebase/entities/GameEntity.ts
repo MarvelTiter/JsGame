@@ -27,10 +27,11 @@ export class GameEntity extends CustomObject {
     draw(ctx: CanvasRenderingContext2D): void {
         let pos = this.pos.copy().add(this.offset)
         let sp = this.sprite
+        let re = this.rect
         ctx.save()
         ctx.translate(pos.x, pos.y)
         ctx.rotate(this.angle)
-        ctx.drawImage(this.image.texture, sp.x, sp.y, sp.w, sp.h, -sp.w / 2, -sp.h / 2, sp.w, sp.h)
+        ctx.drawImage(this.image.texture, sp.x, sp.y, sp.w, sp.h, re.x, re.y, re.w, re.h)
         ctx.translate(-pos.x, -pos.y)
         ctx.restore()
     }

@@ -1,8 +1,9 @@
 export interface IRect {
-    readonly x: number
-    readonly y: number
+    x: number
+    y: number
     w: number
     h: number
+    scale(scale: number): void
 }
 
 export class Rect implements IRect {
@@ -17,6 +18,10 @@ export class Rect implements IRect {
     constructor(w: number, h: number) {
         this.w = w
         this.h = h
+    }
+    scale(scale: number) {
+        this.w *= scale
+        this.h *= scale
     }
 }
 

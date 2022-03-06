@@ -56,53 +56,69 @@ export class MineSence extends BaseSence {
         super(game)
         this.level = level
         this.setup()
+        this.setupEvent()
     }
+    grid!: Grid
+    head!: Head
+    footer!: Footer
     setup() {
         // 背景
         let bg = new Background(this.game, this)
         this.addElement(bg)
         // head
-        let head = new Head(this.game, this) as Head
-        this.addElement(head)
+        this.head = new Head(this.game, this) as Head
+        this.addElement(this.head)
         // footer
-        let footer = new Footer(this.game, this) as Footer
-        footer.mineCount = this.level.mineCount
-        this.addElement(footer)
+        this.footer = new Footer(this.game, this) as Footer
+        this.footer.mineCount = this.level.mineCount
+        this.addElement(this.footer)
         // 雷区
-        let grid = new Grid(this.game, this, this.level)
+        this.grid = new Grid(this.game, this, this.level)
+
+        this.addElement(this.grid)
+        // let over = GameOverDialog.new(this.game, this);
+        // this.addElement(over);
+        let { w, h } = this.getWindowSize()
+
+        let restartButton = new Button(this.game, this, "button", "重新开始")
+        restartButton.pos.x = w - restartButton.rect.w / 2 - 20
+        restartButton.pos.y = h - restartButton.rect.h / 2 - 20
+        restartButton.onClick = () => {            
+            this.game.setSence(new MineSence(this.game, this.level))         
+        }
+        this.addElement(restartButton)
+        let homeBtn = new Button(this.game, this, "button", "主页")
+        homeBtn.pos.x = restartButton.pos.x - restartButton.rect.w - 20
+        homeBtn.pos.y = restartButton.pos.y
+        homeBtn.canDraw = () => {
+            return this.grid.gameOver
+        }
+        homeBtn.onClick = () => {
+            this.game.setSence(new StartSence(this.game))
+        }
+        this.addElement(homeBtn)
+    }
+    setupEvent() {
+        let self = this
         this.registerKeyAction(
             "a",
             function (status) {
-                grid.randomOpen()
+                self.grid.randomOpen()
             },
             1
         )
         this.registerKeyAction(
             "m",
             function (status) {
-                grid.openSafe()
+                self.grid.openSafe()
             },
             1
         )
-        grid.onFlagChanged = (g: Grid) => {
-            footer.mineCount = g.mineCount - g.flagCount
+        this.grid.onFlagChanged = (g: Grid) => {
+            this.footer.mineCount = g.mineCount - g.flagCount
         }
-        grid.onTick = (g: Grid) => {
-            footer.time = g.time
+        this.grid.onTick = (g: Grid) => {
+            this.footer.time = g.time
         }
-        this.addElement(grid)
-        // let over = GameOverDialog.new(this.game, this);
-        // this.addElement(over);
-        let { w, h } = this.getWindowSize()
-        let restartButton = new Button(this.game, this, "button", "重新开始")
-        restartButton.pos.x = w - restartButton.rect.w / 2 - 20
-        restartButton.pos.y = h - restartButton.rect.h / 2 - 20
-        restartButton.canDraw = () => {
-            return grid.gameOver
-        }
-        restartButton.onClick = () => {
-            this.game.setSence(new StartSence(this.game))
-        }
-        this.addElement(restartButton)
     }
 }

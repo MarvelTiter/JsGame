@@ -6,6 +6,7 @@ export interface options {
     gravity: Vector2
     gravityScale: number
     speedScale: number
+    torqueScale: number
 }
 export function defaultOption(): options {
     return {
@@ -13,7 +14,8 @@ export function defaultOption(): options {
         enableGravity: false,
         gravity: Vector2.new(0, 1),
         gravityScale: 0.001,
-        speedScale: 0.001
+        speedScale: 0.001,
+        torqueScale: 0.1
     }
 }
 export function createOption(config: Partial<options>) {

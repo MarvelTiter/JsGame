@@ -6,13 +6,13 @@
 
 <script setup lang="ts">
 import { Game } from "../gamebase/Game";
-import { onMounted, ref } from "vue";
-// import { MineSence, basis } from "./script/MineSence";
+import { onMounted, onUnmounted, ref } from "vue";
 import { SPRITES_URL } from "../../utils/constDefinition";
 import { StartSence } from "./script/StartSence";
 import { loadSprites } from "../gamebase/SpritesLoader"
 import Loading from "../../components/loading.vue";
 let percent = ref(0)
+let game: Game | undefined
 onMounted(async () => {
   let images = {
     n0: `${SPRITES_URL}/mine/n0.png`,
@@ -49,9 +49,13 @@ onMounted(async () => {
     percent.value = c / t
 
   })
-  let g = new Game(sources);
-  let ms = new StartSence(g);
-  g.setSence(ms);
-  g.run();
+  game = new Game(sources);
+  let ms = new StartSence(game);
+  game.setSence(ms);
+  game.run();
 });
+onUnmounted(() => {  
+  game!.clear()
+  game = undefined
+})
 </script>

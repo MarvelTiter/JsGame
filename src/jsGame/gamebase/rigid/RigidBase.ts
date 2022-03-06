@@ -175,7 +175,6 @@ export abstract class RigidBase {
 
     bind(obj: GameObject) {
         this.target = obj
-        this.init()
     }
 
     init() {
@@ -186,6 +185,7 @@ export abstract class RigidBase {
         this.inertia = this.vertices.inertia(this.mass) * 4
         this.vertices.translate(this.pos)
         this.posPrev.set(this.pos.x, this.pos.y)
+        this.vertices.rotate(this.angle, this.pos)
         this.bound.update(this.vertices, this.velocity)
     }
 
@@ -217,12 +217,34 @@ export abstract class RigidBase {
         }
     }
 
-    // public applyForce(f:Vector2):void{
+    /**
+     * 强制修改位置
+     * @param pos
+     */
+    public setPos(offset: Vector2) {
+        this.pos.add(offset)
+        this.posPrev.x = this.pos.x
+        this.posPrev.y = this.pos.y
+    }
+    /**
+     * 强制修改角度
+     * @param angle
+     */
+    public setAngle(angle: number) {
+        this.angle = angle
+        this.anglePrev = angle
+    }
 
-    // }
+    /**
+     * 更新受力
+     * @param f 力的向量
+     */
     public applyForce(f: Vector2): void {
         this.force.add(f)
         this.forceUpdate = true
+    }
+    public applyTorque(torque: number): void {
+        this.torque = torque
     }
     /**
      * 更新重力
@@ -277,12 +299,12 @@ export abstract class RigidBase {
         this.angularVelocity = na
         this.velocity.x = nv.x
         this.velocity.y = nv.y
-        this.onRigidUpdated(this.velocity, this.angularVelocity)
         // console.log("this.velocity: ", this.velocity)
         this.posPrev.set(this.pos.x, this.pos.y)
         this.pos.add(this.velocity)
         this.anglePrev = this.angle
         this.angle = this.angle + this.angularVelocity
+        this.onRigidUpdated(this.velocity, this.angularVelocity)
         // track speed and acceleration
         this.speed = this.velocity.length()
         this.angularSpeed = Math.abs(this.angularVelocity)

@@ -1,4 +1,16 @@
-export async function httpGet(url: string) {
+export class Result {
+    private _content: string
+    constructor(content: string) {
+        this._content = content
+    }
+    json() {
+        return JSON.parse(this._content)
+    }
+    raw(): string {
+        return this._content
+    }
+}
+export async function httpGet(url: string): Promise<Result> {
     const response = await fetch(url, {
         method: "GET", // *GET, POST, PUT, DELETE, etc.
         mode: "cors", // no-cors, *cors, same-origin
@@ -32,6 +44,5 @@ export async function httpGet(url: string) {
         position += chunk.length
     }
     let result = new TextDecoder("utf-8").decode(chunksAll)
-    let commits = JSON.parse(result)
-    return commits
+    return new Result(result)
 }

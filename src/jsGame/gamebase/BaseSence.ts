@@ -11,6 +11,7 @@ import { RigidBase } from "./rigid/RigidBase"
 import { broadphase } from "./collision/broadphase"
 import { randomBetween } from "../../utils/random"
 import { IRect } from "./data/Rect"
+import { Joystick } from "./virtualJoystick/Joystick"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     callBack: (status: KeyStatus) => void
@@ -50,10 +51,27 @@ export abstract class BaseSence {
         }
         return this._camera
     }
+
+    private _enableJoystick: boolean = false
+    public get enableJoystick(): boolean {
+        return this._enableJoystick
+    }
+    public set enableJoystick(v: boolean) {
+        if (v) {
+            this._joystick = new Joystick(this.game, this)
+        }
+        this._enableJoystick = v
+    }
+
+    private _joystick: Joystick | undefined
+    public get joystick(): Joystick {
+        return this._joystick!
+    }
+
     minX: number = 0
-    maxX: number = 0
-    minY: number = Infinity
-    maxY: number = Infinity
+    maxX: number = Number.MAX_VALUE
+    minY: number = 0
+    maxY: number = Number.MAX_VALUE
     private keydown: boolean = false
     private aidElement: GameObject | undefined
     // game:Game;
@@ -134,6 +152,19 @@ export abstract class BaseSence {
 
     public handleTouchStart(e: TouchEvent): void {
         let { pageX, pageY } = e.touches[0]
+        if (this.enableJoystick) {
+            if (this.joystick.checkFocu(pageX, pageY)) {
+                this.aidElement = this.joystick
+                e.preventDefault()
+                this.joystick.onTouchStart({
+                    button: 0,
+                    buttons: 0,
+                    x: pageX,
+                    y: pageY
+                })
+                return
+            }
+        }
         for (let index = this.elements.length - 1; index > -1; index--) {
             const element = this.elements[index]
             if (element.checkFocu(pageX, pageY)) {
@@ -156,7 +187,7 @@ export abstract class BaseSence {
             x: e.touches[0].pageX,
             y: e.touches[0].pageY
         })
-        this.aidElement = undefined
+        // this.aidElement = undefined
     }
 
     public handleTouchEnd(e: TouchEvent): void {
@@ -167,7 +198,7 @@ export abstract class BaseSence {
     public handleKeydown(e: KeyboardEvent): void {
         this.keydown = true
         let ks = this.keys.get(e.key)
-        if (ks == undefined) {
+        if (ks === undefined || ks.status) {
             return
         }
         ks.status = true
@@ -183,14 +214,11 @@ export abstract class BaseSence {
         ks.status = false
         ks.handled = true
     }
-
-    //#endregion
-
     /**
      * 注册按键处理函数
      * @param key 按下的键
-     * @param element 函数调用的对象(函数内部有this)
      * @param callback 按键回调函数
+     * @param times 0按住触发，1按下触发一次
      */
     public registerKeyAction(key: string, callback: (status: KeyStatus) => void, times?: actionTimes): void {
         this.keys.set(key, {
@@ -202,9 +230,14 @@ export abstract class BaseSence {
             callBack: callback
         })
     }
+    //#endregion
 
     public getCenter(): Vector2 {
         return this.camera.getCenter()
+    }
+
+    public getWindowPos(): Vector2 {
+        return this.camera.pos
     }
 
     public getWindowSize(): IRect {
@@ -223,10 +256,10 @@ export abstract class BaseSence {
     public draw(ctx: CanvasRenderingContext2D): void {
         for (const e of this.elements.values()) {
             e.elementDraw(ctx)
-            // if (window.Debug && e.IsRigid) {
-            //     let c = e.rigidBody
-            //     c.drawDebug(ctx)
-            // }
+            if (window.Debug && e.IsRigid) {
+                let c = e.rigidBody
+                c.drawDebug(ctx)
+            }
         }
         if (window.Debug) {
             for (const c of this.ContactsMag.list) {
@@ -240,6 +273,7 @@ export abstract class BaseSence {
                 }
             }
         }
+        this.joystick?.draw(ctx)
     }
 
     private handleKeyboardEvents(): void {
@@ -359,6 +393,11 @@ export abstract class BaseSence {
         this.clearForce(this.rigidsCache)
         this.camera.trace(this.game.context)
         this.draw(this.game.context)
+    }
+
+    clear() {
+        this.elements.splice(0)
+        this.elementMap.clear()
     }
 }
 

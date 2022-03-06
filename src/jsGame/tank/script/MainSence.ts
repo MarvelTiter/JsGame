@@ -1,23 +1,23 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
 import { GameObject } from "../../gamebase/objects/GameObject"
-import { BulletGreen } from "./bullet/bulletGreen"
 import { Ground } from "./ground"
 import { EnemyTank } from "./tank/enemy"
 import { PlayerTank } from "./tank/player"
+import { Wall } from "./wall"
 
 export class MainSence extends BaseSence {
     constructor(game: Game) {
         super(game)
-        this.setup()
-        this.maxX = 10000
+        this.maxX = 56 * 200
         this.minX = 0
-        this.maxY = 2000
+        this.maxY = 56 * 50
         this.minY = 0
         this.camera.direction = "Both"
+        this.setup()
     }
     canCollide(objectA: GameObject, objectB: GameObject): boolean {
-        return objectA.group !== objectB.group
+        return objectA.group !== objectB.group || objectA.group === "All" || objectB.group === "All"
     }
     setup() {
         let ground = new Ground(this.game, this)
@@ -27,21 +27,31 @@ export class MainSence extends BaseSence {
         this.addElement(player)
         this.addElement(enemy)
         this.camera.bind(player)
+
+        let left = new Wall(this.game, this, "LEFT")
+        let top = new Wall(this.game, this, "TOP")
+        let right = new Wall(this.game, this, "RIGHT")
+        let bottom = new Wall(this.game, this, "BOTTOM")
+        this.addElement(left)
+        this.addElement(top)
+        this.addElement(right)
+        this.addElement(bottom)
+
         this.registerKeyAction("a", status => {
-            player.turnTo = true
             player.turnDirection = -1
+            player.turn()
         })
         this.registerKeyAction("d", status => {
-            player.turnTo = true
             player.turnDirection = 1
+            player.turn()
         })
         this.registerKeyAction("w", status => {
-            player.forward = true
             player.forwardDirection = 1
+            player.move()
         })
         this.registerKeyAction("s", status => {
-            player.forward = true
             player.forwardDirection = -1
+            player.move()
         })
         this.registerKeyAction(
             " ",

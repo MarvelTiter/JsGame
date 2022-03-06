@@ -28,6 +28,7 @@
     v-model:members="members"
     v-model:records="records"
   ></Douniu>
+  <div v-html="MarkDownHtml"></div>
 </template>
 
 <script setup lang="ts">
@@ -38,15 +39,15 @@ import Records from "./components/records.vue";
 import Runfaster from "./components/runfaster.vue";
 import Douniu from "./components/douniu.vue";
 import { ElMessage } from "element-plus";
-
+import { httpGet } from "../utils/fetchHelper";
 let mems = localStorage.getItem("members") || "[]";
 let recs = localStorage.getItem("records") || "[]";
 const members: member[] = reactive(JSON.parse(mems));
 const records: record[] = reactive(JSON.parse(recs));
 const game = ref("");
 const recordDialogVisible = ref(false);
-
-const addRecord = () => {
+const MarkDownHtml = ref("")
+const addRecord = async () => {
   if (!game.value) {
     ElMessage.error("玩啥游戏呀??");
     return;

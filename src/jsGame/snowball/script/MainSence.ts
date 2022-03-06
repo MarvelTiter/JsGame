@@ -7,6 +7,7 @@ import { Contact } from "../../gamebase/collision/Contact"
 import { Background } from "./Background"
 import { Ball } from "./Ball"
 import { Tree } from "./Tree"
+import { Joystick } from "../../gamebase/virtualJoystick/Joystick"
 
 export class MainSence extends BaseSence {
     treeCollection!: Map<string, Tree>
@@ -38,14 +39,17 @@ export class MainSence extends BaseSence {
         this.camera.direction = "Vertical"
         this.camera.bind(ball)
 
-        // let setting = Button.new(this.game, this, "setting")
-        // setting.pos = new Vector2(550, 50)
-        // this.addElement(setting)
-
-        // let ret = Button.new(this.game, this, "return")
-        // ret.pos = new Vector2(this.game.getWidth() / 2, this.game.getHeight() / 2)
-        // this.addElement(ret)
-
+        if (this.game.device === "MOBILE") {
+            this.enableJoystick = true
+            this.joystick.onLeft = () => {
+                ball.turnTo = true
+                ball.direction = -1
+            }
+            this.joystick.onRight = () => {
+                ball.turnTo = true
+                ball.direction = 1
+            }
+        }
         this.registerKeyAction("a", status => {
             ball.turnTo = true
             ball.direction = -1
