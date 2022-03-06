@@ -3,7 +3,7 @@ export interface IRect {
     y: number
     w: number
     h: number
-    scale(scale: number): void
+    scale?(scale: number): void
 }
 
 export class Rect implements IRect {

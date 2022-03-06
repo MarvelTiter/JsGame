@@ -25,12 +25,12 @@ export class Ball extends CustomObject implements ITraceable {
         super(game, sence)
         this.radius = getActualPixel(10)
         this.addCircleRigid(getActualPixel(10))
-        // this.rigidBody.limit = (v, a) => {
-        //     return {
-        //         nv: v.min(this.maxVelocity),
-        //         na: a
-        //     }
-        // }
+        this.rigidBody.limit = (v, a) => {
+            return {
+                nv: v.min(this.maxVelocity),
+                na: a
+            }
+        }
     }
     getPosInfo(): { velocity: Vector2; pos: Vector2 } {
         return {
