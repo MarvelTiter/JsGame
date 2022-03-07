@@ -11,7 +11,8 @@ import { RigidBase } from "./rigid/RigidBase"
 import { broadphase } from "./collision/broadphase"
 import { randomBetween } from "../../utils/random"
 import { IRect } from "./data/Rect"
-import { Joystick, JoystickSetting } from "./virtualJoystick/Joystick"
+import { Joystick } from "./virtualJoystick/Joystick"
+import { JoystickSetting } from "./virtualJoystick/JoystickSetting"
 import { MouseArgs } from "./MouseArgs"
 type actionTimes = 0 | 1
 export interface ObjectAction {
