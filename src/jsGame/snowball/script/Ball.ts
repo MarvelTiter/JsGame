@@ -1,6 +1,6 @@
 import { getActualPixel } from "../../../utils/helper"
 import { BaseSence } from "../../gamebase/BaseSence"
-import { ITraceable } from "../../gamebase/Camera"
+import { ITraceable } from "../../gamebase/interfaces/ITraceable"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
@@ -41,6 +41,7 @@ export class Ball extends CustomObject implements ITraceable {
 
     move() {
         // 小球正在转向
+        console.log(this.direction)
         if (this.turnTo && this.direction) {
             // 递增旋转角度
             this.degree = this.degree + (this.direction > 0 ? 1 : -1) * 1.6 // 增加一点转向灵敏度
@@ -65,7 +66,6 @@ export class Ball extends CustomObject implements ITraceable {
         if (this.tailList.length > this.tailMaxLength) {
             this.tailList.splice(this.tailMaxLength)
         }
-        this.turnTo = false
     }
     interval: number = 100
 

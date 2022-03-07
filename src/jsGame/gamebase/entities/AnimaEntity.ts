@@ -14,12 +14,15 @@ export class AnimaEntity extends GameEntity {
     frameIndex: number = 0
     frameInterval: number = 5
     protected frameCooldown: number = 0
-    protected playTimes: number = 0
+    protected playTimes: number
+    protected playedTimes: number = 0
+    done?: () => void
     private currentFrame!: FrameDefinition
-    constructor(game: Game, sence: BaseSence, name: string) {
+    constructor(game: Game, sence: BaseSence, name: string, playtimes: number = 0) {
         super(game, sence, name)
         // this.image = this.game.getTextureByName(name)
         this.frames = this.image.frames
+        this.playTimes = playtimes
     }
     updateRequest(): boolean {
         return true
@@ -27,12 +30,20 @@ export class AnimaEntity extends GameEntity {
 
     private calcFrameIndex(): number {
         if (this.frameIndex === this.frames.length - 1) {
-            this.playTimes++
+            this.playedTimes++
         }
         return (this.frameIndex + 1) % this.frames.length
     }
 
+    checkDone() {
+        if (this.playTimes === 0) return false
+        return this.playedTimes === this.playTimes
+    }
+
     update(): void {
+        if (this.checkDone()) {
+            this.done?.call(null)
+        }
         if (this.frameCooldown !== 0) {
             this.frameCooldown--
             return
@@ -50,6 +61,9 @@ export class AnimaEntity extends GameEntity {
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
+        if (this.checkDone()) {
+            return
+        }
         if (this.currentFrame === undefined) return
         let f = this.currentFrame.frame
         ctx.translate(this.pos.x, this.pos.y)

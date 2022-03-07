@@ -37,27 +37,48 @@ export class MainSence extends BaseSence {
         this.addElement(right)
         this.addElement(bottom)
 
-        this.registerKeyAction("a", status => {
-            player.turnDirection = -1
-            player.turn()
-        })
-        this.registerKeyAction("d", status => {
-            player.turnDirection = 1
-            player.turn()
-        })
-        this.registerKeyAction("w", status => {
-            player.forwardDirection = 1
-            player.move()
-        })
-        this.registerKeyAction("s", status => {
-            player.forwardDirection = -1
-            player.move()
-        })
+        this.registerKeyAction(
+            "a",
+            () => {
+                player.turnDirection = -1
+                // player.turn()
+                player.turning = true
+            },
+            () => (player.turning = false)
+        )
+        this.registerKeyAction(
+            "d",
+            () => {
+                player.turnDirection = 1
+                // player.turn()
+                player.turning = true
+            },
+            () => (player.turning = false)
+        )
+        this.registerKeyAction(
+            "w",
+            () => {
+                player.forwardDirection = 1
+                // player.move()
+                player.moving = true
+            },
+            () => (player.moving = false)
+        )
+        this.registerKeyAction(
+            "s",
+            () => {
+                player.forwardDirection = -1
+                // player.move()
+                player.moving = true
+            },
+            () => (player.moving = false)
+        )
         this.registerKeyAction(
             " ",
-            status => {
+            () => {
                 player.fire()
             },
+            undefined,
             1
         )
     }

@@ -41,24 +41,42 @@ export class MainSence extends BaseSence {
 
         if (this.game.device === "MOBILE") {
             this.enableJoystick = true
-            this.joystick.onLeft = () => {
+            this.joystick.onTouchDown = () => {
                 ball.turnTo = true
+            }
+            this.joystick.onTouchEnd = () => {
+                ball.turnTo = false
+            }
+            this.joystick.onLeft = () => {
                 ball.direction = -1
             }
             this.joystick.onRight = () => {
-                ball.turnTo = true
                 ball.direction = 1
             }
         }
-        this.registerKeyAction("a", status => {
-            ball.turnTo = true
-            ball.direction = -1
-        })
+        this.registerKeyAction(
+            "a",
+            () => {
+                ball.turnTo = true
+                ball.direction = -1
+            },
+            () => {
+                ball.turnTo = false
+            },
+            1
+        )
 
-        this.registerKeyAction("d", status => {
-            ball.turnTo = true
-            ball.direction = 1
-        })
+        this.registerKeyAction(
+            "d",
+            () => {
+                ball.turnTo = true
+                ball.direction = 1
+            },
+            () => {
+                ball.turnTo = false
+            },
+            1
+        )
     }
 
     createTree(num: number): Tree[] {

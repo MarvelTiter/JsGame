@@ -4,12 +4,19 @@ import { Game } from "../../../gamebase/Game"
 
 export class Explosion extends AnimaEntity {
     constructor(game: Game, sence: BaseSence, x: number, y: number) {
-        super(game, sence, "explosion")
+        super(game, sence, "explosion", 1)
         this.pos.set(x, y)
+        this.done = () => {
+            this.sence.removeElement(this)
+        }
     }
-    update(): void {
-        super.update()
-        if (this.playTimes === 1) {
+}
+
+export class ExplosionSmoke extends AnimaEntity {
+    constructor(game: Game, sence: BaseSence, x: number, y: number) {
+        super(game, sence, "explosionSmoke", 1)
+        this.pos.set(x, y)
+        this.done = () => {
             this.sence.removeElement(this)
         }
     }

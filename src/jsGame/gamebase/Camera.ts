@@ -4,14 +4,9 @@ import { Bound } from "./data/Bound"
 import { IRect } from "./data/Rect"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
+import { ITraceable } from "./interfaces/ITraceable"
 import { GameObject } from "./objects/GameObject"
 type Direction = "Horizontal" | "Vertical" | "Both" | "Static"
-export interface ITraceable {
-    getPosInfo(): {
-        velocity: Vector2
-        pos: Vector2
-    }
-}
 export class Camera {
     target: ITraceable | undefined
     pos: Vector2

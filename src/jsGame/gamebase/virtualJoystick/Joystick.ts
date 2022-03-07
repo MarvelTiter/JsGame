@@ -29,6 +29,7 @@ export class Joystick extends GameObject {
     touchPos: Vector2 | undefined
     onTouchStart(e: MouseArgs): void {
         this.touchPos = Vector2.new(e.x, e.y)
+        this.onTouchDown?.call(null)
         this.handleTouch()
     }
     onTouchMove(e: MouseArgs): void {
@@ -36,6 +37,7 @@ export class Joystick extends GameObject {
         this.handleTouch()
     }
     onTouchEnd(): void {
+        this.onTouchEnd?.call(null)
         this.touchPos = undefined
     }
 
@@ -43,6 +45,8 @@ export class Joystick extends GameObject {
     onTop?: () => void
     onRight?: () => void
     onDown?: () => void
+    onTouchDown?: () => void
+    onTouchUp?: () => void
     handleTouch() {
         let { x, y } = this.touchPos!.copy().sub(this.pos)
         let angle = Math.atan2(y, x)

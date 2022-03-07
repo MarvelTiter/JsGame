@@ -6,6 +6,7 @@ import { Bound } from "../data/Bound"
 import { RigidBase } from "../rigid/RigidBase"
 import { Contact } from "../collision/Contact"
 import { IRectangle, IRect, createBoxRect } from "../data/Rect"
+import { ISolveCollide } from "../interfaces/ISolveCollide"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
 //         return
@@ -193,7 +194,7 @@ export abstract class GameObject implements IRectangle {
     canDraw(): boolean {
         return true
     }
-    onCollide(other: GameObject) {}
+    onCollide(other: ISolveCollide) {}
     updateRequest() {
         return this.hasChanged
     }

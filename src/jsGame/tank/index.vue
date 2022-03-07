@@ -23,11 +23,13 @@ onMounted(async () => {
     barricadeWood: `${SPRITES_URL}/tank/png/barricadeWood.png`,
     barricadeMetal: `${SPRITES_URL}/tank/png/barricadeMetal.png`,
     explosion: `${SPRITES_URL}/tank/png/explosion.png`,
+    explosionSmoke: `${SPRITES_URL}/tank/png/explosionSmoke.png`,
   }
   let scripts = {
     allSprites_retina: `/sprites/tank/allSprites_retina.json`,
     onlyObjects_retina: `/sprites/tank/onlyObjects_retina.json`,
     explosion: `/sprites/tank/png/explosion.json`,
+    explosionSmoke: `/sprites/tank/png/explosionSmoke.json`,
   }
   let sources = await loadSprites(images, scripts, (c, t) => {
     percent.value = c / t

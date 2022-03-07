@@ -1,14 +1,8 @@
-import { clamp } from "../../../../utils/helper"
 import { BaseSence } from "../../../gamebase/BaseSence"
-import { ITraceable } from "../../../gamebase/Camera"
 import { createBoxRect } from "../../../gamebase/data/Rect"
 import { Vector2 } from "../../../gamebase/data/Vector2"
 import { GameEntity } from "../../../gamebase/entities/GameEntity"
-import { SpriteDefinition } from "../../../gamebase/FrameDefinition"
 import { Game } from "../../../gamebase/Game"
-import { MouseArgs } from "../../../gamebase/MouseArgs"
-import { GameObject } from "../../../gamebase/objects/GameObject"
-import { RigidBase } from "../../../gamebase/rigid/RigidBase"
 import { Bullet } from "../bullet/bullet"
 
 export class TankBarrel extends GameEntity {

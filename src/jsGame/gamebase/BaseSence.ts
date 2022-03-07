@@ -14,7 +14,8 @@ import { IRect } from "./data/Rect"
 import { Joystick } from "./virtualJoystick/Joystick"
 type actionTimes = 0 | 1
 export interface ObjectAction {
-    callBack: (status: KeyStatus) => void
+    down: () => void
+    up?: () => void
 }
 export interface KeyStatus {
     status: boolean
@@ -211,6 +212,7 @@ export abstract class BaseSence {
         if (ks === undefined) {
             return
         }
+        this.actions.get(e.key)!.up?.call(null)
         ks.status = false
         ks.handled = true
     }
@@ -220,14 +222,15 @@ export abstract class BaseSence {
      * @param callback 按键回调函数
      * @param times 0按住触发，1按下触发一次
      */
-    public registerKeyAction(key: string, callback: (status: KeyStatus) => void, times?: actionTimes): void {
+    public registerKeyAction(key: string, down: () => void, up?: () => void, times: actionTimes = 0): void {
         this.keys.set(key, {
             status: false,
-            times: times ?? 0,
+            times: times,
             handled: true
         })
         this.actions.set(key, {
-            callBack: callback
+            down: down,
+            up: up
         })
     }
     //#endregion
@@ -283,7 +286,7 @@ export abstract class BaseSence {
                 if (ks.handled) continue
                 if (ks.status) {
                     let f = this.actions.get(actionKey)!
-                    f.callBack(ks)
+                    f.down()
                     if (ks.times == 1) {
                         ks.handled = true
                     }
