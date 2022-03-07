@@ -41,7 +41,6 @@ export class Ball extends CustomObject implements ITraceable {
 
     move() {
         // 小球正在转向
-        console.log(this.direction)
         if (this.turnTo && this.direction) {
             // 递增旋转角度
             this.degree = this.degree + (this.direction > 0 ? 1 : -1) * 1.6 // 增加一点转向灵敏度

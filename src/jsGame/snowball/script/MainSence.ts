@@ -40,19 +40,29 @@ export class MainSence extends BaseSence {
         this.camera.bind(ball)
 
         if (this.game.device === "MOBILE") {
-            this.enableJoystick = true
-            this.joystick.onTouchDown = () => {
-                ball.turnTo = true
-            }
-            this.joystick.onTouchEnd = () => {
-                ball.turnTo = false
-            }
-            this.joystick.onLeft = () => {
-                ball.direction = -1
-            }
-            this.joystick.onRight = () => {
-                ball.direction = 1
-            }
+            this.configJoystick({
+                Left: [
+                    {
+                        type: "Stick",
+                        x: 100,
+                        y: this.getWindowSize().h - 100,
+                        events: {
+                            onTouchDown: () => {
+                                ball.turnTo = true
+                            },
+                            onTouchUp: () => {
+                                ball.turnTo = false
+                            },
+                            onLeft: () => {
+                                ball.direction = -1
+                            },
+                            onRight: () => {
+                                ball.direction = 1
+                            }
+                        }
+                    }
+                ]
+            })
         }
         this.registerKeyAction(
             "a",

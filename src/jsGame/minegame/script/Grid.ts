@@ -227,8 +227,8 @@ export class Grid extends CustomObject {
         this.checkWin()
     }
 
-    onTouchStart(e: MouseArgs): void {
-        let { x, y } = e
+    onTouchStart(e: MouseArgs[]): void {
+        let { x, y } = e[0]
         this.temp = this.findCell(x, y)
         if (this.temp === undefined) return
         this.touchTimer = window.setTimeout(() => {
@@ -238,7 +238,7 @@ export class Grid extends CustomObject {
             this.touchTimer = undefined
         }, 500)
     }
-    onTouchMove(e: MouseArgs): void {
+    onTouchMove(e: MouseArgs[]): void {
         if (this.touchTimer) {
             window.clearTimeout(this.touchTimer)
             this.touchTimer = undefined

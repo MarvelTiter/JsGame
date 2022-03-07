@@ -36,7 +36,7 @@ export class MainSence extends BaseSence {
         this.addElement(top)
         this.addElement(right)
         this.addElement(bottom)
-
+      
         this.registerKeyAction(
             "a",
             () => {

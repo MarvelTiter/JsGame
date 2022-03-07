@@ -11,7 +11,8 @@ import { RigidBase } from "./rigid/RigidBase"
 import { broadphase } from "./collision/broadphase"
 import { randomBetween } from "../../utils/random"
 import { IRect } from "./data/Rect"
-import { Joystick } from "./virtualJoystick/Joystick"
+import { Joystick, JoystickSetting } from "./virtualJoystick/Joystick"
+import { MouseArgs } from "./MouseArgs"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     down: () => void
@@ -57,11 +58,10 @@ export abstract class BaseSence {
     public get enableJoystick(): boolean {
         return this._enableJoystick
     }
-    public set enableJoystick(v: boolean) {
-        if (v) {
-            this._joystick = new Joystick(this.game, this)
-        }
-        this._enableJoystick = v
+
+    public configJoystick(options: JoystickSetting): void {        
+        this._joystick = new Joystick(this.game, this, options)
+        this._enableJoystick = true
     }
 
     private _joystick: Joystick | undefined
@@ -151,48 +151,48 @@ export abstract class BaseSence {
         }
     }
 
+    private getTouches(e: TouchEvent): MouseArgs[] {
+        let ret: MouseArgs[] = []
+        for (let index = 0; index < e.touches.length; index++) {
+            const element = e.touches[index]
+            ret.push({
+                button: 0,
+                buttons: 0,
+                x: element.pageX,
+                y: element.pageY
+            })
+        }
+        return ret.sort((a, b) => a.x - b.x)
+    }
     public handleTouchStart(e: TouchEvent): void {
-        let { pageX, pageY } = e.touches[0]
+        let touches = this.getTouches(e)
         if (this.enableJoystick) {
-            if (this.joystick.checkFocu(pageX, pageY)) {
+            if (this.joystick.checkFocu(touches[0].x, touches[0].y)) {
                 this.aidElement = this.joystick
                 e.preventDefault()
-                this.joystick.onTouchStart({
-                    button: 0,
-                    buttons: 0,
-                    x: pageX,
-                    y: pageY
-                })
+                this.joystick.onTouchStart(touches)
                 return
             }
         }
         for (let index = this.elements.length - 1; index > -1; index--) {
             const element = this.elements[index]
-            if (element.checkFocu(pageX, pageY)) {
+            if (element.checkFocu(touches[0].x, touches[0].y)) {
                 this.aidElement = element
-                element.onTouchStart({
-                    button: 0,
-                    buttons: 0,
-                    x: pageX,
-                    y: pageY
-                })
+                element.onTouchStart(touches)
                 break
             }
         }
     }
 
     public handleTouchMove(e: TouchEvent): void {
-        this.aidElement?.onTouchMove({
-            button: 0,
-            buttons: 0,
-            x: e.touches[0].pageX,
-            y: e.touches[0].pageY
-        })
+        let touches = this.getTouches(e)
+        this.aidElement?.onTouchMove(touches)
         // this.aidElement = undefined
     }
 
     public handleTouchEnd(e: TouchEvent): void {
-        this.aidElement?.onTouchEnd()
+        let touches = this.getTouches(e)
+        this.aidElement?.onTouchEnd(touches)
         this.aidElement = undefined
     }
 
@@ -276,7 +276,7 @@ export abstract class BaseSence {
                 }
             }
         }
-        this.joystick?.draw(ctx)
+        if (this.enableJoystick) this.joystick!.draw(ctx)
     }
 
     private handleKeyboardEvents(): void {

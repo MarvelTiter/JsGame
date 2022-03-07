@@ -85,8 +85,6 @@ export abstract class GameObject implements IRectangle {
         this._pos = v
     }
 
-    public abstract get center(): Vector2
-
     private _offset: Vector2
     public get offset(): Vector2 {
         return this._offset
@@ -186,11 +184,11 @@ export abstract class GameObject implements IRectangle {
     onClick(e: MouseArgs) {}
     onMouseOver(e: MouseArgs) {}
     onMouseUp() {}
-    onTouchStart(e: MouseArgs) {
-        this.onClick(e)
+    onTouchStart(e: MouseArgs[]) {
+        this.onClick(e[0])
     }
-    onTouchMove(e: MouseArgs) {}
-    onTouchEnd() {}
+    onTouchMove(e: MouseArgs[]) {}
+    onTouchEnd(e: MouseArgs[]) {}
     canDraw(): boolean {
         return true
     }

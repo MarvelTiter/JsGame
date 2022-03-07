@@ -29,7 +29,7 @@ declare global {
 window.Update = []
 export class Game {
     canvas: HTMLCanvasElement
-    context: any
+    context: CanvasRenderingContext2D
     enableMouseAction: boolean
     images: Map<string, GameImage>
     sence!: BaseSence
@@ -38,7 +38,7 @@ export class Game {
     options: options
     constructor(images: Map<string, GameImage>, opts?: Partial<options>, area?: IRect) {
         this.canvas = document.querySelector("#canvas") as HTMLCanvasElement
-        this.context = this.canvas.getContext("2d")
+        this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D
         this.enableMouseAction = false
         this.images = images
         this.areaSetup(area)
@@ -96,6 +96,10 @@ export class Game {
             if (this.sence) this.sence.handleTouchMove(e)
         })
         this.canvas.addEventListener("touchend", (e: TouchEvent) => {
+            e.preventDefault()
+            if (this.sence) this.sence.handleTouchEnd(e)
+        })
+        this.canvas.addEventListener("touchcancel", (e: TouchEvent) => {
             e.preventDefault()
             if (this.sence) this.sence.handleTouchEnd(e)
         })
