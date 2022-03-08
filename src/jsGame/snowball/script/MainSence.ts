@@ -40,23 +40,21 @@ export class MainSence extends BaseSence {
         this.camera.bind(ball)
 
         if (this.game.device === "MOBILE") {
-            this.configJoystick({
-                Left: [
-                    {
-                        type: "Stick",
-                        x: 100,
-                        y: this.getWindowSize().h - 100,
-                        events: {
-                            onLeft: () => {
-                                ball.turn(-1)
-                            },
-                            onRight: () => {
-                                ball.turn(1)
-                            }
+            this.configJoystick([
+                {
+                    type: "Stick",
+                    x: 100,
+                    y: this.getWindowSize().h - 100,
+                    events: {
+                        onLeft: () => {
+                            ball.turn(-1)
+                        },
+                        onRight: () => {
+                            ball.turn(1)
                         }
                     }
-                ]
-            })
+                }
+            ])
         }
         this.registerKeyAction("a", () => {
             ball.turn(-1)

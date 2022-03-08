@@ -38,41 +38,37 @@ export class MainSence extends BaseSence {
         this.addElement(bottom)
 
         if (this.game.device === "MOBILE")
-            this.configJoystick({
-                Left: [
-                    {
-                        type: "Stick",
-                        x: 100,
-                        y: this.getWindowSize().h - 100,
-                        events: {
-                            onTop: () => {
-                                player.move(1)
-                            },
-                            onDown: () => {
-                                player.move(-1)
-                            },
-                            onLeft: () => {
-                                player.turn(-1)
-                            },
-                            onRight: () => {
-                                player.turn(1)
-                            }
+            this.configJoystick([
+                {
+                    type: "Stick",
+                    x: 100,
+                    y: this.getWindowSize().h - 100,
+                    events: {
+                        onTop: () => {
+                            player.move(1)
+                        },
+                        onDown: () => {
+                            player.move(-1)
+                        },
+                        onLeft: () => {
+                            player.turn(-1)
+                        },
+                        onRight: () => {
+                            player.turn(1)
                         }
                     }
-                ],
-                Right: [
-                    {
-                        type: "Button",
-                        x: this.getWindowSize().w - 100,
-                        y: this.getWindowSize().h - 100,
-                        events: {
-                            onButtonA: () => {
-                                player.fire()
-                            }
+                },
+                {
+                    type: "Button",
+                    x: this.getWindowSize().w - 100,
+                    y: this.getWindowSize().h - 100,
+                    events: {
+                        onButtonX: () => {
+                            player.fire()
                         }
                     }
-                ]
-            })
+                }
+            ])
 
         this.registerKeyAction("a", () => {
             player.turn(-1)
