@@ -1,3 +1,4 @@
+import { clamp } from "../../../utils/helper"
 import { RigidBase } from "../rigid/RigidBase"
 
 /**
@@ -136,6 +137,25 @@ export class Vector2 {
      */
     cross(vec: Vector2): number {
         return this.x * vec.y - this.y * vec.x
+    }
+    /**
+     * atan2
+     * @returns
+     */
+    angle(): number {
+        return Math.atan2(this.y, this.x)
+    }
+    /**
+     * 向量的夹角(返回弧度)
+     * @param vec
+     */
+    includedAngle(vec: Vector2): number {
+        let sl = this.length()
+        let ol = vec.length()
+        if (sl === 0 || ol === 0) return 0
+        let cos = this.dot(vec) / sl / ol
+        cos = clamp(cos, -1, 1)
+        return Math.acos(cos)
     }
 }
 

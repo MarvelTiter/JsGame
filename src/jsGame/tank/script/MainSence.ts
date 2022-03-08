@@ -1,4 +1,5 @@
 import { BaseSence } from "../../gamebase/BaseSence"
+import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { GameObject } from "../../gamebase/objects/GameObject"
 import { Ground } from "./ground"
@@ -44,17 +45,8 @@ export class MainSence extends BaseSence {
                     x: 100,
                     y: this.getWindowSize().h - 100,
                     events: {
-                        onTop: () => {
-                            player.move(1)
-                        },
-                        onDown: () => {
-                            player.move(-1)
-                        },
-                        onLeft: () => {
-                            player.turn(-1)
-                        },
-                        onRight: () => {
-                            player.turn(1)
+                        onChange: (direction, scale) => {
+                            player.moveDirectly(direction, scale)
                         }
                     }
                 },
@@ -89,5 +81,11 @@ export class MainSence extends BaseSence {
             },
             1
         )
+        window.Update.push(() => {
+            let v1 = Vector2.new(0, 1)
+            let v2 = Vector2.new(0, -1)
+            let cos = v1.dot(v2) / v1.length() / v2.length()
+            console.log(cos, Math.acos(cos))
+        })
     }
 }

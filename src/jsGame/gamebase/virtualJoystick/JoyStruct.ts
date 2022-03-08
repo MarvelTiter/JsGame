@@ -1,3 +1,4 @@
+import { Vector2 } from "../data/Vector2";
 import { JoyType } from "./JoystickDefType"
 export interface JoyStruct {
     type: JoyType
@@ -8,6 +9,7 @@ export interface JoyStruct {
         onTop?: () => void
         onRight?: () => void
         onDown?: () => void
+        onChange?: (direction: Vector2, scale: number) => void
         onButtonA?: () => void
         onButtonB?: () => void
         onButtonX?: () => void

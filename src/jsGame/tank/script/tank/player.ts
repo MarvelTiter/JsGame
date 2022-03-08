@@ -19,6 +19,15 @@ export class PlayerTank extends TankBase implements ITraceable {
         }
     }
 
+    moveDirectly(direction: Vector2, scale: number) {
+        let angleDif = this.facing.includedAngle(direction)
+        this.facing.rotate(angleDif)
+        this.rigidBody.setAngle(direction.angle() - Math.PI / 2)
+        let power = scale * 1.5 * this.game.options.speedScale
+        let pv = this.facing.copy().multi(power)
+        this.rigidBody.applyForce(pv)
+    }
+
     createBullet(p: Vector2): Bullet {
         // 素材原因，坦克与子弹相差 180°
         return new Bullet(this.game, this.sence, "bulletGreen3_outline", p.x, p.y, this.angle + Math.PI, this.facing.copy(), 1, this.group)

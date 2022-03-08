@@ -11,13 +11,14 @@ export class JoystickRocker extends JoystickPart {
     onTop?: () => void
     onRight?: () => void
     onDown?: () => void
+    onChange?: (direction: Vector2, scale: number) => void
     constructor(x: number, y: number) {
         super(x, y, "Stick")
     }
     handleTouch(): void {
-        let { x, y } = this.touchPos!.copy().sub(this.pos)
-        let angle = Math.atan2(y, x)
-
+        let direction = this.touchPos!.copy().sub(this.pos)
+        let angle = Math.atan2(direction.y, direction.x)
+        this.onChange?.call(null, direction, direction.length() / JoystickBoxRadius)
         if (-Math.PI / 4 < angle && angle < Math.PI / 4) {
             // 指向右边
             this.onRight?.call(null)
