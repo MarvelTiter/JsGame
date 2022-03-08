@@ -10,8 +10,8 @@ export class JoystickButtons extends JoystickPart {
     onButtonB?: () => void
     onButtonX?: () => void
     onButtonY?: () => void
-    constructor(x: number, y: number, position: JoyPosition) {
-        super(x, y, position, "Button")
+    constructor(x: number, y: number) {
+        super(x, y, "Button")
         this.once = true
     }
     /**
@@ -19,8 +19,7 @@ export class JoystickButtons extends JoystickPart {
      * 0 top , 1 right , 2 bottom , 3 left
      */
     private startFlag!: number
-    handleTouch(): void {
-        if (!this.active) return
+    handleTouch(): void {        
         let { x, y } = this.touchPos!.copy().sub(this.pos)
         let angle = Math.atan2(y, x)
         if (-Math.PI / 4 < angle && angle < Math.PI / 4) {
@@ -61,6 +60,7 @@ export class JoystickButtons extends JoystickPart {
             let rt = Vector2.new(1, -1).normalize().multi(JoystickBoxRadius).add(sencePos)
             // 左下的点
             let lb = Vector2.new(-1, 1).normalize().multi(JoystickBoxRadius).add(sencePos)
+            ctx.strokeStyle = JoystickBgColor
             ctx.beginPath()
             ctx.moveTo(lt.x, lt.y)
             ctx.lineTo(rb.x, rb.y)
@@ -82,6 +82,7 @@ export class JoystickButtons extends JoystickPart {
             this.drawButton(ctx, Vector2.new(-1, 0), sencePos, "X")
             this.drawButton(ctx, Vector2.new(0, -1), sencePos, "Y")
         }
+        if(!this.active) return
         // 画按下的区域
         {
             if (this.active) {
@@ -107,7 +108,7 @@ export class JoystickButtons extends JoystickPart {
         ctx.beginPath()
         ctx.arc(pos.x, pos.y, 25, 0, Math.PI * 2)
         ctx.closePath()
-        ctx.fillText(text, pos.x, pos.y + 5)
+        ctx.fillText(text, pos.x, pos.y)
         ctx.fill()
     }
     private drawPie(ctx: CanvasRenderingContext2D, startAngle: number, endAngle: number, sencePos: Vector2) {

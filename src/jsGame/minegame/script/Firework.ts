@@ -6,11 +6,9 @@ export class Firework extends AnimaEntity {
     constructor(game: Game, sence: BaseSence, name: string) {
         super(game, sence, name)
         this.pos = this.sence.getCenter()
-    }
-    update(): void {
-        super.update()
-        if (this.playTimes === 2) {
-            this.sence.removeElement(this)
+        this.playTimes = 2
+        this.done = () => {
+            sence.removeElement(this)
         }
     }
 }

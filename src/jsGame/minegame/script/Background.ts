@@ -1,6 +1,5 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
-import { GameStatisEntity } from "../../gamebase/entities/GameStatisEntity"
 import { Game } from "../../gamebase/Game"
 
 export class Background extends GameEntity {

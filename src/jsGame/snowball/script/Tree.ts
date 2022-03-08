@@ -3,7 +3,6 @@ import { BaseSence } from "../../gamebase/BaseSence"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
-import { GameStatisEntity } from "../../gamebase/entities/GameStatisEntity"
 
 export class Tree extends GameEntity {
     treeCollection!: Map<string, Tree>

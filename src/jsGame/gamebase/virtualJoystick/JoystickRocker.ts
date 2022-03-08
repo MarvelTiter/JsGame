@@ -1,6 +1,7 @@
 import { Vector2 } from "../data/Vector2"
 import { JoystickPart } from "./JoystickPart"
 import { JoyPosition, JoystickBgColor, JoystickBoxRadius, JoystickColor, JoystickRadius } from "./JoystickDefType"
+import { MouseArgs } from "../MouseArgs"
 
 /**
  * 摇杆部件
@@ -10,11 +11,10 @@ export class JoystickRocker extends JoystickPart {
     onTop?: () => void
     onRight?: () => void
     onDown?: () => void
-    constructor(x: number, y: number, position: JoyPosition) {
-        super(x, y, position, "Stick")
+    constructor(x: number, y: number) {
+        super(x, y, "Stick")
     }
     handleTouch(): void {
-        if (!this.active) return
         let { x, y } = this.touchPos!.copy().sub(this.pos)
         let angle = Math.atan2(y, x)
 
@@ -40,7 +40,7 @@ export class JoystickRocker extends JoystickPart {
         ctx.arc(sencePos.x, sencePos.y, JoystickBoxRadius, 0, Math.PI * 2)
         ctx.closePath()
         ctx.fill()
-
+        if (!this.active) return
         // 摇杆中心的点
         if (this.touchPos !== undefined) {
             let f = this.touchPos.copy().sub(this.pos)

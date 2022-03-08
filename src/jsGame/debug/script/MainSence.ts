@@ -43,5 +43,41 @@ export class MainSence extends BaseSence {
             // this.createNew()
             this.removeElement(circle)
         })
+
+        this.configJoystick([
+            {
+                type: "Stick",
+                x: 100,
+                y: this.getWindowSize().h - 150,
+                events: {
+                    onTop: () => {},
+                    onDown: () => {},
+                    onLeft: () => {},
+                    onRight: () => {}
+                }
+            },
+            {
+                type: "Button",
+                x: this.getWindowSize().w - 400,
+                y: this.getWindowSize().h - 150,
+                events: {
+                    onButtonA: () => {},
+                    onButtonB: () => {},
+                    onButtonX: () => {},
+                    onButtonY: () => {}
+                }
+            },
+            {
+                type: "Stick",
+                x: this.getWindowSize().w - 150,
+                y: this.getWindowSize().h - 150,
+                events: {
+                    onTop: () => {},
+                    onDown: () => {},
+                    onLeft: () => {},
+                    onRight: () => {}
+                }
+            }
+        ])
     }
 }

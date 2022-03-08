@@ -10,8 +10,8 @@ import { broadphase } from "./collision/broadphase"
 import { randomBetween } from "../../utils/random"
 import { IRect } from "./data/Rect"
 import { Joystick } from "./virtualJoystick/Joystick"
-import { JoystickSetting } from "./virtualJoystick/JoystickSetting"
 import { MouseArgs } from "./MouseArgs"
+import { JoyStruct } from "./virtualJoystick/JoyStruct"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     status: boolean
@@ -61,7 +61,7 @@ export abstract class BaseSence {
         return this._enableJoystick
     }
 
-    public configJoystick(options: JoystickSetting): void {
+    public configJoystick(options: JoyStruct[]): void {
         this._joystick = new Joystick(this.game, this, options)
         this._enableJoystick = true
     }
@@ -195,7 +195,7 @@ export abstract class BaseSence {
     public handleTouchEnd(e: TouchEvent): void {
         let touches = this.getTouches(e)
         this.aidElement?.onTouchEnd(touches)
-        this.aidElement = undefined
+        if (e.touches.length === 0) this.aidElement = undefined
     }
 
     public handleKeydown(e: KeyboardEvent): void {

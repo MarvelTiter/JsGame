@@ -2,7 +2,6 @@ import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
 import { Grid } from "./Grid"
 import { Bound } from "../../gamebase/data/Bound"
-import { GameStatisEntity } from "../../gamebase/entities/GameStatisEntity"
 import { createBoxRect } from "../../gamebase/data/Rect"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
 
@@ -25,8 +24,10 @@ export class Cell extends GameEntity {
         this.column = columnIndex
         this.flag = 0
         this.rect = createBoxRect(len, len)
-        this.pos.x = this.column * this.rect.w + (this.column + 1) * this.gutter
-        this.pos.y = this.row * this.rect.h + (this.row + 1) * this.gutter
+        // this.pos.x = this.column * this.rect.w + (this.column + 1) * this.gutter
+        // this.pos.y = this.row * this.rect.h + (this.row + 1) * this.gutter
+        this.pos.x = len / 2 + this.column * len + grid.contentRelateOffset.x
+        this.pos.y = len / 2 + this.row * len + grid.contentRelateOffset.y
         this.isOpen = false
         this.isMine = false
         this.count = 0
@@ -124,17 +125,17 @@ export class Cell extends GameEntity {
     }
     draw(ctx: CanvasRenderingContext2D): void {
         if (this.image !== undefined) {
-            ctx.drawImage(this.image.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
+            ctx.drawImage(this.image.texture, this.pos.x + this.offset.x - this.rect.w / 2, this.pos.y + this.offset.y - this.rect.h / 2, this.rect.w, this.rect.h)
         }
         this.drawFlag(ctx)
     }
     private drawFlag(ctx: CanvasRenderingContext2D) {
         let img = this.game.getTextureByName("flag")
         if (this.flag == 1) {
-            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
+            ctx.drawImage(img.texture, this.pos.x + this.offset.x - this.rect.w / 2, this.pos.y + this.offset.y - this.rect.h / 2, this.rect.w, this.rect.h)
         }
         if (this.grid.gameOver && this.isMine && !this.isOpen) {
-            ctx.drawImage(img.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
+            ctx.drawImage(img.texture, this.pos.x + this.offset.x - this.rect.w / 2, this.pos.y + this.offset.y - this.rect.h / 2, this.rect.w, this.rect.h)
         }
     }
 }

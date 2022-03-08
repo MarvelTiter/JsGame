@@ -6,6 +6,7 @@ import { Firework } from "./Firework"
 import { MineMapSize } from "./config"
 import { MouseArgs } from "../../gamebase/MouseArgs"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
+import { Vector2 } from "../../gamebase/data/Vector2"
 
 function PadLeft(v: string, len: number, char: string): string {
     if (v.length < len) {
@@ -27,7 +28,7 @@ export class Grid extends CustomObject {
     mineCount: number
     cellLen: number
     touchTimer: number | undefined
-    temp: Cell | undefined
+    contentRelateOffset: Vector2
     constructor(game: Game, sence: BaseSence, level: MineMapSize) {
         super(game, sence)
         this.row = level.row
@@ -39,14 +40,15 @@ export class Grid extends CustomObject {
         this.rect.w = this.column * level.len
         this.rect.h = this.row * level.len
         let { w, h } = this.sence.getWindowSize()
-        this.offset.x = (w - this.rect.w) / 2
         let marginTop = (h - this.rect.h) / 2
         if (marginTop < 50) {
-            marginTop = 50
-            this.sence.updateWindow(w, 150 + this.rect.h)
-            this.game.reSize(w, 150 + this.rect.h)
+            this.sence.updateWindow(w, 140 + this.rect.h)
+            this.game.reSize(w, 140 + this.rect.h)
+            this.offset.y = -20
         }
-        this.offset.y = marginTop
+        ;({ w, h } = this.sence.getWindowSize())
+        this.pos.set(w / 2, h / 2)
+        this.contentRelateOffset = new Vector2(this.pos.x - this.rect.w / 2, this.pos.y - this.rect.h / 2)
         this.mineCount = level.mineCount
         this.time = "00:00:00"
         this.timer = -1
@@ -148,8 +150,6 @@ export class Grid extends CustomObject {
                 cell.isOpen = true
             }
         }
-        // let overDialog = GameOverDialog.new(this.game, this.sence);
-        // this.sence.addElement(overDialog);
     }
 
     private openCell(temp: Cell) {
@@ -170,6 +170,7 @@ export class Grid extends CustomObject {
             this.flagCount--
         }
         if (this.onFlagChanged !== undefined) this.onFlagChanged(this)
+        this.checkWin()
     }
 
     private checkWin() {
@@ -186,8 +187,8 @@ export class Grid extends CustomObject {
     }
 
     private findCell(x: number, y: number): Cell | undefined {
-        let c = Math.floor((x - this.offset.x) / this.cellLen)
-        let r = Math.floor((y - this.offset.y) / this.cellLen)
+        let c = Math.floor((x - this.contentRelateOffset.x - this.offset.x) / this.cellLen)
+        let r = Math.floor((y - this.contentRelateOffset.y - this.offset.y) / this.cellLen)
         if (c > -1 && c < this.column && r > -1 && r < this.row) {
             return this.data[r][c]
         }
@@ -199,14 +200,17 @@ export class Grid extends CustomObject {
         for (let r = 0; r < this.row; r++) {
             for (let c = 0; c < this.column; c++) {
                 let temp = this.data[r][c]
-                temp.checkFocu(x, y)
+                if (temp.checkFocu(x, y)) {
+                    this.temp = temp
+                }
             }
         }
     }
-
+    temp: Cell | undefined
     public onClick(e: MouseArgs): void {
-        let { x, y, button, buttons } = e
-        let temp = this.findCell(x, y)
+        if (this.gameOver) return
+        let { button } = e
+        let temp = this.temp
         if (!temp) return
         if (this.game.device === DEVICE_MOBILE) {
             return
@@ -220,14 +224,14 @@ export class Grid extends CustomObject {
                 if (button == 2) {
                     this.makeFlag(temp)
                 }
-            } else if ((button = 2)) {
+            } else if (button == 2) {
                 temp.scan()
             }
         }
-        this.checkWin()
     }
 
     onTouchStart(e: MouseArgs[]): void {
+        if (this.gameOver) return
         let { x, y } = e[0]
         this.temp = this.findCell(x, y)
         if (this.temp === undefined) return
@@ -248,14 +252,14 @@ export class Grid extends CustomObject {
         if (this.touchTimer) {
             window.clearTimeout(this.touchTimer)
             this.touchTimer = undefined
-        }
-        if (!this.temp) {
-            return
-        }
-        if (!this.temp.isOpen) {
-            this.makeFlag(this.temp)
-        } else {
-            this.temp.scan()
+            if (!this.temp) {
+                return
+            }
+            if (!this.temp.isOpen) {
+                this.makeFlag(this.temp)
+            } else {
+                this.temp.scan()
+            }
         }
     }
     updateRequest(): boolean {
@@ -272,6 +276,9 @@ export class Grid extends CustomObject {
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = "rgba(0,0,0,0)"
-        ctx.fillRect(this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
+        let { x, y } = this.pos.copy().add(this.offset)
+        ctx.translate(x, y)
+        ctx.fillRect(-this.rect.w / 2, -this.rect.h / 2, this.rect.w, this.rect.h)
+        ctx.translate(-x, -y)
     }
 }

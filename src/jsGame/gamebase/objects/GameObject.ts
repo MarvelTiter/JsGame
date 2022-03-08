@@ -159,7 +159,9 @@ export abstract class GameObject implements IRectangle {
     }
 
     checkFocu(x: number, y: number) {
-        let isfocus = x - this.offset.x > this.pos.x && x - this.offset.x < this.pos.x + this.rect.w && y - this.offset.y > this.pos.y && y - this.offset.y < this.pos.y + this.rect.h
+        let centre = this.pos.copy().add(this.offset)
+        let { w, h } = this.rect
+        let isfocus = x > centre.x - w / 2 && x < centre.x + w / 2 && y > centre.y - h / 2 && y < centre.y + h / 2
         if (isfocus !== this.focus) {
             this.focus = isfocus
         }
