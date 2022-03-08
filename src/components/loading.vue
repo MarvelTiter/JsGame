@@ -44,7 +44,7 @@ let loadingText = computed(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     background-color: rgb(64, 149, 175);
     &.done {
         background-color: white;

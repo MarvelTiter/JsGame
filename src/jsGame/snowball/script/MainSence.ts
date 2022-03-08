@@ -47,46 +47,24 @@ export class MainSence extends BaseSence {
                         x: 100,
                         y: this.getWindowSize().h - 100,
                         events: {
-                            onTouchDown: () => {
-                                ball.turnTo = true
-                            },
-                            onTouchUp: () => {
-                                ball.turnTo = false
-                            },
                             onLeft: () => {
-                                ball.direction = -1
+                                ball.turn(-1)
                             },
                             onRight: () => {
-                                ball.direction = 1
+                                ball.turn(1)
                             }
                         }
                     }
                 ]
             })
         }
-        this.registerKeyAction(
-            "a",
-            () => {
-                ball.turnTo = true
-                ball.direction = -1
-            },
-            () => {
-                ball.turnTo = false
-            },
-            1
-        )
+        this.registerKeyAction("a", () => {
+            ball.turn(-1)
+        })
 
-        this.registerKeyAction(
-            "d",
-            () => {
-                ball.turnTo = true
-                ball.direction = 1
-            },
-            () => {
-                ball.turnTo = false
-            },
-            1
-        )
+        this.registerKeyAction("d", () => {
+            ball.turn(1)
+        })
     }
 
     createTree(num: number): Tree[] {

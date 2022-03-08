@@ -9,11 +9,9 @@ import { GameObject } from "../../../gamebase/objects/GameObject"
 import { Bullet } from "../bullet/bullet"
 import { Explosion, ExplosionSmoke } from "../effects/explosion"
 import { HpBar } from "./HpBar"
-
+type Direction = 1 | -1
 export abstract class TankBase extends GameEntity implements IHp {
     facing: Vector2
-    turnDirection: number = -1
-    forwardDirection: number = 1
     hpBar: HpBar
     constructor(game: Game, sence: BaseSence, defaultTank: string, x: number, y: number, facing: Vector2) {
         super(game, sence, "onlyObjects_retina")
@@ -41,17 +39,13 @@ export abstract class TankBase extends GameEntity implements IHp {
         return Vector2.new(0, -this.sprite.h / 2 - 10).add(this.pos)
     }
     //#endregion
-    moving: boolean = false
-    move() {
-        if (!this.moving) return
-        let power = this.forwardDirection * 1 * this.game.options.speedScale
+    move(direction: Direction) {
+        let power = direction * 1 * this.game.options.speedScale
         let pv = this.facing.copy().multi(power)
         this.rigidBody.applyForce(pv)
     }
-    turning: boolean = false
-    turn() {
-        if (!this.turning) return
-        this.rigidBody.applyTorque(this.turnDirection * 1.6 * this.game.options.torqueScale)
+    turn(direction: Direction) {
+        this.rigidBody.applyTorque(direction * 1.6 * this.game.options.torqueScale)
     }
     fireCooldown: number = 0
     calcCooldown: boolean = false
@@ -77,8 +71,6 @@ export abstract class TankBase extends GameEntity implements IHp {
         this.sence.removeElement(this)
     }
     update(delta: number, timeScale: number, correction: number): void {
-        this.move()
-        this.turn()
         if (this.calcCooldown && this.fireCooldown > 0) this.fireCooldown--
     }
     draw(ctx: CanvasRenderingContext2D): void {

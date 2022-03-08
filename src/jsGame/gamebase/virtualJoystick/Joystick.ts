@@ -68,6 +68,12 @@ export class Joystick extends GameObject {
         this.updateTouchPos(e)
     }
 
+    update(delta: number, timeScale: number, correction: number): void {
+        for (const p of this.parts) {
+            p.update()
+        }
+    }
+
     draw(ctx: CanvasRenderingContext2D) {
         let offset = this.sence.getWindowPos()
         for (const p of this.parts) {

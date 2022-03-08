@@ -11,8 +11,6 @@ interface SnowBallTail {
     degree: number
 }
 export class Ball extends CustomObject implements ITraceable {
-    direction: number = -1
-    turnTo: boolean = false
     degree: number = 0
     maxDegree: number = 50
     minDegree: number = -50
@@ -38,20 +36,17 @@ export class Ball extends CustomObject implements ITraceable {
             pos: this.pos
         }
     }
-
-    move() {
-        // 小球正在转向
-        if (this.turnTo && this.direction) {
-            // 递增旋转角度
-            this.degree = this.degree + (this.direction > 0 ? 1 : -1) * 1.6 // 增加一点转向灵敏度
-            // 限制最大、最小旋转角度
-            if (this.degree > this.maxDegree) {
-                this.degree = this.maxDegree
-            } else if (this.degree < this.minDegree) {
-                this.degree = this.minDegree
-            }
+    turn(direction: number) {
+        // 递增旋转角度
+        this.degree = this.degree + (direction > 0 ? 1 : -1) * 1.6 // 增加一点转向灵敏度
+        // 限制最大、最小旋转角度
+        if (this.degree > this.maxDegree) {
+            this.degree = this.maxDegree
+        } else if (this.degree < this.minDegree) {
+            this.degree = this.minDegree
         }
-
+    }
+    move() {
         const radian = (this.degree * Math.PI) / 180
         const offsetX = Math.sin(radian) * this.distance * this.game.options.speedScale
         const offsetY = Math.cos(radian) * this.distance * this.game.options.speedScale

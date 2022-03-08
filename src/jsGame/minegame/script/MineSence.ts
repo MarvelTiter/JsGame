@@ -79,21 +79,21 @@ export class MineSence extends BaseSence {
         // let over = GameOverDialog.new(this.game, this);
         // this.addElement(over);
         let { w, h } = this.getWindowSize()
-
+        let scale = this.game.device === "MOBILE" ? 0.6 : 1
         let restartButton = new Button(this.game, this, "button", "重新开始")
-        restartButton.pos.x = w - restartButton.rect.w / 2 - 20
-        restartButton.pos.y = h - restartButton.rect.h / 2 - 20
-        restartButton.onClick = () => {            
-            this.game.setSence(new MineSence(this.game, this.level))         
+        restartButton.rect.scale!(scale)
+        restartButton.pos.x = w / 2 - restartButton.rect.w / 2 - 10
+        restartButton.pos.y = h - restartButton.rect.h / 2 - 50
+        restartButton.onClick = () => {
+            this.game.setSence(new MineSence(this.game, this.level))
         }
         this.addElement(restartButton)
-        let homeBtn = new Button(this.game, this, "button", "主页")
-        homeBtn.pos.x = restartButton.pos.x - restartButton.rect.w - 20
+        let homeBtn = new Button(this.game, this, "button", "返回")
+        homeBtn.rect.scale!(scale)
+        homeBtn.pos.x = w / 2 + homeBtn.rect.w / 2 + 10
         homeBtn.pos.y = restartButton.pos.y
-        homeBtn.canDraw = () => {
-            return this.grid.gameOver
-        }
         homeBtn.onClick = () => {
+            this.game.areaSetup()
             this.game.setSence(new StartSence(this.game))
         }
         this.addElement(homeBtn)
@@ -102,14 +102,14 @@ export class MineSence extends BaseSence {
         let self = this
         this.registerKeyAction(
             "a",
-            function (status) {
+            () => {
                 self.grid.randomOpen()
             },
             1
         )
         this.registerKeyAction(
             "m",
-            function (status) {
+            () => {
                 self.grid.openSafe()
             },
             1

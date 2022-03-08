@@ -1,6 +1,6 @@
 import { Vector2 } from "../data/Vector2"
 import { JoystickPart } from "./JoystickPart"
-import { JoyPosition, JoystickBgColor, JoystickBoxRadius, JoystickColor, JoystickRadius } from "./Joystick"
+import { JoyPosition, JoystickBgColor, JoystickBoxRadius, JoystickColor, JoystickRadius } from "./JoystickDefType"
 
 /**
  * 摇杆部件
@@ -17,6 +17,7 @@ export class JoystickRocker extends JoystickPart {
         if (!this.active) return
         let { x, y } = this.touchPos!.copy().sub(this.pos)
         let angle = Math.atan2(y, x)
+
         if (-Math.PI / 4 < angle && angle < Math.PI / 4) {
             // 指向右边
             this.onRight?.call(null)

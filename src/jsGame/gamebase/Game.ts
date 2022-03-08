@@ -96,11 +96,9 @@ export class Game {
             if (this.sence) this.sence.handleTouchMove(e)
         })
         this.canvas.addEventListener("touchend", (e: TouchEvent) => {
-            e.preventDefault()
             if (this.sence) this.sence.handleTouchEnd(e)
         })
         this.canvas.addEventListener("touchcancel", (e: TouchEvent) => {
-            e.preventDefault()
             if (this.sence) this.sence.handleTouchEnd(e)
         })
         window.addEventListener("keydown", (e: KeyboardEvent) => {

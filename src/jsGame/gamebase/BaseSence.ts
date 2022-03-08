@@ -1,10 +1,8 @@
 import { Camera } from "./Camera"
 import { collides } from "./collision/collides"
-import { Bound } from "./data/Bound"
 import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
 import { GameObject } from "./objects/GameObject"
-import { Contact } from "./collision/Contact"
 import { ContactManage } from "./collision/ContactManage"
 import { CollisionInfo } from "./collision/CollisionInfo"
 import { RigidBase } from "./rigid/RigidBase"
@@ -16,6 +14,9 @@ import { JoystickSetting } from "./virtualJoystick/JoystickSetting"
 import { MouseArgs } from "./MouseArgs"
 type actionTimes = 0 | 1
 export interface ObjectAction {
+    status: boolean
+    handled: boolean
+    times: actionTimes
     down: () => void
     up?: () => void
 }
@@ -35,7 +36,7 @@ export abstract class BaseSence {
     private rigidElements: Map<string, RigidBase>
     private elementMap: Map<string, GameObject>
     private requiredUpdateCache: boolean = false
-    private keys: Map<string, KeyStatus>
+    private keys: Map<string, string>
     private actions: Map<string, ObjectAction>
     // onceAction: Map<string, ObjectAction>;
 
@@ -60,7 +61,7 @@ export abstract class BaseSence {
         return this._enableJoystick
     }
 
-    public configJoystick(options: JoystickSetting): void {        
+    public configJoystick(options: JoystickSetting): void {
         this._joystick = new Joystick(this.game, this, options)
         this._enableJoystick = true
     }
@@ -82,7 +83,7 @@ export abstract class BaseSence {
         this._ContactsMag = new ContactManage()
         this.elementMap = new Map<string, GameObject>()
         this.rigidElements = new Map<string, RigidBase>()
-        this.keys = new Map<string, KeyStatus>()
+        this.keys = new Map<string, string>()
         this.actions = new Map<string, ObjectAction>()
     }
 
@@ -168,9 +169,9 @@ export abstract class BaseSence {
     public handleTouchStart(e: TouchEvent): void {
         let touches = this.getTouches(e)
         if (this.enableJoystick) {
+            e.preventDefault()
             if (this.joystick.checkFocu(touches[0].x, touches[0].y)) {
                 this.aidElement = this.joystick
-                e.preventDefault()
                 this.joystick.onTouchStart(touches)
                 return
             }
@@ -199,21 +200,24 @@ export abstract class BaseSence {
 
     public handleKeydown(e: KeyboardEvent): void {
         this.keydown = true
-        let ks = this.keys.get(e.key)
+        let ks = this.actions.get(e.key)
         if (ks === undefined || ks.status) {
             return
         }
+        this.keys.set(e.key, e.key)
         ks.status = true
         ks.handled = false
     }
 
     public handleKeyup(e: KeyboardEvent): void {
-        this.keydown = false
-        let ks = this.keys.get(e.key)
+        let ks = this.actions.get(e.key)
         if (ks === undefined) {
             return
         }
+
         this.actions.get(e.key)!.up?.call(null)
+        this.keys.delete(e.key)
+        this.keydown = this.keys.size !== 0
         ks.status = false
         ks.handled = true
     }
@@ -223,13 +227,11 @@ export abstract class BaseSence {
      * @param callback 按键回调函数
      * @param times 0按住触发，1按下触发一次
      */
-    public registerKeyAction(key: string, down: () => void, up?: () => void, times: actionTimes = 0): void {
-        this.keys.set(key, {
-            status: false,
-            times: times,
-            handled: true
-        })
+    public registerKeyAction(key: string, down: () => void, times: actionTimes = 0, up?: () => void): void {
         this.actions.set(key, {
+            status: false,
+            handled: false,
+            times: times,
             down: down,
             up: up
         })
@@ -246,6 +248,11 @@ export abstract class BaseSence {
 
     public getWindowSize(): IRect {
         return this.camera.window
+    }
+
+    public updateWindow(w: number, h: number) {
+        this._camera!.window.w = w
+        this._camera!.window.h = h
     }
 
     public outOfWindow(obj: GameObject): boolean {
@@ -282,14 +289,12 @@ export abstract class BaseSence {
 
     private handleKeyboardEvents(): void {
         if (this.keydown) {
-            for (const actionKey of this.actions.keys()) {
-                let ks = this.keys.get(actionKey)!
-                if (ks.handled) continue
-                if (ks.status) {
-                    let f = this.actions.get(actionKey)!
-                    f.down()
-                    if (ks.times == 1) {
-                        ks.handled = true
+            for (const action of this.actions.values()) {
+                if (action.handled) continue
+                if (action.status) {
+                    action.down()
+                    if (action.times == 1) {
+                        action.handled = true
                     }
                 }
             }
@@ -377,6 +382,7 @@ export abstract class BaseSence {
         this.timing.timestamp += delta * this.timing.timeScale
         // 处理按键事件
         this.handleKeyboardEvents()
+        if (this.enableJoystick) this.joystick.update(delta, this.timing.timeScale, correction)
         this.applyGravity(this.rigidsCache)
         for (const e of this.elements.values()) {
             e.elementUpdate(delta, this.timing.timeScale, correction)

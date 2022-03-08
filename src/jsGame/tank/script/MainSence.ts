@@ -36,49 +36,61 @@ export class MainSence extends BaseSence {
         this.addElement(top)
         this.addElement(right)
         this.addElement(bottom)
-      
-        this.registerKeyAction(
-            "a",
-            () => {
-                player.turnDirection = -1
-                // player.turn()
-                player.turning = true
-            },
-            () => (player.turning = false)
-        )
-        this.registerKeyAction(
-            "d",
-            () => {
-                player.turnDirection = 1
-                // player.turn()
-                player.turning = true
-            },
-            () => (player.turning = false)
-        )
-        this.registerKeyAction(
-            "w",
-            () => {
-                player.forwardDirection = 1
-                // player.move()
-                player.moving = true
-            },
-            () => (player.moving = false)
-        )
-        this.registerKeyAction(
-            "s",
-            () => {
-                player.forwardDirection = -1
-                // player.move()
-                player.moving = true
-            },
-            () => (player.moving = false)
-        )
+
+        if (this.game.device === "MOBILE")
+            this.configJoystick({
+                Left: [
+                    {
+                        type: "Stick",
+                        x: 100,
+                        y: this.getWindowSize().h - 100,
+                        events: {
+                            onTop: () => {
+                                player.move(1)
+                            },
+                            onDown: () => {
+                                player.move(-1)
+                            },
+                            onLeft: () => {
+                                player.turn(-1)
+                            },
+                            onRight: () => {
+                                player.turn(1)
+                            }
+                        }
+                    }
+                ],
+                Right: [
+                    {
+                        type: "Button",
+                        x: this.getWindowSize().w - 100,
+                        y: this.getWindowSize().h - 100,
+                        events: {
+                            onButtonA: () => {
+                                player.fire()
+                            }
+                        }
+                    }
+                ]
+            })
+
+        this.registerKeyAction("a", () => {
+            player.turn(-1)
+        })
+        this.registerKeyAction("d", () => {
+            player.turn(1)
+        })
+        this.registerKeyAction("w", () => {
+            player.move(1)
+        })
+        this.registerKeyAction("s", () => {
+            player.move(-1)
+        })
         this.registerKeyAction(
             " ",
             () => {
                 player.fire()
             },
-            undefined,
             1
         )
     }

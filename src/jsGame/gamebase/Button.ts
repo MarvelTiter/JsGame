@@ -28,7 +28,7 @@ export class Button extends GameEntity {
         ctx.fillStyle = "white"
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
-        ctx.font = "24px serif"
+        ctx.font = "18px serif"
         ctx.fillText(this.text, x, y)
     }
 }

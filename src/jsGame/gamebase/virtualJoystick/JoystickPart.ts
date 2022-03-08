@@ -8,8 +8,7 @@ export abstract class JoystickPart {
     position: JoyPosition
     active: boolean
     joyType: JoyType
-    onTouchDown?: () => void
-    onTouchUp?: () => void
+    once: boolean = false
     constructor(x: number, y: number, position: JoyPosition, type: JoyType) {
         this.pos = new Vector2(x, y)
         this.position = position
@@ -18,22 +17,25 @@ export abstract class JoystickPart {
     }
     updateTouchPos(e: MouseArgs | undefined) {
         if (e === undefined) {
-            if (this.joyType === "Stick") this.onTouchUp?.call(null)
             this.touchPos = undefined
             this.active = false
         } else {
-            if (this.checkFocu(e.x, e.y)) {
-                if (this.touchPos === undefined) {
-                    if (this.joyType === "Stick") this.onTouchDown?.call(null)
-                    this.touchPos = new Vector2(e.x, e.y)
-                } else this.touchPos.set(e.x, e.y)
+            this.active = true
+            if (this.touchPos === undefined) {
+                this.touchPos = new Vector2(e.x, e.y)
                 this.handleTouch()
+            } else {
+                this.touchPos.set(e.x, e.y)
+                if (!this.once) this.handleTouch()
             }
         }
     }
     checkFocu(x: number, y: number): boolean {
         this.active = Vector2.new(x, y).sub(this.pos).length() < JoystickBoxRadius
         return this.active
+    }
+    update() {
+        this.handleTouch()
     }
     abstract draw(ctx: CanvasRenderingContext2D, offset: Vector2): void
     abstract handleTouch(): void

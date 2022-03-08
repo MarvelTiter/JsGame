@@ -33,17 +33,18 @@ export class Grid extends CustomObject {
         this.row = level.row
         this.column = level.column
         if (this.game.device === DEVICE_MOBILE) {
-            level.len = document.body.clientWidth / 12
+            level.len = this.sence.getWindowSize().w / 12
         }
         this.cellLen = level.len
         this.rect.w = this.column * level.len
         this.rect.h = this.row * level.len
         let { w, h } = this.sence.getWindowSize()
-        this.offset.x = (w - this.column * this.cellLen) / 2
-        let marginTop = (h - this.row * this.cellLen) / 2
+        this.offset.x = (w - this.rect.w) / 2
+        let marginTop = (h - this.rect.h) / 2
         if (marginTop < 50) {
             marginTop = 50
-            this.game.reSize(w, 100 + this.row * this.cellLen)
+            this.sence.updateWindow(w, 150 + this.rect.h)
+            this.game.reSize(w, 150 + this.rect.h)
         }
         this.offset.y = marginTop
         this.mineCount = level.mineCount
@@ -85,7 +86,6 @@ export class Grid extends CustomObject {
                 let cell = new Cell(this.game, this.sence, this, r, c, this.cellLen)
                 cell.offset = this.offset
                 row.push(cell)
-
                 this.sence.addElement(cell)
             }
             this.data.push(row)

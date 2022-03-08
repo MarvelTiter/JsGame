@@ -32,7 +32,15 @@ let goBack = () => {
   justify-content: center;
   align-items: center;
   border-radius: 20px;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
+}
+* {
+  -moz-user-select: none;
+  -o-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>
