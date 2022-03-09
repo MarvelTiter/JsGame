@@ -1,6 +1,7 @@
 import { BaseSence } from "./BaseSence"
 import { Game } from "./Game"
 import { GameEntity } from "./entities/GameEntity"
+import { CanvasContext } from "./types/DefineType"
 
 export class Button extends GameEntity {
     text: string
@@ -19,7 +20,8 @@ export class Button extends GameEntity {
         }
         return this.focus
     }
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(context: CanvasContext): void {
+        let ctx = context.ui
         let x = this.pos.x + this.offset.x
         let y = this.pos.y + this.offset.y
         // ctx.fillStyle = "rgba(0,0,0,0.3)";

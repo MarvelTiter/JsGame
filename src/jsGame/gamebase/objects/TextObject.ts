@@ -2,6 +2,7 @@ import { BaseSence } from "../BaseSence"
 import { GameObject } from "./GameObject"
 import { Game } from "../Game"
 import { Vector2 } from "../data/Vector2"
+import { CanvasContext } from "../types/DefineType"
 
 /**
  * 文本对象
@@ -20,7 +21,8 @@ export class TextObject extends GameObject {
         this.color = "black"
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(context: CanvasContext) {
+        let ctx = context.game
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
         ctx.fillStyle = this.background

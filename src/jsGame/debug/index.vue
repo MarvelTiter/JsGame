@@ -1,7 +1,7 @@
 <template>
   <div style="text-align: center">
     <Loading :percent="percent">
-      <canvas id="canvas"></canvas>
+      <div id="container"></div>
     </Loading>
     <Debug></Debug>
   </div>
@@ -27,7 +27,7 @@ onMounted(async () => {
     attack_effect: `/sprites/plane/attack_effect.json`,
   }
   let sources = await loadSprites(images, scripts, (c, t) => percent.value = c / t)
-  let g = new Game(sources, {
+  let g = new Game("container", sources, {
     enableCollide: true, enableGravity: true
   });
   let ms = new MainSence(g);

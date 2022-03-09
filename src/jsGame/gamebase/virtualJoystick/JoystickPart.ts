@@ -38,6 +38,6 @@ export abstract class JoystickPart {
         if (!this.active) return
         this.handleTouch()
     }
-    abstract draw(ctx: CanvasRenderingContext2D, offset: Vector2): void
+    abstract draw(ctx: CanvasRenderingContext2D): void
     abstract handleTouch(): void
 }

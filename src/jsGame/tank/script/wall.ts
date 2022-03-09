@@ -3,6 +3,7 @@ import { createBoxRect } from "../../gamebase/data/Rect"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
 import { Game } from "../../gamebase/Game"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
+import { CanvasContext } from "../../gamebase/types/DefineType"
 type Position = "LEFT" | "TOP" | "RIGHT" | "BOTTOM"
 const WallWidth = 56
 export class Wall extends GameEntity {
@@ -26,7 +27,8 @@ export class Wall extends GameEntity {
         })
     }
     pattern: CanvasPattern | undefined
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(context: CanvasContext): void {
+        let ctx = context.game
         if (this.pattern === undefined) this.pattern = ctx.createPattern(this.image.texture, "repeat")!
         ctx.fillStyle = this.pattern
         // 不能用 translate, 否则 pattern 也会 translate

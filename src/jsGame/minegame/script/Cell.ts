@@ -4,6 +4,7 @@ import { Grid } from "./Grid"
 import { Bound } from "../../gamebase/data/Bound"
 import { createBoxRect } from "../../gamebase/data/Rect"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
+import { CanvasContext } from "../../gamebase/types/DefineType"
 
 export class Cell extends GameEntity {
     gutter: number
@@ -123,7 +124,8 @@ export class Cell extends GameEntity {
         }
         this.setTexture(name)
     }
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(context: CanvasContext): void {
+        let ctx = context.game
         if (this.image !== undefined) {
             ctx.drawImage(this.image.texture, this.pos.x + this.offset.x - this.rect.w / 2, this.pos.y + this.offset.y - this.rect.h / 2, this.rect.w, this.rect.h)
         }

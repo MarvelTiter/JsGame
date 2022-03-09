@@ -1,5 +1,5 @@
 <template>
-    <div id="container" :class="visible ? '' : 'done'">
+    <div id="loading-container" :class="visible ? '' : 'done'">
         <div id="process" :class="visible ? '' : 'done'">
             <h3>资源加载中</h3>
             <div id="process-bound">
@@ -38,7 +38,7 @@ let loadingText = computed(() => {
 
 </script>
 <style lang="scss">
-#container {
+#loading-container {
     text-align: center;
     position: relative;
     display: flex;

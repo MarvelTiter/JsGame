@@ -7,6 +7,7 @@ import { RigidBase } from "../rigid/RigidBase"
 import { Contact } from "../collision/Contact"
 import { IRectangle, IRect, createBoxRect } from "../data/Rect"
 import { ISolveCollide } from "../interfaces/ISolveCollide"
+import { CanvasContext } from "../types/DefineType"
 // export function observe(data: any) {
 //     if (!data || typeof data !== "object") {
 //         return
@@ -202,7 +203,7 @@ export abstract class GameObject implements IRectangle {
     update(delta: number, timeScale: number, correction: number) {}
 
     // 子类复写
-    draw(ctx: CanvasRenderingContext2D) {}
+    draw(ctx: CanvasContext) {}
 
     // sence调用
     elementUpdate(delta: number, timeScale: number, correction: number) {
@@ -214,7 +215,7 @@ export abstract class GameObject implements IRectangle {
     }
 
     // sence调用
-    elementDraw(ctx: CanvasRenderingContext2D) {
+    elementDraw(ctx: CanvasContext) {
         if (!this.canDraw()) return
         this.draw(ctx)
     }

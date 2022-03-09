@@ -33,8 +33,8 @@ export class JoystickRocker extends JoystickPart {
             this.onDown?.call(null)
         }
     }
-    draw(ctx: CanvasRenderingContext2D, offset: Vector2): void {
-        let sencePos = this.pos.copy().add(offset)
+    draw(ctx: CanvasRenderingContext2D): void {
+        let sencePos = this.pos
         // 摇杆背景圈圈
         ctx.fillStyle = JoystickBgColor
         ctx.beginPath()
@@ -48,7 +48,7 @@ export class JoystickRocker extends JoystickPart {
             if (f.length() > JoystickBoxRadius) {
                 f.normalize().multi(JoystickBoxRadius)
             }
-            let { x, y } = f.add(this.pos).add(offset)
+            let { x, y } = f.add(this.pos)
             ctx.fillStyle = JoystickColor
             ctx.beginPath()
             ctx.arc(x, y, JoystickRadius, 0, Math.PI * 2)

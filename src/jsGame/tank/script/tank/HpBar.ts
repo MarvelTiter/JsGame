@@ -2,6 +2,7 @@ import { BaseSence } from "../../../gamebase/BaseSence"
 import { Game } from "../../../gamebase/Game"
 import { IHp } from "../../../gamebase/interfaces/IHp"
 import { CustomObject } from "../../../gamebase/objects/CustomObject"
+import { CanvasContext } from "../../../gamebase/types/DefineType"
 
 export class HpBar {
     owner: IHp
@@ -9,7 +10,8 @@ export class HpBar {
     constructor(owner: IHp) {
         this.owner = owner
     }
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(context: CanvasContext): void {
+        let ctx = context.game
         let { x, y } = this.owner.getPos()
         let w = this.owner.barWidth
         let h = this.owner.barHeight

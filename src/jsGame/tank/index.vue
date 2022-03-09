@@ -1,6 +1,6 @@
 <template>
   <Loading :percent="percent">
-    <canvas id="canvas"></canvas>
+    <div id="container"></div>
   </Loading>
   <Debug></Debug>
 </template>
@@ -34,7 +34,7 @@ onMounted(async () => {
   let sources = await loadSprites(images, scripts, (c, t) => {
     percent.value = c / t
   })
-  game = new Game(sources, {
+  game = new Game("container", sources, {
     enableCollide: true
   });
   let ms = new MainSence(game)

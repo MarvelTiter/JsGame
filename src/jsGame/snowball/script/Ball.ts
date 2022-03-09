@@ -5,6 +5,7 @@ import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
 import { CircleRigid } from "../../gamebase/rigid/CircleRigid"
+import { CanvasContext } from "../../gamebase/types/DefineType"
 interface SnowBallTail {
     x: number
     y: number
@@ -72,7 +73,8 @@ export class Ball extends CustomObject implements ITraceable {
         }
     }
 
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(context: CanvasContext): void {
+        let ctx = context.game
         {
             // 绘制小球尾巴
             const tailListsLength = this.tailList.length

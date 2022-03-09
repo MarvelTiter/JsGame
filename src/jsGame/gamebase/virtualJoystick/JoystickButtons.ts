@@ -41,8 +41,8 @@ export class JoystickButtons extends JoystickPart {
         }
     }
     update(): void {}
-    draw(ctx: CanvasRenderingContext2D, offset: Vector2): void {
-        let sencePos = this.pos.copy().add(offset)
+    draw(ctx: CanvasRenderingContext2D): void {
+        let sencePos = this.pos
         // 摇杆背景圈圈
         ctx.fillStyle = JoystickBgColor
         ctx.beginPath()

@@ -1,6 +1,6 @@
 <template>
   <Loading :percent="percent">
-    <canvas id="canvas"></canvas>
+    <div id="container"></div>
   </Loading>
 </template>
 
@@ -49,12 +49,12 @@ onMounted(async () => {
     percent.value = c / t
 
   })
-  game = new Game(sources);
+  game = new Game("container", sources);
   let ms = new StartSence(game);
   game.setSence(ms);
   game.run();
 });
-onUnmounted(() => {  
+onUnmounted(() => {
   game!.clear()
   game = undefined
 })

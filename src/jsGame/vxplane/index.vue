@@ -1,6 +1,6 @@
 <template>
   <Loading :percent="percent">
-    <canvas id="canvas"></canvas>
+    <div id="container"></div>
   </Loading>
   <Debug></Debug>
 </template>
@@ -15,12 +15,12 @@ import Loading from "../../components/loading.vue";
 let percent = ref(0)
 onMounted(async () => {
   let images = {
-    
+
   }
   let sources = await loadSprites(images, {}, (c, t) => {
     percent.value = c / t
   })
-  let g = new Game(sources, {
+  let g = new Game("container", sources, {
     enableCollide: true
   });
 });

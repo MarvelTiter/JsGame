@@ -22,7 +22,7 @@
 //         return this._center
 //     }
 
-//     draw(ctx: CanvasRenderingContext2D): void {
+//     draw(context: CanvasContext): void {
 //         ctx.drawImage(this.image.texture, this.pos.x + this.offset.x, this.pos.y + this.offset.y, this.rect.w, this.rect.h)
 //     }
 // }

@@ -8,6 +8,7 @@ import { JoystickPart } from "./JoystickPart"
 import { JoystickRocker } from "./JoystickRocker"
 import { JoystickButtons } from "./JoystickButtons"
 import { JoyStruct } from "./JoyStruct"
+import { CanvasContext } from "../types/DefineType"
 
 export class Joystick extends GameObject {
     window: IRect
@@ -52,10 +53,9 @@ export class Joystick extends GameObject {
         }
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
-        let offset = this.sence.getWindowPos()
+    draw(context: CanvasContext) {
         for (const p of this.parts) {
-            p.draw(ctx, offset)
+            p.draw(context.ui)
         }
     }
 }

@@ -5,6 +5,7 @@ import { Game } from "../../../gamebase/Game"
 import { GameObject } from "../../../gamebase/objects/GameObject"
 import { Bullet } from "../bullet/bullet"
 import { TankBase } from "./tankBase"
+import { dir } from "console"
 
 export class PlayerTank extends TankBase implements ITraceable {
     // barrel:GameObject
@@ -20,6 +21,10 @@ export class PlayerTank extends TankBase implements ITraceable {
     }
 
     moveDirectly(direction: Vector2, scale: number) {
+        // let cross = this.facing.cross(direction.normalize())
+        // if (Math.abs(cross) > 0.2) {
+        //     this.turn(Math.sign(cross))
+        // }
         let angleDif = this.facing.includedAngle(direction)
         this.facing.rotate(angleDif)
         this.rigidBody.setAngle(direction.angle() - Math.PI / 2)
@@ -32,5 +37,7 @@ export class PlayerTank extends TankBase implements ITraceable {
         // 素材原因，坦克与子弹相差 180°
         return new Bullet(this.game, this.sence, "bulletGreen3_outline", p.x, p.y, this.angle + Math.PI, this.facing.copy(), 1, this.group)
     }
-    onCollide(other: GameObject): void {}
+    onCollide(other: GameObject): void {
+        this.remain -= 1
+    }
 }

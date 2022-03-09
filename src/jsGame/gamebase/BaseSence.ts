@@ -12,6 +12,7 @@ import { IRect } from "./data/Rect"
 import { Joystick } from "./virtualJoystick/Joystick"
 import { MouseArgs } from "./MouseArgs"
 import { JoyStruct } from "./virtualJoystick/JoyStruct"
+import { CanvasContext } from "./types/DefineType"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     status: boolean
@@ -264,15 +265,16 @@ export abstract class BaseSence {
 
     public update(): void {}
 
-    public draw(ctx: CanvasRenderingContext2D): void {
+    public draw(context: CanvasContext): void {
         for (const e of this.elements.values()) {
-            e.elementDraw(ctx)
+            e.elementDraw(context)
             if (window.Debug && e.IsRigid) {
                 let c = e.rigidBody
-                c.drawDebug(ctx)
+                c.drawDebug(context)
             }
         }
         if (window.Debug) {
+            let ctx = context.game
             for (const c of this.ContactsMag.list) {
                 if (!c.collision.collided) continue
                 for (const p of c.collision.supports) {
@@ -284,7 +286,7 @@ export abstract class BaseSence {
                 }
             }
         }
-        if (this.enableJoystick) this.joystick!.draw(ctx)
+        if (this.enableJoystick) this.joystick!.draw(context)
     }
 
     private handleKeyboardEvents(): void {

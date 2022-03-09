@@ -7,6 +7,7 @@ import { MineMapSize } from "./config"
 import { MouseArgs } from "../../gamebase/MouseArgs"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
 import { Vector2 } from "../../gamebase/data/Vector2"
+import { CanvasContext } from "../../gamebase/types/DefineType"
 
 function PadLeft(v: string, len: number, char: string): string {
     if (v.length < len) {
@@ -274,7 +275,8 @@ export class Grid extends CustomObject {
     //   console.log("fire");
     // }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(context: CanvasContext) {
+        let ctx = context.game
         ctx.fillStyle = "rgba(0,0,0,0)"
         let { x, y } = this.pos.copy().add(this.offset)
         ctx.translate(x, y)

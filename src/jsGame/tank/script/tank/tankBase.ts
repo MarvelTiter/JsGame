@@ -6,10 +6,11 @@ import { GameEntity } from "../../../gamebase/entities/GameEntity"
 import { Game } from "../../../gamebase/Game"
 import { IHp } from "../../../gamebase/interfaces/IHp"
 import { GameObject } from "../../../gamebase/objects/GameObject"
+import { CanvasContext } from "../../../gamebase/types/DefineType"
 import { Bullet } from "../bullet/bullet"
 import { Explosion, ExplosionSmoke } from "../effects/explosion"
 import { HpBar } from "./HpBar"
-type Direction = 1 | -1
+export type Direction = 1 | -1
 export abstract class TankBase extends GameEntity implements IHp {
     facing: Vector2
     hpBar: HpBar
@@ -39,12 +40,12 @@ export abstract class TankBase extends GameEntity implements IHp {
         return Vector2.new(0, -this.sprite.h / 2 - 10).add(this.pos)
     }
     //#endregion
-    move(direction: Direction) {
+    move(direction: number) {
         let power = direction * 1 * this.game.options.speedScale
         let pv = this.facing.copy().multi(power)
         this.rigidBody.applyForce(pv)
     }
-    turn(direction: Direction) {
+    turn(direction: number) {
         this.rigidBody.applyTorque(direction * 1.6 * this.game.options.torqueScale)
     }
     fireCooldown: number = 0
@@ -73,7 +74,7 @@ export abstract class TankBase extends GameEntity implements IHp {
     update(delta: number, timeScale: number, correction: number): void {
         if (this.calcCooldown && this.fireCooldown > 0) this.fireCooldown--
     }
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(ctx: CanvasContext): void {
         super.draw(ctx)
         this.hpBar.draw(ctx)
     }

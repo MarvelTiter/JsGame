@@ -5,6 +5,7 @@ import { createBoxRect, IRect } from "./data/Rect"
 import { createOption, defaultOption, options } from "./GameOptions"
 import { GameObject } from "./objects/GameObject"
 import { GameImage } from "./Source"
+import { CanvasContext } from "./types/DefineType"
 
 export const RESET = 0x0000
 export const MOUSE_MOVE = 0x0001
@@ -28,18 +29,40 @@ declare global {
 }
 window.Update = []
 export class Game {
-    canvas: HTMLCanvasElement
-    context: CanvasRenderingContext2D
-    enableMouseAction: boolean
+    gameCanvas: HTMLCanvasElement
+    gameContext: CanvasRenderingContext2D
+    UICanvas: HTMLCanvasElement
+    UIContext: CanvasRenderingContext2D
     images: Map<string, GameImage>
     sence!: BaseSence
     area!: IRect
     device: DEVICE = DEVICE_PC
     options: options
-    constructor(images: Map<string, GameImage>, opts?: Partial<options>, area?: IRect) {
-        this.canvas = document.querySelector("#canvas") as HTMLCanvasElement
-        this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D
-        this.enableMouseAction = false
+    container: HTMLDivElement
+    public get context(): CanvasContext {
+        return {
+            game: this.gameContext,
+            ui: this.UIContext
+        }
+    }
+    constructor(dom: string | HTMLDivElement, images: Map<string, GameImage>, opts?: Partial<options>, area?: IRect) {
+        if (dom instanceof HTMLDivElement) {
+            this.container = dom
+        } else {
+            this.container = document.querySelector("#" + dom) as HTMLDivElement
+        }
+        this.gameCanvas = document.createElement("canvas") as HTMLCanvasElement
+        this.gameContext = this.gameCanvas.getContext("2d") as CanvasRenderingContext2D
+        this.UICanvas = document.createElement("canvas") as HTMLCanvasElement
+        this.UIContext = this.UICanvas.getContext("2d") as CanvasRenderingContext2D
+        this.gameCanvas.style.position = "absolute"
+        this.gameCanvas.style.left = "0"
+        this.gameCanvas.style.top = "0"
+        this.UICanvas.style.position = "absolute"
+        this.UICanvas.style.left = "0"
+        this.UICanvas.style.top = "0"
+        this.container.appendChild(this.gameCanvas)
+        this.container.appendChild(this.UICanvas)
         this.images = images
         this.areaSetup(area)
         this.options = createOption(opts || {})
@@ -61,11 +84,13 @@ export class Game {
             h = getActualPixel(window.document.body.clientHeight)
         }
         this.area = area ?? createBoxRect(w, h)
-        this.canvas.width = this.area.w
-        this.canvas.height = this.area.h
+        this.gameCanvas.width = this.area.w
+        this.gameCanvas.height = this.area.h
+        this.UICanvas.width = this.area.w
+        this.UICanvas.height = this.area.h
     }
     eventSetup() {
-        this.canvas.addEventListener("mouseover", (e: MouseEvent) => {
+        this.container.addEventListener("mouseover", (e: MouseEvent) => {
             e.preventDefault()
             let handleMouseMove = (event: MouseEvent) => {
                 event.preventDefault()
@@ -78,27 +103,27 @@ export class Game {
                 this.sence.handleMouseup(event)
             }
             let handleMoveout = (event: MouseEvent) => {
-                this.canvas.removeEventListener("mousemove", handleMouseMove)
-                this.canvas.removeEventListener("mouseout", handleMoveout)
-                this.canvas.removeEventListener("mousedown", handleMouseDown)
-                this.canvas.removeEventListener("mouseup", handleMouseUp)
+                this.container.removeEventListener("mousemove", handleMouseMove)
+                this.container.removeEventListener("mouseout", handleMoveout)
+                this.container.removeEventListener("mousedown", handleMouseDown)
+                this.container.removeEventListener("mouseup", handleMouseUp)
             }
-            this.canvas.addEventListener("mousemove", handleMouseMove)
-            this.canvas.addEventListener("mousedown", handleMouseDown)
-            this.canvas.addEventListener("mouseup", handleMouseUp)
-            this.canvas.addEventListener("mouseout", handleMoveout)
+            this.container.addEventListener("mousemove", handleMouseMove)
+            this.container.addEventListener("mousedown", handleMouseDown)
+            this.container.addEventListener("mouseup", handleMouseUp)
+            this.container.addEventListener("mouseout", handleMoveout)
         })
 
-        this.canvas.addEventListener("touchstart", (e: TouchEvent) => {
+        this.container.addEventListener("touchstart", (e: TouchEvent) => {
             if (this.sence) this.sence.handleTouchStart(e)
         })
-        this.canvas.addEventListener("touchmove", (e: TouchEvent) => {
+        this.container.addEventListener("touchmove", (e: TouchEvent) => {
             if (this.sence) this.sence.handleTouchMove(e)
         })
-        this.canvas.addEventListener("touchend", (e: TouchEvent) => {
+        this.container.addEventListener("touchend", (e: TouchEvent) => {
             if (this.sence) this.sence.handleTouchEnd(e)
         })
-        this.canvas.addEventListener("touchcancel", (e: TouchEvent) => {
+        this.container.addEventListener("touchcancel", (e: TouchEvent) => {
             if (this.sence) this.sence.handleTouchEnd(e)
         })
         window.addEventListener("keydown", (e: KeyboardEvent) => {

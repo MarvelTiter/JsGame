@@ -4,6 +4,7 @@ import { Contact } from "../collision/Contact"
 import { RectRigid } from "./RectRigid"
 import { RigidBase } from "./RigidBase"
 import { TriangleRigid } from "./TriangleRigid"
+import { CanvasContext } from "../types/DefineType"
 
 export class CircleRigid extends RigidBase {
     private _radius: number
@@ -31,7 +32,8 @@ export class CircleRigid extends RigidBase {
         }
     }
 
-    drawDebug(ctx: CanvasRenderingContext2D): void {
+    drawDebug(context: CanvasContext): void {
+        let ctx = context.game
         ctx.strokeStyle = "#ff0000"
         ctx.translate(this.pos.x, this.pos.y)
         ctx.beginPath()

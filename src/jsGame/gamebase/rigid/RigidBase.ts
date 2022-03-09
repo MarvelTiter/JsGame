@@ -7,6 +7,7 @@ import { Bound } from "../data/Bound"
 import { Game } from "../Game"
 import { BaseSence } from "../BaseSence"
 import { log } from "../../../utils/debug"
+import { CanvasContext } from "../types/DefineType"
 
 const nextId = (function (): Function {
     let count = 1
@@ -263,7 +264,8 @@ export abstract class RigidBase {
      */
     abstract get points(): Vector2[]
 
-    drawDebug(ctx: CanvasRenderingContext2D): void {
+    drawDebug(context: CanvasContext): void {
+        let ctx = context.game
         ctx.save()
         ctx.strokeStyle = "#ff0000"
         ctx.beginPath()

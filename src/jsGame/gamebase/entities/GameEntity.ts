@@ -6,6 +6,7 @@ import { SpriteDefinition } from "../FrameDefinition"
 import { Game } from "../Game"
 import { CustomObject } from "../objects/CustomObject"
 import { GameImage } from "../Source"
+import { CanvasContext } from "../types/DefineType"
 
 /**
  * 有texture的Object
@@ -24,7 +25,8 @@ export class GameEntity extends CustomObject {
         return this.pos
     }
 
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(context: CanvasContext): void {
+        let ctx = context.game
         let pos = this.pos.copy().add(this.offset)
         let sp = this.sprite
         let re = this.rect

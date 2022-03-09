@@ -6,6 +6,7 @@ import { Vector2 } from "./data/Vector2"
 import { Game } from "./Game"
 import { ITraceable } from "./interfaces/ITraceable"
 import { GameObject } from "./objects/GameObject"
+import { CanvasContext } from "./types/DefineType"
 type Direction = "Horizontal" | "Vertical" | "Both" | "Static"
 export class Camera {
     target: ITraceable | undefined
@@ -63,7 +64,8 @@ export class Camera {
         return newPos
     }
 
-    public trace(ctx: CanvasRenderingContext2D): void {
+    public trace(context: CanvasContext): void {
+        let ctx = context.game
         if (this.target !== undefined) {
             let { velocity, pos } = this.target.getPosInfo()
             let newPos = this.getNewPos(velocity, pos)
@@ -85,5 +87,6 @@ export class Camera {
             this.pos.add(delta)
         }
         ctx.clearRect(this.pos.x, this.pos.y, this.window.w, this.window.h)
+        context.ui.clearRect(0, 0, this.window.w, this.window.h)
     }
 }

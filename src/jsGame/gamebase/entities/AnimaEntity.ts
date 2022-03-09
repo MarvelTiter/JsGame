@@ -5,6 +5,7 @@ import { GameObject } from "../objects/GameObject"
 import { GameImage } from "../Source"
 import { GameEntity } from "./GameEntity"
 import { Bound } from "../data/Bound"
+import { CanvasContext } from "../types/DefineType"
 
 /**
  * 动画对象
@@ -60,7 +61,8 @@ export class AnimaEntity extends GameEntity {
         this.radius = (this.currentFrame.frame.w + this.currentFrame.frame.h) / 2
     }
 
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(context: CanvasContext): void {
+        let ctx = context.game
         if (this.checkDone()) {
             return
         }
