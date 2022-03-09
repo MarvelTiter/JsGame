@@ -2,10 +2,8 @@ import { BaseSence } from "../BaseSence"
 import { Game } from "../Game"
 import { Vector2 } from "../data/Vector2"
 import { MouseArgs } from "../MouseArgs"
-import { Bound } from "../data/Bound"
 import { RigidBase } from "../rigid/RigidBase"
-import { Contact } from "../collision/Contact"
-import { IRectangle, IRect, createBoxRect } from "../data/Rect"
+import { IRectangle, IRect, Rect } from "../data/Rect"
 import { ISolveCollide } from "../interfaces/ISolveCollide"
 import { CanvasContext } from "../types/DefineType"
 // export function observe(data: any) {
@@ -150,7 +148,7 @@ export abstract class GameObject implements IRectangle {
         this._sence = sence
         this._pos = new Vector2()
         this._offset = new Vector2()
-        this._rect = createBoxRect(0, 0)
+        this._rect = Rect.createBoxRect(0, 0)
         this._focus = false
         this._hasChanged = true
         this.zIndex = zIndex()

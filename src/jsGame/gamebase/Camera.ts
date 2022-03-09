@@ -1,11 +1,7 @@
-import { clamp } from "../../utils/helper"
 import { BaseSence } from "./BaseSence"
-import { Bound } from "./data/Bound"
 import { IRect } from "./data/Rect"
 import { Vector2 } from "./data/Vector2"
-import { Game } from "./Game"
 import { ITraceable } from "./interfaces/ITraceable"
-import { GameObject } from "./objects/GameObject"
 import { CanvasContext } from "./types/DefineType"
 type Direction = "Horizontal" | "Vertical" | "Both" | "Static"
 export class Camera {

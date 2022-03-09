@@ -10,8 +10,7 @@ export class HpBar {
     constructor(owner: IHp) {
         this.owner = owner
     }
-    draw(context: CanvasContext): void {
-        let ctx = context.game
+    draw(ctx: CanvasRenderingContext2D): void {
         let { x, y } = this.owner.getPos()
         let w = this.owner.barWidth
         let h = this.owner.barHeight

@@ -1,10 +1,7 @@
 import { BaseSence } from "../BaseSence"
 import { Game } from "../Game"
 import { FrameDefinition } from "../FrameDefinition"
-import { GameObject } from "../objects/GameObject"
-import { GameImage } from "../Source"
 import { GameEntity } from "./GameEntity"
-import { Bound } from "../data/Bound"
 import { CanvasContext } from "../types/DefineType"
 
 /**

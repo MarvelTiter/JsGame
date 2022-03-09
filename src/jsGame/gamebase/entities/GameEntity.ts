@@ -1,6 +1,5 @@
 import { BaseSence } from "../BaseSence"
-import { Bound } from "../data/Bound"
-import { createBoxRect } from "../data/Rect"
+import { Rect } from "../data/Rect"
 import { Vector2 } from "../data/Vector2"
 import { SpriteDefinition } from "../FrameDefinition"
 import { Game } from "../Game"
@@ -18,7 +17,7 @@ export class GameEntity extends CustomObject {
         super(game, sence)
         this.image = game.getTextureByName(name)
         this.sprite = this.image.getSprite()
-        this.rect = createBoxRect(this.sprite.w, this.sprite.h)
+        this.rect = Rect.createBoxRect(this.sprite.w, this.sprite.h)
     }
 
     public get center(): Vector2 {

@@ -37,7 +37,4 @@ export class PlayerTank extends TankBase implements ITraceable {
         // 素材原因，坦克与子弹相差 180°
         return new Bullet(this.game, this.sence, "bulletGreen3_outline", p.x, p.y, this.angle + Math.PI, this.facing.copy(), 1, this.group)
     }
-    onCollide(other: GameObject): void {
-        this.remain -= 1
-    }
 }

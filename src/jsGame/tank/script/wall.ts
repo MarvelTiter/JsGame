@@ -1,8 +1,7 @@
 import { BaseSence } from "../../gamebase/BaseSence"
-import { createBoxRect } from "../../gamebase/data/Rect"
+import { Rect } from "../../gamebase/data/Rect"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
 import { Game } from "../../gamebase/Game"
-import { CustomObject } from "../../gamebase/objects/CustomObject"
 import { CanvasContext } from "../../gamebase/types/DefineType"
 type Position = "LEFT" | "TOP" | "RIGHT" | "BOTTOM"
 const WallWidth = 56
@@ -10,16 +9,16 @@ export class Wall extends GameEntity {
     constructor(game: Game, sence: BaseSence, position: Position) {
         super(game, sence, "barricadeWood")
         if (position === "LEFT") {
-            this.rect = createBoxRect(WallWidth, sence.maxY)
+            this.rect = Rect.createBoxRect(WallWidth, sence.maxY)
             this.pos.set(WallWidth / 2, sence.maxY / 2)
         } else if (position === "TOP") {
-            this.rect = createBoxRect(sence.maxX - WallWidth * 2, WallWidth)
+            this.rect = Rect.createBoxRect(sence.maxX - WallWidth * 2, WallWidth)
             this.pos.set(sence.maxX / 2, WallWidth / 2)
         } else if (position === "RIGHT") {
-            this.rect = createBoxRect(WallWidth, sence.maxY)
+            this.rect = Rect.createBoxRect(WallWidth, sence.maxY)
             this.pos.set(sence.maxX - WallWidth / 2, sence.maxY / 2)
         } else {
-            this.rect = createBoxRect(sence.maxX - WallWidth * 2, WallWidth)
+            this.rect = Rect.createBoxRect(sence.maxX - WallWidth * 2, WallWidth)
             this.pos.set(sence.maxX / 2, sence.maxY - WallWidth / 2)
         }
         this.addRectRigid(this.rect.w, this.rect.h, {

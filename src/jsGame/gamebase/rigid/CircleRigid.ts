@@ -1,9 +1,5 @@
-import { AxisInfo } from "../data/AxisInfo"
 import { Vector2 } from "../data/Vector2"
-import { Contact } from "../collision/Contact"
-import { RectRigid } from "./RectRigid"
 import { RigidBase } from "./RigidBase"
-import { TriangleRigid } from "./TriangleRigid"
 import { CanvasContext } from "../types/DefineType"
 
 export class CircleRigid extends RigidBase {

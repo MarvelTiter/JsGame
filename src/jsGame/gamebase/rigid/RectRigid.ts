@@ -1,12 +1,5 @@
-import { AxisInfo } from "../data/AxisInfo"
-import { Bound } from "../data/Bound"
 import { Vector2 } from "../data/Vector2"
-import { CircleRigid } from "./CircleRigid"
-import { Contact } from "../collision/Contact"
 import { RigidBase } from "./RigidBase"
-import { TriangleRigid } from "./TriangleRigid"
-import { BaseSence } from "../BaseSence"
-import { Game } from "../Game"
 
 export class RectRigid extends RigidBase {
     private _points: Vector2[]

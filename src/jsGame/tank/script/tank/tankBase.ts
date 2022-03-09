@@ -1,11 +1,10 @@
 import { randomBetween } from "../../../../utils/random"
 import { BaseSence } from "../../../gamebase/BaseSence"
-import { createBoxRect } from "../../../gamebase/data/Rect"
+import { Rect } from "../../../gamebase/data/Rect"
 import { Vector2 } from "../../../gamebase/data/Vector2"
 import { GameEntity } from "../../../gamebase/entities/GameEntity"
 import { Game } from "../../../gamebase/Game"
 import { IHp } from "../../../gamebase/interfaces/IHp"
-import { GameObject } from "../../../gamebase/objects/GameObject"
 import { CanvasContext } from "../../../gamebase/types/DefineType"
 import { Bullet } from "../bullet/bullet"
 import { Explosion, ExplosionSmoke } from "../effects/explosion"
@@ -17,7 +16,7 @@ export abstract class TankBase extends GameEntity implements IHp {
     constructor(game: Game, sence: BaseSence, defaultTank: string, x: number, y: number, facing: Vector2) {
         super(game, sence, "onlyObjects_retina")
         this.sprite = this.image.getSprite(defaultTank)
-        this.rect = createBoxRect(this.sprite.w, this.sprite.h)
+        this.rect = Rect.createBoxRect(this.sprite.w, this.sprite.h)
         this.pos = Vector2.new(x, y)
         this.posPrev = Vector2.new(x, y)
         this.facing = facing
@@ -76,6 +75,6 @@ export abstract class TankBase extends GameEntity implements IHp {
     }
     draw(ctx: CanvasContext): void {
         super.draw(ctx)
-        this.hpBar.draw(ctx)
+        this.hpBar.draw(ctx.game)
     }
 }

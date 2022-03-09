@@ -6,6 +6,10 @@ export interface IRect {
     scale?(scale: number): void
 }
 
+export interface IRectangle {
+    getRect: () => IRect
+}
+
 export class Rect implements IRect {
     get x(): number {
         return -this.w / 2
@@ -23,12 +27,9 @@ export class Rect implements IRect {
         this.w *= scale
         this.h *= scale
     }
+    public static createBoxRect(w: number, h: number): IRect {
+        return new Rect(w, h)
+    }
 }
 
-export function createBoxRect(w: number, h: number): IRect {
-    return new Rect(w, h)
-}
 
-export interface IRectangle {
-    getRect: () => IRect
-}

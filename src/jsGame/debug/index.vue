@@ -1,10 +1,7 @@
 <template>
-  <div style="text-align: center">
-    <Loading :percent="percent">
-      <div id="container"></div>
-    </Loading>
-    <Debug></Debug>
-  </div>
+  <Loading :images="images" :scripts="scripts" :done="done"></Loading>
+  <Debug></Debug>
+  <div id="container"></div>
 </template>
 
 <script setup lang="ts">
@@ -15,26 +12,23 @@ import { MainSence } from "./script/MainSence";
 import { loadSprites } from "../gamebase/SpritesLoader"
 import Debug from "../../components/debug.vue"
 import Loading from "../../components/loading.vue";
+import { GameImage } from "../gamebase/Source";
 window.Debug = true
-let percent = ref(0)
-onMounted(async () => {
-  let images = {
-    enemy: `${SPRITES_URL}/plane/enemy.png`,
-    mine: `${SPRITES_URL}/mine/mine.png`,
-    attack_effect: `${SPRITES_URL}/plane/attack_effect.png`,
-  }
-  let scripts = {
-    attack_effect: `/sprites/plane/attack_effect.json`,
-  }
-  let sources = await loadSprites(images, scripts, (c, t) => percent.value = c / t)
+
+let images = {
+  enemy: "/sprites/plane/enemy.png",
+  mine: "/sprites/mine/mine.png",
+  attack_effect: "/sprites/plane/attack_effect.png",
+}
+let scripts = {
+  attack_effect: "/sprites/plane/attack_effect.json",
+}
+let done = function (sources: Map<string, GameImage>) {
   let g = new Game("container", sources, {
     enableCollide: true, enableGravity: true
   });
   let ms = new MainSence(g);
   g.setSence(ms);
   g.run();
-  Object.assign(window, {
-    game: g
-  })
-});
+}
 </script>

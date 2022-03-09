@@ -1,9 +1,7 @@
 import { getActualPixel } from "../../utils/helper"
 import { BaseSence } from "./BaseSence"
-import { Bound } from "./data/Bound"
-import { createBoxRect, IRect } from "./data/Rect"
-import { createOption, defaultOption, options } from "./GameOptions"
-import { GameObject } from "./objects/GameObject"
+import { Rect, IRect } from "./data/Rect"
+import { GameOption, IOptions } from "./GameOptions"
 import { GameImage } from "./Source"
 import { CanvasContext } from "./types/DefineType"
 
@@ -37,7 +35,7 @@ export class Game {
     sence!: BaseSence
     area!: IRect
     device: DEVICE = DEVICE_PC
-    options: options
+    options: IOptions
     container: HTMLDivElement
     public get context(): CanvasContext {
         return {
@@ -45,7 +43,7 @@ export class Game {
             ui: this.UIContext
         }
     }
-    constructor(dom: string | HTMLDivElement, images: Map<string, GameImage>, opts?: Partial<options>, area?: IRect) {
+    constructor(dom: string | HTMLDivElement, images: Map<string, GameImage>, opts?: Partial<IOptions>, area?: IRect) {
         if (dom instanceof HTMLDivElement) {
             this.container = dom
         } else {
@@ -65,7 +63,7 @@ export class Game {
         this.container.appendChild(this.UICanvas)
         this.images = images
         this.areaSetup(area)
-        this.options = createOption(opts || {})
+        this.options = GameOption.createOption(opts || {})
         this.eventSetup()
         Object.assign(window, {
             game: this
@@ -83,7 +81,7 @@ export class Game {
             w = getActualPixel(window.document.body.clientWidth)
             h = getActualPixel(window.document.body.clientHeight)
         }
-        this.area = area ?? createBoxRect(w, h)
+        this.area = area ?? Rect.createBoxRect(w, h)
         this.gameCanvas.width = this.area.w
         this.gameCanvas.height = this.area.h
         this.UICanvas.width = this.area.w
@@ -149,7 +147,7 @@ export class Game {
     }
 
     public reSize(w: number, h: number): void {
-        this.areaSetup(createBoxRect(w, h))
+        this.areaSetup(Rect.createBoxRect(w, h))
     }
 
     public setSence(sence: BaseSence): void {

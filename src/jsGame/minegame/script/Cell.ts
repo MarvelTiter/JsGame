@@ -1,8 +1,7 @@
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Game } from "../../gamebase/Game"
 import { Grid } from "./Grid"
-import { Bound } from "../../gamebase/data/Bound"
-import { createBoxRect } from "../../gamebase/data/Rect"
+import { Rect } from "../../gamebase/data/Rect"
 import { GameEntity } from "../../gamebase/entities/GameEntity"
 import { CanvasContext } from "../../gamebase/types/DefineType"
 
@@ -24,7 +23,7 @@ export class Cell extends GameEntity {
         this.row = rowIndex
         this.column = columnIndex
         this.flag = 0
-        this.rect = createBoxRect(len, len)
+        this.rect = Rect.createBoxRect(len, len)
         // this.pos.x = this.column * this.rect.w + (this.column + 1) * this.gutter
         // this.pos.y = this.row * this.rect.h + (this.row + 1) * this.gutter
         this.pos.x = len / 2 + this.column * len + grid.contentRelateOffset.x

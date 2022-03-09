@@ -1,6 +1,4 @@
 import { BaseSence } from "../../gamebase/BaseSence"
-import { Bound } from "../../gamebase/data/Bound"
-import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { TestCircle } from "./TestCircle"
 import { TestRect } from "./TestRect"

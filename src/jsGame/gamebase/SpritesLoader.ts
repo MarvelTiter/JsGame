@@ -1,11 +1,11 @@
 import { httpGet } from "../../utils/fetchHelper"
 import { GameImage } from "./Source"
 
-export interface Source {
-    name: string
-    url: string
-    script: string | undefined
-}
+// export interface Source {
+//     name: string
+//     url: string
+//     script: string | undefined
+// }
 
 export async function loadSprites(sources: any, script?: any, progress?: (percent: number) => void): Promise<Map<string, GameImage>> {
     let count = 0

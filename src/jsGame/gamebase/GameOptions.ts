@@ -1,6 +1,6 @@
 import { Vector2 } from "./data/Vector2"
 
-export interface options {
+export interface IOptions {
     enableCollide: boolean
     enableGravity: boolean
     gravity: Vector2
@@ -8,17 +8,18 @@ export interface options {
     speedScale: number
     torqueScale: number
 }
-export function defaultOption(): options {
-    return {
-        enableCollide: false,
-        enableGravity: false,
-        gravity: Vector2.new(0, 1),
-        gravityScale: 0.001,
-        speedScale: 0.001,
-        torqueScale: 0.1
+export class GameOption implements IOptions {
+    enableCollide: boolean = false
+    enableGravity: boolean = false
+    gravity: Vector2 = Vector2.new(0, 1)
+    gravityScale: number = 0.001
+    speedScale: number = 0.001
+    torqueScale: number = 0.1
+    public static defaultOption(): IOptions {
+        return new GameOption()
     }
-}
-export function createOption(config: Partial<options>) {
-    let options = defaultOption()
-    return Object.assign(options, config)
+    public static createOption(config: Partial<IOptions>):IOptions {
+        let opt = GameOption.defaultOption()
+        return Object.assign(opt, config)
+    }
 }

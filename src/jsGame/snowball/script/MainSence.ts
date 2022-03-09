@@ -1,13 +1,8 @@
 import { BaseSence } from "../../gamebase/BaseSence"
-import { Button } from "../../gamebase/Button"
-import { Bound } from "../../gamebase/data/Bound"
-import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
-import { Contact } from "../../gamebase/collision/Contact"
 import { Background } from "./Background"
 import { Ball } from "./Ball"
 import { Tree } from "./Tree"
-import { Joystick } from "../../gamebase/virtualJoystick/Joystick"
 
 export class MainSence extends BaseSence {
     treeCollection!: Map<string, Tree>

@@ -76,7 +76,6 @@ export abstract class BaseSence {
     maxX: number = Number.MAX_VALUE
     minY: number = 0
     maxY: number = Number.MAX_VALUE
-    private keydown: boolean = false
     private aidElement: GameObject | undefined
     // game:Game;
     constructor(game: Game) {
@@ -200,7 +199,6 @@ export abstract class BaseSence {
     }
 
     public handleKeydown(e: KeyboardEvent): void {
-        this.keydown = true
         let ks = this.actions.get(e.key)
         if (ks === undefined || ks.status) {
             return
@@ -218,7 +216,6 @@ export abstract class BaseSence {
 
         this.actions.get(e.key)!.up?.call(null)
         this.keys.delete(e.key)
-        this.keydown = this.keys.size !== 0
         ks.status = false
         ks.handled = true
     }
@@ -290,14 +287,13 @@ export abstract class BaseSence {
     }
 
     private handleKeyboardEvents(): void {
-        if (this.keydown) {
-            for (const action of this.actions.values()) {
-                if (action.handled) continue
-                if (action.status) {
-                    action.down()
-                    if (action.times == 1) {
-                        action.handled = true
-                    }
+        for (const key of this.keys) {
+            let action = this.actions.get(key)!
+            if (action.handled) continue
+            if (action.status) {
+                action.down()
+                if (action.times == 1) {
+                    action.handled = true
                 }
             }
         }

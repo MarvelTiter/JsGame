@@ -1,16 +1,11 @@
-import { Vertices } from "../rigid/vertices"
+import { Vertices } from "../rigid/Vertices"
 import { IRect } from "./Rect"
 import { Vector2 } from "./Vector2"
 
 export class Bound {
-    w: number
-    h: number
     min: Vector2 = new Vector2()
     max: Vector2 = new Vector2()
-    constructor(w?: number, h?: number) {
-        this.w = w || 0
-        this.h = h || 0
-    }
+    
     update(vertices: Vertices, velocity: Vector2) {
         this.max.set(-Infinity, -Infinity)
         this.min.set(Infinity, Infinity)
@@ -41,18 +36,5 @@ export class Bound {
             Vector2.new(this.max.x, this.max.y),
             Vector2.new(this.min.x, this.max.y)
         ]
-    }
-    div(p: number): Bound {
-        this.w = this.w * p
-        this.h = this.h * p
-        return this
-    }
-    set(w: number, h: number): Bound {
-        this.w = w
-        this.h = h
-        return this
-    }
-    copy() {
-        return new Bound(this.w, this.h)
-    }
+    }    
 }

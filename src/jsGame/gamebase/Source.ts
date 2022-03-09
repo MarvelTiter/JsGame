@@ -1,5 +1,3 @@
-import { Bound } from "./data/Bound"
-import { createBoxRect, IRect } from "./data/Rect"
 import { FrameDefinition, SpriteDefinition } from "./FrameDefinition"
 
 export class GameImage {

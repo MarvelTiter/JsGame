@@ -1,12 +1,7 @@
-import { AxisInfo } from "../data/AxisInfo"
 import { Vector2, Vertex } from "../data/Vector2"
 import { GameObject } from "../objects/GameObject"
-import { Contact } from "../collision/Contact"
-import { Vertices } from "./vertices"
+import { Vertices } from "./Vertices"
 import { Bound } from "../data/Bound"
-import { Game } from "../Game"
-import { BaseSence } from "../BaseSence"
-import { log } from "../../../utils/debug"
 import { CanvasContext } from "../types/DefineType"
 
 const nextId = (function (): Function {

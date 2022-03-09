@@ -1,7 +1,7 @@
 import { Interface } from "readline"
 import { clamp } from "../../../../utils/helper"
 import { BaseSence } from "../../../gamebase/BaseSence"
-import { createBoxRect } from "../../../gamebase/data/Rect"
+import { Rect } from "../../../gamebase/data/Rect"
 import { Vector2 } from "../../../gamebase/data/Vector2"
 import { GameEntity } from "../../../gamebase/entities/GameEntity"
 import { SpriteDefinition } from "../../../gamebase/FrameDefinition"
@@ -21,7 +21,7 @@ export class Bullet extends GameEntity {
         super(game, sence, "onlyObjects_retina")
         this.group = group
         this.sprite = this.image.getSprite(bulletType)
-        this.rect = createBoxRect(this.sprite.w, this.sprite.h)
+        this.rect = Rect.createBoxRect(this.sprite.w, this.sprite.h)
         this.pos = Vector2.new(x, y)
         this.facing = facing
         this.speed = speed

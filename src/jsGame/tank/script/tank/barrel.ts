@@ -1,5 +1,5 @@
 import { BaseSence } from "../../../gamebase/BaseSence"
-import { createBoxRect } from "../../../gamebase/data/Rect"
+import { Rect } from "../../../gamebase/data/Rect"
 import { Vector2 } from "../../../gamebase/data/Vector2"
 import { GameEntity } from "../../../gamebase/entities/GameEntity"
 import { Game } from "../../../gamebase/Game"
@@ -10,7 +10,7 @@ export class TankBarrel extends GameEntity {
     constructor(game: Game, sence: BaseSence, x: number, y: number, name: string) {
         super(game, sence, "onlyObjects_retina")
         this.sprite = this.image.getSprite("tankGreen_barrel2_outline")
-        this.rect = createBoxRect(this.sprite.w, this.sprite.h)
+        this.rect = Rect.createBoxRect(this.sprite.w, this.sprite.h)
         this.pos = Vector2.new(x, y)
         this.posPrev = Vector2.new(x, y)
     }

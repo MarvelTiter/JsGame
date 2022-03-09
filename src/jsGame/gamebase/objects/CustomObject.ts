@@ -1,5 +1,4 @@
 import { BaseSence } from "../BaseSence"
-import { Bound } from "../data/Bound"
 import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { CircleRigid } from "../rigid/CircleRigid"
