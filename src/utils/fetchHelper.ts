@@ -1,16 +1,24 @@
+import { base64EncArr, UTF8ArrToStr } from "./encoding"
+
 export class Result {
-    private _content: string
-    constructor(content: string) {
+    private _content: Uint8Array
+    constructor(content: Uint8Array) {
         this._content = content
     }
     json() {
-        return JSON.parse(this._content)
+        return JSON.parse(this.stringify())
     }
-    raw(): string {
+    raw(): Uint8Array {
         return this._content
     }
+    stringify(): string {
+        return new TextDecoder("utf-8").decode(this._content)
+    }
+    base64(): string {
+        return base64EncArr(this._content)
+    }
 }
-export async function httpGet(url: string): Promise<Result> {
+export async function httpGet(url: string, progress?: (process: number) => void): Promise<Result> {
     const response = await fetch(url, {
         method: "GET", // *GET, POST, PUT, DELETE, etc.
         mode: "cors", // no-cors, *cors, same-origin
@@ -35,6 +43,9 @@ export async function httpGet(url: string): Promise<Result> {
         }
         chunks.push(value)
         receivedLength += value?.length || 0
+        if (contentLength !== 0 && progress !== undefined) {
+            progress(receivedLength / contentLength)
+        }
     }
     let chunksAll = new Uint8Array(receivedLength)
     let position = 0
@@ -43,6 +54,5 @@ export async function httpGet(url: string): Promise<Result> {
         chunksAll.set(chunk, position)
         position += chunk.length
     }
-    let result = new TextDecoder("utf-8").decode(chunksAll)
-    return new Result(result)
+    return new Result(chunksAll)
 }

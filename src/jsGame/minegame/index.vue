@@ -1,59 +1,51 @@
 <template>
-  <Loading :percent="percent">
-    <div id="container"></div>
-  </Loading>
+  <Loading :images="images" :scripts="scripts" :done="done"></Loading>
+  <div id="container"></div>
 </template>
 
 <script setup lang="ts">
 import { Game } from "../gamebase/Game";
-import { onMounted, onUnmounted, ref } from "vue";
-import { SPRITES_URL } from "../../utils/constDefinition";
+import { onUnmounted } from "vue";
 import { StartSence } from "./script/StartSence";
-import { loadSprites } from "../gamebase/SpritesLoader"
 import Loading from "../../components/loading.vue";
-let percent = ref(0)
+import { GameImage } from "../gamebase/Source";
 let game: Game | undefined
-onMounted(async () => {
-  let images = {
-    n0: `${SPRITES_URL}/mine/n0.png`,
-    n1: `${SPRITES_URL}/mine/n1.png`,
-    n2: `${SPRITES_URL}/mine/n2.png`,
-    n3: `${SPRITES_URL}/mine/n3.png`,
-    n4: `${SPRITES_URL}/mine/n4.png`,
-    n5: `${SPRITES_URL}/mine/n5.png`,
-    n6: `${SPRITES_URL}/mine/n6.png`,
-    n7: `${SPRITES_URL}/mine/n7.png`,
-    n8: `${SPRITES_URL}/mine/n8.png`,
-    normal: `${SPRITES_URL}/mine/normal.png`,
-    flag: `${SPRITES_URL}/mine/flag.png`,
-    unknow: `${SPRITES_URL}/mine/unknow.png`,
-    over: `${SPRITES_URL}/mine/over.png`,
-    mine: `${SPRITES_URL}/mine/mine.png`,
-    mineFail: `${SPRITES_URL}/mine/mine_b.png`,
-    bg: `${SPRITES_URL}/mine/bg.jpg`,
-    button: `${SPRITES_URL}/mine/button.png`,
-    firework_green: `${SPRITES_URL}/other/firework_green.png`,
-    firework_red: `${SPRITES_URL}/other/firework_red.png`,
-    attack_effect: `${SPRITES_URL}/plane/attack_effect.png`,
-    attack_effect_explode: `${SPRITES_URL}/plane/attack_effect_explode.png`,
-  }
+let images = {
+  n0: "/sprites/mine/n0.png",
+  n1: "/sprites/mine/n1.png",
+  n2: "/sprites/mine/n2.png",
+  n3: "/sprites/mine/n3.png",
+  n4: "/sprites/mine/n4.png",
+  n5: "/sprites/mine/n5.png",
+  n6: "/sprites/mine/n6.png",
+  n7: "/sprites/mine/n7.png",
+  n8: "/sprites/mine/n8.png",
+  normal: "/sprites/mine/normal.png",
+  flag: "/sprites/mine/flag.png",
+  unknow: "/sprites/mine/unknow.png",
+  over: "/sprites/mine/over.png",
+  mine: "/sprites/mine/mine.png",
+  mineFail: "/sprites/mine/mine_b.png",
+  bg: "/sprites/mine/bg.jpg",
+  button: "/sprites/mine/button.png",
+  firework_green: "/sprites/other/firework_green.png",
+  firework_red: "/sprites/other/firework_red.png",
+  attack_effect: "/sprites/plane/attack_effect.png",
+  attack_effect_explode: "/sprites/plane/attack_effect_explode.png",
+}
 
-  let scripts = {
-    firework_green: `/sprites/other/firework_green.json`,
-    firework_red: `/sprites/other/firework_red.json`,
-    attack_effect: `/sprites/plane/attack_effect.json`,
-    attack_effect_explode: `/sprites/plane/attack_effect_explode.json`,
-  }
-
-  let sources = await loadSprites(images, scripts, (c, t) => {
-    percent.value = c / t
-
-  })
+let scripts = {
+  firework_green: "/sprites/other/firework_green.json",
+  firework_red: "/sprites/other/firework_red.json",
+  attack_effect: "/sprites/plane/attack_effect.json",
+  attack_effect_explode: "/sprites/plane/attack_effect_explode.json",
+}
+let done = function (sources: Map<string, GameImage>) {
   game = new Game("container", sources);
   let ms = new StartSence(game);
   game.setSence(ms);
   game.run();
-});
+}
 onUnmounted(() => {
   game!.clear()
   game = undefined

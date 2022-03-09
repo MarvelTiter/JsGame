@@ -7,38 +7,38 @@ export interface Source {
     script: string | undefined
 }
 
-export function loadSprites(sources: any, script?: any, stepCallback?: (loaded: number, total: number) => void): Promise<Map<string, GameImage>> {
+export async function loadSprites(sources: any, script?: any, progress?: (percent: number) => void): Promise<Map<string, GameImage>> {
     let count = 0
     let images = new Map<string, GameImage>()
-    return new Promise((resolve, reject) => {
-        let keys = Object.keys(sources)
-        if (keys.length === 0) {
-            resolve(images)
-        }
-        for (const k of keys) {
-            let img = new Image()
-            let url = sources[k]
-            img.src = url
-            img.onload = async () => {
-                let i = new GameImage(k, img)
-                let s = tryGetProp(script, k)
-                if (s !== undefined) {
-                    let scripts = (await httpGet(s)).json()
-                    if (scripts instanceof Array) {
-                        i.frames = scripts
-                    } else {
-                        i.sprites = scripts
-                    }
-                }
-                images.set(k, i)
-                count++
-                if (stepCallback) stepCallback(count, keys.length)
-                if (count == keys.length) {
-                    resolve(images)
-                }
+    let keys = Object.keys(sources)
+    if (keys.length === 0) {
+        return images
+    }
+    let stepProgress = 1 / keys.length
+    for (const k of keys) {
+        let result = await httpGet(sources[k], sp => {
+            if (progress) progress(count * stepProgress + sp * stepProgress)
+        })
+        let img = new Image()
+        img.src = "data:image/png;base64, " + result.base64()
+        let i = new GameImage(k, img)
+        let s = tryGetProp(script, k)
+        if (s !== undefined) {
+            let file = await httpGet(s, sp => {
+                if (progress) progress(count * stepProgress + sp * stepProgress)
+            })
+            let script = file.json()
+            if (script instanceof Array) {
+                i.frames = script
+            } else {
+                i.sprites = script
             }
         }
-    })
+        images.set(k, i)
+        count++
+        if (progress) progress(count * stepProgress)
+    }
+    return images
 }
 
 function tryGetProp(obj: any, key: string) {

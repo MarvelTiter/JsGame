@@ -1,7 +1,6 @@
 <template>
-  <Loading :percent="percent">
-    <div id="container"></div>
-  </Loading>
+  <Loading :images="images" :done="done"></Loading>
+  <div id="container"></div>
   <Debug></Debug>
 </template>
 
@@ -13,25 +12,23 @@ import { MainSence } from "./script/MainSence";
 import { loadSprites } from "../gamebase/SpritesLoader"
 import Debug from "../../components/debug.vue";
 import Loading from "../../components/loading.vue";
-let percent = ref(0)
+import { GameImage } from "../gamebase/Source";
 let game: Game | undefined
-onMounted(async () => {
-  let images = {
-    tree: `${SPRITES_URL}/ballgame/terr.png`,
-    return: `${SPRITES_URL}/ballgame/return.png`,
-    setting: `${SPRITES_URL}/ballgame/setting.png`,
-    yes: `${SPRITES_URL}/ballgame/yes.png`,
-  }
-  let sources = await loadSprites(images, {}, (c, t) => {
-    percent.value = c / t
-  })
+let images = {
+  tree: "/sprites/ballgame/terr.png",
+  return: "/sprites/ballgame/return.png",
+  setting: "/sprites/ballgame/setting.png",
+  yes: "/sprites/ballgame/yes.png",
+}
+let done = function (sources: Map<string, GameImage>) {
   game = new Game("container", sources, {
     enableCollide: true
   });
   let ms = new MainSence(game);
   game.setSence(ms);
   game.run();
-});
+}
+
 onUnmounted(() => {
   game?.clear()
   game = undefined

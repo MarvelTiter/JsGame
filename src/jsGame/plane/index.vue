@@ -1,5 +1,5 @@
 <template>
-  <Loading :percent="percent">
+  <Loading :images="images" :done="done">
     <div id="container"></div>
   </Loading>
   <Debug></Debug>
@@ -12,16 +12,16 @@ import { SPRITES_URL } from "../../utils/constDefinition";
 import { loadSprites } from "../gamebase/SpritesLoader"
 import Debug from "../../components/debug.vue";
 import Loading from "../../components/loading.vue";
-let percent = ref(0)
-onMounted(async () => {
-  let images = {
+import { GameImage } from "../gamebase/Source";
 
-  }
-  let sources = await loadSprites(images, {}, (c, t) => {
-    percent.value = c / t
-  })
+let images = {
+
+}
+
+let done = function (sources: Map<string, GameImage>) {
   let g = new Game("container", sources, {
     enableCollide: true
   });
-});
+}
+
 </script>

@@ -1,46 +1,44 @@
 <template>
-  <Loading :percent="percent">
-    <div id="container"></div>
-  </Loading>
+  <Loading :images="images" :scripts="scripts" :done="done"></Loading>
+  <div id="container"></div>
   <Debug></Debug>
 </template>
 
 <script setup lang="ts">
 import { Game } from "../gamebase/Game";
-import { onMounted, onUnmounted, ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { SPRITES_URL } from "../../utils/constDefinition";
-import { loadSprites } from "../gamebase/SpritesLoader"
 import Debug from "../../components/debug.vue";
 import Loading from "../../components/loading.vue";
 import { MainSence } from "./script/MainSence";
-let percent = ref(0)
+import { GameImage } from "../gamebase/Source";
 let game: Game | undefined
-onMounted(async () => {
-  let images = {
-    allSprites_retina: `${SPRITES_URL}/tank/allSprites_retina.png`,
-    onlyObjects_retina: `${SPRITES_URL}/tank/onlyObjects_retina.png`,
-    tileSand1: `${SPRITES_URL}/tank/png/tileSand1.png`,
-    barricadeWood: `${SPRITES_URL}/tank/png/barricadeWood.png`,
-    barricadeMetal: `${SPRITES_URL}/tank/png/barricadeMetal.png`,
-    explosion: `${SPRITES_URL}/tank/png/explosion.png`,
-    explosionSmoke: `${SPRITES_URL}/tank/png/explosionSmoke.png`,
-  }
-  let scripts = {
-    allSprites_retina: `/sprites/tank/allSprites_retina.json`,
-    onlyObjects_retina: `/sprites/tank/onlyObjects_retina.json`,
-    explosion: `/sprites/tank/png/explosion.json`,
-    explosionSmoke: `/sprites/tank/png/explosionSmoke.json`,
-  }
-  let sources = await loadSprites(images, scripts, (c, t) => {
-    percent.value = c / t
-  })
+
+let images = {
+  allSprites_retina: "/sprites/tank/allSprites_retina.png",
+  onlyObjects_retina: "/sprites/tank/onlyObjects_retina.png",
+  tileSand1: "/sprites/tank/png/tileSand1.png",
+  barricadeWood: "/sprites/tank/png/barricadeWood.png",
+  barricadeMetal: "/sprites/tank/png/barricadeMetal.png",
+  explosion: "/sprites/tank/png/explosion.png",
+  explosionSmoke: "/sprites/tank/png/explosionSmoke.png",
+}
+let scripts = {
+  allSprites_retina: "/sprites/tank/allSprites_retina.json",
+  onlyObjects_retina: "/sprites/tank/onlyObjects_retina.json",
+  explosion: "/sprites/tank/png/explosion.json",
+  explosionSmoke: "/sprites/tank/png/explosionSmoke.json",
+}
+let src = ref("")
+let done = function (sources: Map<string, GameImage>) {
   game = new Game("container", sources, {
     enableCollide: true
   });
   let ms = new MainSence(game)
   game.setSence(ms)
   game.run()
-});
+}
+
 onUnmounted(() => {
   game?.clear()
   game = undefined

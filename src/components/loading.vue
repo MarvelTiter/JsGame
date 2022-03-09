@@ -7,33 +7,38 @@
             </div>
             <h3>{{ loadingText }}</h3>
         </div>
-        <slot></slot>
     </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, PropType, ref, watch, onMounted } from 'vue';
+import { GameImage } from '../jsGame/gamebase/Source';
+import { loadSprites } from '../jsGame/gamebase/SpritesLoader';
 const prop = defineProps({
-    percent: {
-        type: Number,
+    images: {
+        type: Object,
+        required: true
+    },
+    scripts: {
+        type: Object,
+        default: function () {
+            return []
+        }
+    },
+    done: {
+        type: Function as PropType<(sources: Map<string, GameImage>) => void>,
         required: true
     }
 })
 const visible = ref(true)
-watch(() => prop.percent, (nv, ov) => {
-    if (nv === 1) {
-        visible.value = false
-    }
-})
-// let width = ref(0)
-let widStyle = computed(() => {
-    return {
-        width: (prop.percent * 100).toFixed(2) + '%'
-    }
-})
-
-let loadingText = computed(() => {
-    return (prop.percent * 100).toFixed(2) + '%'
-
+const widStyle = ref("width:0px")
+const loadingText = ref("0%")
+onMounted(async () => {
+    let sources = await loadSprites(prop.images, prop.scripts, (process) => {
+        widStyle.value = `width:${(process * 100).toFixed(2)}%`
+        loadingText.value = `${(process * 100).toFixed(2)}%`
+    })
+    visible.value = false
+    prop.done(sources)
 })
 
 </script>
