@@ -37,7 +37,7 @@ export abstract class BaseSence {
     private rigidElements: Map<string, RigidBase>
     private elementMap: Map<string, GameObject>
     private requiredUpdateCache: boolean = false
-    private keys: Map<string, string>
+    private keys: Set<string>
     private actions: Map<string, ObjectAction>
     // onceAction: Map<string, ObjectAction>;
 
@@ -84,7 +84,7 @@ export abstract class BaseSence {
         this._ContactsMag = new ContactManage()
         this.elementMap = new Map<string, GameObject>()
         this.rigidElements = new Map<string, RigidBase>()
-        this.keys = new Map<string, string>()
+        this.keys = new Set<string>()
         this.actions = new Map<string, ObjectAction>()
     }
 
@@ -205,7 +205,7 @@ export abstract class BaseSence {
         if (ks === undefined || ks.status) {
             return
         }
-        this.keys.set(e.key, e.key)
+        this.keys.add(e.key)
         ks.status = true
         ks.handled = false
     }
