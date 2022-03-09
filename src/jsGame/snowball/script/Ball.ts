@@ -90,7 +90,7 @@ export class Ball extends CustomObject implements ITraceable {
                     const cos = Math.cos(radian) * _radius * step
                     const sin = Math.sin(radian) * _radius * step
 
-                    ctx.lineTo(x - cos, y + sin)
+                    ctx.lineTo(getActualPixel(x - cos), getActualPixel(y + sin))
                     if (index === tailListsLength - 1) step = -1
                     index += step
                     paint()
@@ -101,7 +101,7 @@ export class Ball extends CustomObject implements ITraceable {
 
                 const firstTail = this.tailList[0]
                 const lastTail = this.tailList[tailListsLength - 1]
-                const line = ctx.createLinearGradient(firstTail.x, firstTail.y, lastTail.x, lastTail.y)
+                const line = ctx.createLinearGradient(getActualPixel(firstTail.x), getActualPixel(firstTail.y), getActualPixel(lastTail.x), getActualPixel(lastTail.y))
 
                 try {
                     line.addColorStop(0, this.color + "80")
@@ -118,7 +118,7 @@ export class Ball extends CustomObject implements ITraceable {
         // 绘制小球
         ctx.beginPath()
         ctx.fillStyle = this.color
-        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI)
+        ctx.arc(getActualPixel(this.pos.x), getActualPixel(this.pos.y), getActualPixel(this.radius), 0, 2 * Math.PI)
         ctx.fill()
     }
 }

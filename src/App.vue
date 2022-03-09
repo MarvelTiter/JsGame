@@ -35,6 +35,10 @@ let goBack = () => {
   top: 20px;
   right: 20px;
 }
+canvas {
+  height: 100vh;
+  width: 100vw;
+}
 * {
   -moz-user-select: none;
   -o-user-select: none;

@@ -22,6 +22,6 @@ const dpr = window.devicePixelRatio || 1
  * @returns
  */
 export function getActualPixel(pixel: number) {
-    // return pixel * dpr
+    return pixel * dpr
     return pixel
 }

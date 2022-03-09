@@ -1,14 +1,13 @@
 import { BaseSence } from "../BaseSence"
 import { IRect } from "../data/Rect"
-import { Vector2 } from "../data/Vector2"
 import { Game } from "../Game"
 import { MouseArgs } from "../MouseArgs"
 import { GameObject } from "../objects/GameObject"
+import { CanvasContext } from "../types/DefineType"
+import { JoystickButtons } from "./JoystickButtons"
 import { JoystickPart } from "./JoystickPart"
 import { JoystickRocker } from "./JoystickRocker"
-import { JoystickButtons } from "./JoystickButtons"
 import { JoyStruct } from "./JoyStruct"
-import { CanvasContext } from "../types/DefineType"
 
 export class Joystick extends GameObject {
     window: IRect

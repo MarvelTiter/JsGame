@@ -31,5 +31,3 @@ export class Rect implements IRect {
         return new Rect(w, h)
     }
 }
-
-

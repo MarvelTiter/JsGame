@@ -1,3 +1,4 @@
+import { getActualPixel } from "../../../utils/helper"
 import { BaseSence } from "../../gamebase/BaseSence"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
@@ -42,8 +43,8 @@ export class MainSence extends BaseSence {
             this.configJoystick([
                 {
                     type: "Stick",
-                    x: 100,
-                    y: this.getWindowSize().h - 100,
+                    x: getActualPixel(100),
+                    y: this.getWindowSize().h - getActualPixel(100),
                     events: {
                         onChange: (direction, scale) => {
                             player.moveDirectly(direction, scale)
@@ -52,8 +53,8 @@ export class MainSence extends BaseSence {
                 },
                 {
                     type: "Button",
-                    x: this.getWindowSize().w - 100,
-                    y: this.getWindowSize().h - 100,
+                    x: this.getWindowSize().w - getActualPixel(100),
+                    y: this.getWindowSize().h - getActualPixel(100),
                     events: {
                         onButtonX: () => {
                             player.fire()

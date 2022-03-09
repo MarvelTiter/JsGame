@@ -13,6 +13,7 @@ import { Joystick } from "./virtualJoystick/Joystick"
 import { MouseArgs } from "./MouseArgs"
 import { JoyStruct } from "./virtualJoystick/JoyStruct"
 import { CanvasContext } from "./types/DefineType"
+import "@/utils/extension/NumberExtension.ts"
 type actionTimes = 0 | 1
 export interface ObjectAction {
     status: boolean
@@ -160,8 +161,8 @@ export abstract class BaseSence {
             ret.push({
                 button: 0,
                 buttons: 0,
-                x: element.pageX,
-                y: element.pageY
+                x: element.pageX.actualPixel(),
+                y: element.pageY.actualPixel()
             })
         }
         return ret.sort((a, b) => a.x - b.x)

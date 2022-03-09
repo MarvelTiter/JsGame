@@ -1,7 +1,6 @@
 import { Vector2 } from "../data/Vector2"
-import { JoyPosition, JoystickBgColor, JoystickBoxRadius } from "./JoystickDefType"
+import { JoystickBgColor, JoystickBoxRadius } from "./JoystickDefType"
 import { JoystickPart } from "./JoystickPart"
-
 /**
  * 虚拟按键部件
  */
@@ -19,7 +18,7 @@ export class JoystickButtons extends JoystickPart {
      * 0 top , 1 right , 2 bottom , 3 left
      */
     private startFlag!: number
-    handleTouch(): void {        
+    handleTouch(): void {
         let { x, y } = this.touchPos!.copy().sub(this.pos)
         let angle = Math.atan2(y, x)
         if (-Math.PI / 4 < angle && angle < Math.PI / 4) {
@@ -74,7 +73,7 @@ export class JoystickButtons extends JoystickPart {
         }
         //画字母
         {
-            ctx.font = "bold 48px Arial"
+            ctx.font = `bold ${(48).actualPixel()}px Arial`
             ctx.textAlign = "center"
             ctx.textBaseline = "middle"
             this.drawButton(ctx, Vector2.new(0, 1), sencePos, "A")
@@ -82,7 +81,7 @@ export class JoystickButtons extends JoystickPart {
             this.drawButton(ctx, Vector2.new(-1, 0), sencePos, "X")
             this.drawButton(ctx, Vector2.new(0, -1), sencePos, "Y")
         }
-        if(!this.active) return
+        if (!this.active) return
         // 画按下的区域
         {
             if (this.active) {
@@ -104,9 +103,9 @@ export class JoystickButtons extends JoystickPart {
     }
 
     private drawButton(ctx: CanvasRenderingContext2D, vec: Vector2, sencePos: Vector2, text: string) {
-        let pos = vec.multi(JoystickBoxRadius / 2 + 5).add(sencePos)
+        let pos = vec.multi((JoystickBoxRadius * 3) / 5).add(sencePos)
         ctx.beginPath()
-        ctx.arc(pos.x, pos.y, 25, 0, Math.PI * 2)
+        ctx.arc(pos.x, pos.y, (25).actualPixel(), 0, Math.PI * 2)
         ctx.closePath()
         ctx.fillText(text, pos.x, pos.y)
         ctx.fill()

@@ -1,9 +1,9 @@
-import { getActualPixel } from "../../utils/helper"
 import { BaseSence } from "./BaseSence"
 import { Rect, IRect } from "./data/Rect"
 import { GameOption, IOptions } from "./GameOptions"
 import { GameImage } from "./Source"
 import { CanvasContext } from "./types/DefineType"
+import "@/utils/extension/NumberExtension"
 
 export const RESET = 0x0000
 export const MOUSE_MOVE = 0x0001
@@ -78,8 +78,8 @@ export class Game {
         let w: number = 0
         let h: number = 0
         if (!area) {
-            w = getActualPixel(window.document.body.clientWidth)
-            h = getActualPixel(window.document.body.clientHeight)
+            w = window.document.body.clientWidth.actualPixel()
+            h = window.document.body.clientHeight.actualPixel()
         }
         this.area = area ?? Rect.createBoxRect(w, h)
         this.gameCanvas.width = this.area.w
