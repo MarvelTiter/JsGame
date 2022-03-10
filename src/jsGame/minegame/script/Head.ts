@@ -6,8 +6,8 @@ export class Head extends TextObject {
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
         this.rect.w = this.sence.getWindowSize().w
-        this.rect.h = 50
+        this.rect.h = (50).actualPixel()
         this.text = "是兄弟就来扫雷！"
-        this.font = "36px serif"
+        this.font = `${(36).actualPixel()}px serif`
     }
 }

@@ -29,7 +29,7 @@ export class StartSence extends BaseSence {
 
         let btnBasisLevel = new Button(this.game, this, "button", "初级")
         btnBasisLevel.pos.x = w / 2
-        btnBasisLevel.pos.y = btnMiddleLevel.pos.y - 70
+        btnBasisLevel.pos.y = btnMiddleLevel.pos.y - (70).actualPixel()
         this.addElement(btnBasisLevel)
         btnBasisLevel.onClick = () => {
             let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? basis_m : basis)
@@ -38,7 +38,7 @@ export class StartSence extends BaseSence {
 
         let btnProLevel = new Button(this.game, this, "button", "专家")
         btnProLevel.pos.x = w / 2
-        btnProLevel.pos.y = btnMiddleLevel.pos.y + 70
+        btnProLevel.pos.y = btnMiddleLevel.pos.y + (70).actualPixel()
         this.addElement(btnProLevel)
         btnProLevel.onClick = () => {
             let ms = new MineSence(this.game, this.game.device === DEVICE_MOBILE ? professional_m : professional)

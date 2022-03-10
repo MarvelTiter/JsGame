@@ -9,7 +9,7 @@ export class Button extends GameEntity {
     constructor(game: Game, sence: BaseSence, texture: string, text?: string, fontSize?: number) {
         super(game, sence, texture)
         this.text = text || ""
-        this.font = `${fontSize ?? 18}px serif`
+        this.font = `${(fontSize ?? 18).actualPixel()}px serif`
     }
     checkFocu(x: number, y: number): boolean {
         let isfocus = x - this.offset.x > this.pos.x - this.rect.w / 2 && x - this.offset.x < this.pos.x + this.rect.w / 2 && y - this.offset.y > this.pos.y - this.rect.h / 2 && y - this.offset.y < this.pos.y + this.rect.h / 2
@@ -22,7 +22,9 @@ export class Button extends GameEntity {
         let ctx = context.ui
         let x = this.pos.x + this.offset.x
         let y = this.pos.y + this.offset.y
-        ctx.drawImage(this.image.texture, x - this.rect.w / 2, y - this.rect.h / 2, this.rect.w, this.rect.h)
+        ctx.translate(x, y)
+        ctx.drawImage(this.image.texture, this.rect.x, this.rect.y, this.rect.w, this.rect.h)
+        ctx.translate(-x, -y)
         ctx.fillStyle = "white"
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"

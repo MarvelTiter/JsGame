@@ -228,7 +228,6 @@ export abstract class RigidBase {
      */
     public setAngle(angle: number) {
         this.angle = angle
-        this.anglePrev = angle
     }
 
     /**
@@ -237,7 +236,6 @@ export abstract class RigidBase {
      */
     public applyForce(f: Vector2): void {
         this.force.add(f)
-        this.forceUpdate = true
     }
     public applyTorque(torque: number): void {
         this.torque = torque
@@ -248,7 +246,6 @@ export abstract class RigidBase {
      */
     applyGravity(g: Vector2) {
         this.force.add(g.copy().multi(this.mass))
-        this.forceUpdate = true
     }
     clearForce() {
         this.force.set(0, 0)
@@ -281,7 +278,6 @@ export abstract class RigidBase {
         }
         ctx.restore()
     }
-    forceUpdate: boolean = false
     update(delta: number, timeScale: number, correction: number): void {
         if (this.isStatic) return
         let deltaTimeSquared = Math.pow(delta * timeScale * this.timeScale, 2)

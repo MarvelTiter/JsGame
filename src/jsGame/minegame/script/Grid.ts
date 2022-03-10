@@ -42,10 +42,10 @@ export class Grid extends CustomObject {
         this.rect.h = this.row * level.len
         let { w, h } = this.sence.getWindowSize()
         let marginTop = (h - this.rect.h) / 2
-        if (marginTop < 50) {
-            this.sence.updateWindow(w, 140 + this.rect.h)
-            this.game.reSize(w, 140 + this.rect.h)
-            this.offset.y = -20
+        if (marginTop < (50).actualPixel()) {
+            this.sence.updateWindow(w, (140).actualPixel() + this.rect.h)
+            this.game.reSize(w, (140).actualPixel() + this.rect.h)
+            this.offset.y = -(20).actualPixel()
         }
         ;({ w, h } = this.sence.getWindowSize())
         this.pos.set(w / 2, h / 2)

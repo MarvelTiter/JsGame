@@ -17,14 +17,12 @@ export class GameImage {
                 x: 0,
                 y: 0,
                 w: this.texture.width,
-                h: this.texture.height,
-                scale: window.devicePixelRatio || 1
+                h: this.texture.height
             }
         } else {
             if (this.sprites[name]) {
                 return {
-                    ...this.sprites[name],
-                    scale: window.devicePixelRatio || 1
+                    ...this.sprites[name]
                 }
             }
             throw new Error(`${name} did not exit`)

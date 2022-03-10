@@ -36,7 +36,7 @@ let goBack = () => {
   right: 20px;
 }
 canvas {
-  height: 100vh;
+  // height: 100vh;
   width: 100vw;
 }
 * {

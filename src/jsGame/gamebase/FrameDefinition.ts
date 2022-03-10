@@ -7,7 +7,6 @@ export interface SpriteDefinition {
     y: number
     w: number
     h: number
-    scale: number
 }
 export interface FrameDefinition {
     filename: string

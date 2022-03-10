@@ -9,6 +9,7 @@ export class MainSence extends BaseSence {
     constructor(game: Game) {
         super(game)
         this.minX = 0
+        this.maxY = Number.MAX_VALUE
         this.setup()
     }
     ball!: Ball
@@ -17,9 +18,6 @@ export class MainSence extends BaseSence {
         this.addElement(bg)
 
         let ball = new Ball(this.game, this)
-        ball.pos.x = this.getWindowSize().w / 2
-        ball.pos.y = this.getWindowSize().h / 2
-        ball.addCircleRigid(ball.radius)
         this.addElement(ball)
         this.ball = ball
 
@@ -30,7 +28,6 @@ export class MainSence extends BaseSence {
             this.addElement(tree)
         }
 
-        // this.camera = new Camera(this, this.game.context, this.game.area, "Vertical")
         this.camera.direction = "Vertical"
         this.camera.bind(ball)
 
@@ -38,14 +35,17 @@ export class MainSence extends BaseSence {
             this.configJoystick([
                 {
                     type: "Stick",
-                    x: 100,
-                    y: this.getWindowSize().h - 100,
+                    x: (100).actualPixel(),
+                    y: this.getWindowSize().h - (100).actualPixel(),
                     events: {
                         onLeft: () => {
                             ball.turn(-1)
                         },
                         onRight: () => {
                             ball.turn(1)
+                        },
+                        onDown: () => {
+                            ball.degree = 0
                         }
                     }
                 }
@@ -57,6 +57,10 @@ export class MainSence extends BaseSence {
 
         this.registerKeyAction("d", () => {
             ball.turn(1)
+        })
+
+        this.registerKeyAction("s", () => {
+            ball.degree = 0
         })
     }
 

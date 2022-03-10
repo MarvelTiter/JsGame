@@ -47,7 +47,7 @@ let done = function (sources: Map<string, GameImage>) {
   game.run();
 }
 onUnmounted(() => {
-  game!.clear()
+  game?.clear()
   game = undefined
 })
 </script>

@@ -1,3 +1,4 @@
+import { DPR } from "../../../utils/constDefinition"
 import { BaseSence } from "../BaseSence"
 import { Rect } from "../data/Rect"
 import { Vector2 } from "../data/Vector2"
@@ -18,6 +19,7 @@ export class GameEntity extends CustomObject {
         this.image = game.getTextureByName(name)
         this.sprite = this.image.getSprite()
         this.rect = Rect.createBoxRect(this.sprite.w, this.sprite.h)
+        this.rect.scale!(DPR)
     }
 
     public get center(): Vector2 {

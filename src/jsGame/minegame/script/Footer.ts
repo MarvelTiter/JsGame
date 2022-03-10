@@ -9,12 +9,12 @@ export class Footer extends TextObject {
         super(game, sence)
         this.mineCount = 0
         this.rect.w = this.sence.getWindowSize().w
-        this.rect.h = 50
+        this.rect.h = (50).actualPixel()
         this.time = ""
-        this.font = "36px serif"
+        this.font = `${(36).actualPixel()}px serif`
     }
     update() {
-        this.pos.y = this.sence.getWindowSize().h - 50
+        this.pos.y = this.sence.getWindowSize().h - (50).actualPixel()
         this.text = `雷:${this.mineCount}  计时:${this.time}`
     }
 }

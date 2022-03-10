@@ -1,11 +1,10 @@
-import { getActualPixel } from "../../../utils/helper"
 import { BaseSence } from "../../gamebase/BaseSence"
 import { ITraceable } from "../../gamebase/interfaces/ITraceable"
 import { Vector2 } from "../../gamebase/data/Vector2"
 import { Game } from "../../gamebase/Game"
 import { CustomObject } from "../../gamebase/objects/CustomObject"
-import { CircleRigid } from "../../gamebase/rigid/CircleRigid"
 import { CanvasContext } from "../../gamebase/types/DefineType"
+import { ISolveCollide } from "../../gamebase/interfaces/ISolveCollide"
 interface SnowBallTail {
     x: number
     y: number
@@ -15,21 +14,25 @@ export class Ball extends CustomObject implements ITraceable {
     degree: number = 0
     maxDegree: number = 50
     minDegree: number = -50
-    distance: number = 0.05
-    tailMaxLength: number = 50
+    distance: number = (0.05).actualPixel()
+    tailMaxLength: number = (50).actualPixel()
     color: string = "#d2fdff"
     tailList: Array<SnowBallTail> = []
-    maxVelocity: Vector2 = Vector2.new(1, 1)
+    maxVelocity: Vector2 = Vector2.new((1).actualPixel(), (1).actualPixel())
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
-        this.radius = getActualPixel(10)
-        this.addCircleRigid(getActualPixel(10))
+        this.radius = (10).actualPixel()
+        this.pos = sence.getCenter()
+        this.addCircleRigid((10).actualPixel())
         this.rigidBody.limit = (v, a) => {
             return {
                 nv: v.min(this.maxVelocity),
                 na: a
             }
         }
+    }
+    onCollide(other: ISolveCollide): void {
+        console.log("collide")
     }
     getPosInfo(): { velocity: Vector2; pos: Vector2 } {
         return {
@@ -39,7 +42,7 @@ export class Ball extends CustomObject implements ITraceable {
     }
     turn(direction: number) {
         // 递增旋转角度
-        this.degree = this.degree + (direction > 0 ? 1 : -1) * 1.6 // 增加一点转向灵敏度
+        this.degree = this.degree + direction * 1.6 // 增加一点转向灵敏度
         // 限制最大、最小旋转角度
         if (this.degree > this.maxDegree) {
             this.degree = this.maxDegree
@@ -62,7 +65,6 @@ export class Ball extends CustomObject implements ITraceable {
             this.tailList.splice(this.tailMaxLength)
         }
     }
-    interval: number = 100
 
     update(delta: number, timeScale: number, correction: number): void {
         this.move()
@@ -90,7 +92,7 @@ export class Ball extends CustomObject implements ITraceable {
                     const cos = Math.cos(radian) * _radius * step
                     const sin = Math.sin(radian) * _radius * step
 
-                    ctx.lineTo(getActualPixel(x - cos), getActualPixel(y + sin))
+                    ctx.lineTo(x - cos, y + sin)
                     if (index === tailListsLength - 1) step = -1
                     index += step
                     paint()
@@ -101,7 +103,7 @@ export class Ball extends CustomObject implements ITraceable {
 
                 const firstTail = this.tailList[0]
                 const lastTail = this.tailList[tailListsLength - 1]
-                const line = ctx.createLinearGradient(getActualPixel(firstTail.x), getActualPixel(firstTail.y), getActualPixel(lastTail.x), getActualPixel(lastTail.y))
+                const line = ctx.createLinearGradient(firstTail.x, firstTail.y, lastTail.x, lastTail.y)
 
                 try {
                     line.addColorStop(0, this.color + "80")
@@ -118,7 +120,7 @@ export class Ball extends CustomObject implements ITraceable {
         // 绘制小球
         ctx.beginPath()
         ctx.fillStyle = this.color
-        ctx.arc(getActualPixel(this.pos.x), getActualPixel(this.pos.y), getActualPixel(this.radius), 0, 2 * Math.PI)
+        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI)
         ctx.fill()
     }
 }

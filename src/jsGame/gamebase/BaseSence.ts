@@ -86,6 +86,8 @@ export abstract class BaseSence {
         this.rigidElements = new Map<string, RigidBase>()
         this.keys = new Set<string>()
         this.actions = new Map<string, ObjectAction>()
+        this.maxX = this.game.area.w
+        this.maxY = this.game.area.h
     }
 
     public addElement<T extends GameObject>(e: T): void {
@@ -250,6 +252,8 @@ export abstract class BaseSence {
     }
 
     public updateWindow(w: number, h: number) {
+        this.maxX = w
+        this.maxY = h
         this._camera!.window.w = w
         this._camera!.window.h = h
     }

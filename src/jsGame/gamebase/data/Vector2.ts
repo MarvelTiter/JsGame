@@ -16,6 +16,10 @@ export class Vector2 {
         return new Vector2(x, y)
     }
 
+    public static zero(): Vector2 {
+        return new Vector2(0, 0)
+    }
+
     set(x: number, y: number): Vector2 {
         this.x = x
         this.y = y

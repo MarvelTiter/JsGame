@@ -82,15 +82,15 @@ export class MineSence extends BaseSence {
         let scale = this.game.device === "MOBILE" ? 0.6 : 1
         let restartButton = new Button(this.game, this, "button", "重新开始")
         restartButton.rect.scale!(scale)
-        restartButton.pos.x = w / 2 - restartButton.rect.w / 2 - 10
-        restartButton.pos.y = h - restartButton.rect.h / 2 - 50
+        restartButton.pos.x = w / 2 - restartButton.rect.w / 2 - (10).actualPixel()
+        restartButton.pos.y = h - restartButton.rect.h / 2 - (50).actualPixel()
         restartButton.onClick = () => {
             this.game.setSence(new MineSence(this.game, this.level))
         }
         this.addElement(restartButton)
         let homeBtn = new Button(this.game, this, "button", "返回")
         homeBtn.rect.scale!(scale)
-        homeBtn.pos.x = w / 2 + homeBtn.rect.w / 2 + 10
+        homeBtn.pos.x = w / 2 + homeBtn.rect.w / 2 + (10).actualPixel()
         homeBtn.pos.y = restartButton.pos.y
         homeBtn.onClick = () => {
             this.game.areaSetup()
