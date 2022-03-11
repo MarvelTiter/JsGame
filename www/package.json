@@ -7,6 +7,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "MtPageRust": "file:../pkg",
         "@element-plus/icons-vue": "^0.2.6",
         "element-plus": "^1.3.0-beta.10",
         "peer": "^0.6.1",

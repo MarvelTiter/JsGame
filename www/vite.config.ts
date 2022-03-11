@@ -22,7 +22,7 @@ export default defineConfig({
         Components({
             resolvers: [ElementPlusResolver()]
         })
-    ],
+    ],    
     resolve: {
         alias: {
             "@": "/src"
@@ -30,6 +30,9 @@ export default defineConfig({
     },
     server: {
         cors: true,
+        fs:{
+            allow:['..']
+        },
         proxy: {
             "/sprites": {
                 target: "https://marveltiter.gitee.io",
