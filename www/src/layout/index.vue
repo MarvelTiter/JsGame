@@ -1,6 +1,7 @@
 <template>
 	<div class="nav">
 		<router-link :class="className" to="calc">计算器</router-link>
+		<router-link :class="className" to="account">账本</router-link>
 		<router-link :class="className" to="mine">扫雷</router-link>
 		<router-link :class="className" to="ball">雪球</router-link>
 		<router-link :class="className" to="tank">坦克大战</router-link>

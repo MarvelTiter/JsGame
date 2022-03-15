@@ -6,6 +6,10 @@ const routes = [
     },
     {
         path: '/calc',
+        component: () => import('@/calculator/index.vue')
+    },
+    {
+        path: '/account',
         component: () => import('@/accounts/index.vue')
     },
     {
