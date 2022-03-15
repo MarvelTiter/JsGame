@@ -10,6 +10,9 @@ const operators:any = {
     },
     "-":{
         level:1
+    },
+    "%":{
+        level:2
     }
 }
 
@@ -37,5 +40,9 @@ String.prototype.priority = function(compare:string):boolean {
 }
 String.prototype.parseNumber = function(): number {
     return Number(this)
+}
+String.prototype.removeEnd = function(): string {
+    let tail = this.length - 1
+    return this.slice(0, tail)
 }
 export {}

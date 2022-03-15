@@ -27,3 +27,10 @@ export class Division implements ICalculator {
         return nums[0] / nums[1]
     }
 }
+
+export class Mod implements ICalculator {
+    type: OperatorType = "Binary"
+    calc(nums: number[]): number {
+        return nums[0] % nums[1]
+    }
+}

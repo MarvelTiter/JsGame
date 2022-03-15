@@ -10,6 +10,7 @@ declare global {
         isDot(): boolean
         priority(compare: string): boolean
         parseNumber(): number
+        removeEnd(): string
     }
 }
 export {}

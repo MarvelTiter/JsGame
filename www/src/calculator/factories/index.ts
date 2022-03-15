@@ -1,4 +1,4 @@
-import { Add, Division, Multiply, Sub } from "./add"
+import { Add, Division, Mod, Multiply, Sub } from "./add"
 import { ICalculator } from "./define"
 
 function init():Map<string,ICalculator>{
@@ -7,6 +7,7 @@ function init():Map<string,ICalculator>{
     map.set("-",new Sub())
     map.set("*",new Multiply())
     map.set("/",new Division())
+    map.set("%",new Mod())
     return map
 }
 

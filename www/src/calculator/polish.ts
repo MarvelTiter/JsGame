@@ -21,24 +21,11 @@ import { CalcFactory } from "./factories"
 export function parseReversePolish(content: string): string[] {
     let ret :string[] = []
     let operators :string[] = []
-    for (let index = 0; index < content.length; index++) {
-        const cur = content.charAt(index)            
+    let pre = prevSolve(content)    
+    for (let index = 0; index < pre.length; index++) {
+        const cur = pre[index]            
         if (cur.isNumeric()){
-            let prev = content[index-1]
-            if (prev === undefined) {
-                ret.push(cur)
-            } else {
-                if (prev.isNumeric()){
-                    let p = ret.pop()
-                   ret.push(p+cur)
-                }else if (prev.isDot()){
-                    let p = ret.pop()
-                   ret.push(p+'.'+cur)
-                }
-                else{
-                    ret.push(cur)
-                }
-            }
+            ret.push(cur)
         } else if (cur.isOperator()) {
             let prev = operators.pop()
             while(true){
@@ -101,4 +88,26 @@ export function solveReversePolish(reversePolish:string[]): number{
         e = reversePolish.pop()
     }
     return temp.pop()!
+}
+
+function prevSolve(content: string): string[] {
+    let ret = []
+    let index = 0
+    let current = content.charAt(index)
+    let temp = ""
+    while (current !== "") {
+        if (current.isNumeric()||current.isDot()){
+            temp += current
+        } else {
+            if (temp){
+                ret.push(temp)
+                temp = ""
+            }
+            ret.push(current)
+        }
+        index++
+        current = content.charAt(index)
+    }
+    if (temp) ret.push(temp)
+    return ret
 }
