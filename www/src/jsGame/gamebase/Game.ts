@@ -56,9 +56,11 @@ export class Game {
         this.gameCanvas.style.position = "absolute"
         this.gameCanvas.style.left = "0"
         this.gameCanvas.style.top = "0"
+        this.gameCanvas.classList.add("game-canvas")
         this.UICanvas.style.position = "absolute"
         this.UICanvas.style.left = "0"
         this.UICanvas.style.top = "0"
+        this.UICanvas.classList.add("game-canvas")
         this.container.appendChild(this.gameCanvas)
         this.container.appendChild(this.UICanvas)
         this.images = images

@@ -13,6 +13,10 @@ const routes = [
         component: () => import('@/accounts/index.vue')
     },
     {
+        path: '/slaythespire',
+        component: () => import('@/slayTheSpireHelper/index.vue')
+    },
+    {
         path: '/mine',
         component: () => import("@/jsGame/minegame/index.vue")
     },
