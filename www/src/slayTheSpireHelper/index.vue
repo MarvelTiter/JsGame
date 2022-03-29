@@ -51,6 +51,7 @@
 import { reactive, ref } from 'vue';
 import { ISize } from './data/ISize';
 import { clear, drawBackground, drawForeground, drawOutline, PictureType, sync } from './data/canvasHelper';
+import { ElMessage } from 'element-plus';
 const file = ref<HTMLInputElement>();
 const canvas1 = ref<HTMLCanvasElement>();
 const canvas2 = ref<HTMLCanvasElement>();
@@ -119,6 +120,10 @@ const loadImage = (files: FileList) => {
 }
 
 const selectBg = async () => {
+    if (size1.w * size1.h === 0) {
+        ElMessage.error("选择类型")
+        return
+    }
     let input = document.createElement("input")
     input.type = "file"
     input.onchange = async e => {
@@ -131,6 +136,10 @@ const selectBg = async () => {
     input.click()
 }
 const selectFg = () => {
+    if (size1.w * size1.h === 0) {
+        ElMessage.error("选择类型")
+        return
+    }
     let input = document.createElement("input")
     input.type = "file"
     input.onchange = async e => {
@@ -143,16 +152,17 @@ const selectFg = () => {
     input.click()
 }
 const fgChanged = async () => {
-    let bg = await drawBackground(bgImg!, size1, cardType)
-    let f = drawForeground(fgImg!, size1, fgScale.value, offsetX, offsetY)
+    let bg = await drawBackground(bgImg, size1, cardType)
+    let f = drawForeground(fgImg, size1, fgScale.value, offsetX, offsetY)
     clear(canvas1.value!, canvas2.value!)
     render(bg, f)
 }
 
-const render = (...args: HTMLCanvasElement[]) => {
+const render = (...args: Array<HTMLCanvasElement | undefined>) => {
     let ctx1 = canvas1.value!.getContext('2d')
     for (const c of args) {
-        ctx1?.drawImage(c, 0, 0, size1.w, size1.h)
+        if (c !== undefined)
+            ctx1?.drawImage(c, 0, 0, size1.w, size1.h)
     }
     sync(canvas1.value!, canvas2.value!, size2)
 }

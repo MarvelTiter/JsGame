@@ -9,9 +9,10 @@ export function clear(canvas1: HTMLCanvasElement | undefined, canvas2: HTMLCanva
         canvas2.getContext("2d")?.clearRect(0, 0, canvas2.width, canvas2.height)
     }
 }
-export async function drawBackground(img: HTMLImageElement, size1: ISize, type?: PictureType) {
-    // draw background img
-    // let display = canvas.getContext("2d")!
+export async function drawBackground(img: HTMLImageElement | undefined, size1: ISize, type?: PictureType) {
+    if (!img) {
+        return undefined
+    }
     let ctx1 = createContext(size1)
     ctx1.drawImage(img, 0, 0, size1.w, size1.h)
     // draw cover
@@ -20,8 +21,11 @@ export async function drawBackground(img: HTMLImageElement, size1: ISize, type?:
     return ctx1.canvas
 }
 
-export function drawForeground(img: HTMLImageElement, size1: ISize, scale: number = 1, offsetX: number = 0, offsetY: number = 0) {
+export function drawForeground(img: HTMLImageElement | undefined, size1: ISize, scale: number = 1, offsetX: number = 0, offsetY: number = 0) {
     // let bg = canvas.getContext("2d")!
+    if (!img) {
+        return undefined
+    }
     let ctx1 = createContext(size1)
     let centreX = size1.w / 2 + offsetX
     let centreY = size1.h / 2 + offsetY
