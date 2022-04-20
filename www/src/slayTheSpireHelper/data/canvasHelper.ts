@@ -16,12 +16,12 @@ export async function drawBackground(img: HTMLImageElement | undefined, size1: I
     let ctx1 = createContext(size1)
     ctx1.drawImage(img, 0, 0, size1.w, size1.h)
     // draw cover
-    if (type !== undefined) await cover(ctx1, type)
+    // if (type !== undefined) await cover(ctx1, type)
     // display.drawImage(ctx1.canvas, 0, 0, size1.w, size1.h)
     return ctx1.canvas
 }
 
-export function drawForeground(img: HTMLImageElement | undefined, size1: ISize, scale: number = 1, offsetX: number = 0, offsetY: number = 0) {
+export async function drawForeground(img: HTMLImageElement | undefined, size1: ISize, scale: number = 1, offsetX: number = 0, offsetY: number = 0) {
     // let bg = canvas.getContext("2d")!
     if (!img) {
         return undefined
@@ -61,12 +61,21 @@ export function sync(canvas1: HTMLCanvasElement, canvas2: HTMLCanvasElement, siz
     ctx2.drawImage(canvas1, 0, 0, size2.w, size2.h)
 }
 
-const cover = async (ctx: CanvasRenderingContext2D, type: PictureType) => {
+const CoverCache: Map<PictureType, Set<Number>> = new Map<PictureType, Set<Number>>()
+
+export async function cover(ctx: CanvasRenderingContext2D, type: PictureType) {
     let imgData = ctx.getImageData(0, 0, 500, 380)
     let data = imgData?.data
-    let result = await httpGet(`/data/${type.toLocaleLowerCase()}_cover.json`)
-    let nums = result.json() as Number[]
-    let set = new Set(nums)
+    let set: Set<Number>
+    if (!CoverCache.has(type)) {
+        let result = await httpGet(`/data/${type.toLocaleLowerCase()}_cover.json`)
+        let nums = result.json() as Number[]
+        set = new Set(nums)
+        CoverCache.set(type, set)
+    } else {
+        set = CoverCache.get(type)!
+    }
+
     for (let i = 0; i < data.length; i += 4) {
         if (set.has(i)) {
             data[i] = 0
