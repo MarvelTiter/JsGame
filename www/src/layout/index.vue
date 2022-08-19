@@ -8,6 +8,7 @@
 		<router-link :class="className" to="tank">坦克大战</router-link>
 		<router-link :class="className" to="vxplane">飞机大战<br/>(微信版)</router-link>
 		<router-link :class="className" to="plane">飞机大战</router-link>
+		<router-link :class="className" to="mazda">Gear</router-link>
 		<router-link :class="className" to="debug">Debug</router-link>
 	</div>
 	<!-- <router-view></router-view> -->

@@ -39,6 +39,10 @@ const routes = [
     {
         path: '/vxplane',
         component: () => import("@/jsGame/vxplane/index.vue")
+    },
+    {
+        path: '/mazda',
+        component: () => import("@/jsGame/mazda/index.vue")
     }
 ]
 const router = createRouter({
