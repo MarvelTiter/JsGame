@@ -53,13 +53,13 @@ export class Game {
         this.gameContext = this.gameCanvas.getContext("2d") as CanvasRenderingContext2D
         this.UICanvas = document.createElement("canvas") as HTMLCanvasElement
         this.UIContext = this.UICanvas.getContext("2d") as CanvasRenderingContext2D
-        this.gameCanvas.style.position = "absolute"
-        this.gameCanvas.style.left = "0"
-        this.gameCanvas.style.top = "0"
+        // this.gameCanvas.style.position = "absolute"
+        // this.gameCanvas.style.left = "0"
+        // this.gameCanvas.style.top = "0"
         this.gameCanvas.classList.add("game-canvas")
-        this.UICanvas.style.position = "absolute"
-        this.UICanvas.style.left = "0"
-        this.UICanvas.style.top = "0"
+        // this.UICanvas.style.position = "absolute"
+        // this.UICanvas.style.left = "0"
+        // this.UICanvas.style.top = "0"
         this.UICanvas.classList.add("game-canvas")
         this.container.appendChild(this.gameCanvas)
         this.container.appendChild(this.UICanvas)
@@ -80,8 +80,8 @@ export class Game {
         let w: number = 0
         let h: number = 0
         if (!area) {
-            w = window.document.body.clientWidth.actualPixel()
-            h = window.document.body.clientHeight.actualPixel()
+            w = window.document.body.offsetWidth.actualPixel()
+            h = window.document.body.offsetHeight.actualPixel()
         }
         this.area = area ?? Rect.createBoxRect(w, h)
         this.gameCanvas.width = this.area.w

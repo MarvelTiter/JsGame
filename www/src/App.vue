@@ -35,11 +35,12 @@ let goBack = () => {
   top: 20px;
   right: 20px;
 }
+
 .game-canvas {
-  // height: 100vh;
   width: 100vw;
-}
-* {
+  position: fixed;
+  left: 0;
+  top: 0;
   -moz-user-select: none;
   -o-user-select: none;
   -khtml-user-select: none;

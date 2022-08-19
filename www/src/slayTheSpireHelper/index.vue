@@ -7,25 +7,22 @@
             <el-button @click="init('Relic')">遗物</el-button>
             <el-button @click="init('Status')">状态</el-button>
         </el-card>
-        <div class="card" style="flex: 1;">
+        <div class="card"
+             style="flex: 1;">
             <div class="canvas-box">
                 <div class="box left">
                     <p>{{ size1.w }} × {{ size1.h }}</p>
-                    <canvas
-                        :width="size1.w"
-                        :height="size1.h"
-                        :style="`height:${size1.h}px;width:${size1.w}px`"
-                        ref="canvas1"
-                    ></canvas>
+                    <canvas :width="size1.w"
+                            :height="size1.h"
+                            :style="`height:${size1.h}px;width:${size1.w}px`"
+                            ref="canvas1"></canvas>
                 </div>
                 <div class="box right">
                     <p>{{ size2.w }} × {{ size2.h }}</p>
-                    <canvas
-                        :width="size2.w"
-                        :height="size2.h"
-                        :style="`height:${size2.h}px;width:${size2.w}px`"
-                        ref="canvas2"
-                    ></canvas>
+                    <canvas :width="size2.w"
+                            :height="size2.h"
+                            :style="`height:${size2.h}px;width:${size2.w}px`"
+                            ref="canvas2"></canvas>
                 </div>
             </div>
         </div>
@@ -34,7 +31,9 @@
             <el-space>
                 <el-button @click="selectBg">背景</el-button>
                 <el-button @click="selectFg">前景</el-button>
-                <el-input style="width:200px;" v-model="fgScale" @change="fgChanged">
+                <el-input style="width:200px;"
+                          v-model="fgScale"
+                          @change="fgChanged">
                     <template #prepend>前景缩放比例</template>
                 </el-input>
                 <el-button @click="outline">outline</el-button>
@@ -43,14 +42,17 @@
                 <el-button @click="fgMove(0)">前景左移</el-button>
                 <el-button @click="fgMove(2)">前景右移</el-button>
                 <el-button @click="fgMove(-1)">重置</el-button>
+                <el-input v-model="offsetX"></el-input>
+                <el-input v-model="offsetY"></el-input>
             </el-space>
         </el-card>
     </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { ISize } from './data/ISize';
-import { clear, drawBackground, drawForeground, drawOutline, PictureType, sync } from './data/canvasHelper';
+import { clear, drawBackground, drawForeground, drawOutline, PictureType, sync, cover } from './data/canvasHelper';
+import { ElMessage } from 'element-plus';
 const file = ref<HTMLInputElement>();
 const canvas1 = ref<HTMLCanvasElement>();
 const canvas2 = ref<HTMLCanvasElement>();
@@ -63,8 +65,8 @@ const size2 = reactive<ISize>({
     h: 0
 })
 const fgScale = ref(1)
-let offsetX = 0
-let offsetY = 0
+let offsetX = ref(0)
+let offsetY = ref(0)
 
 let cardType: PictureType | undefined
 let bgImg: HTMLImageElement | undefined
@@ -119,6 +121,10 @@ const loadImage = (files: FileList) => {
 }
 
 const selectBg = async () => {
+    if (size1.w * size1.h === 0) {
+        ElMessage.error("选择类型")
+        return
+    }
     let input = document.createElement("input")
     input.type = "file"
     input.onchange = async e => {
@@ -131,28 +137,36 @@ const selectBg = async () => {
     input.click()
 }
 const selectFg = () => {
+    if (size1.w * size1.h === 0) {
+        ElMessage.error("选择类型")
+        return
+    }
     let input = document.createElement("input")
     input.type = "file"
     input.onchange = async e => {
         if (input.files) {
             fgImg = await loadImage(input.files)
-            let canva = drawForeground(fgImg, size1, fgScale.value, offsetX, offsetY)
+            let canva = await drawForeground(fgImg, size1, fgScale.value, offsetX.value, offsetY.value)
             render(canva)
         }
     }
     input.click()
 }
 const fgChanged = async () => {
-    let bg = await drawBackground(bgImg!, size1, cardType)
-    let f = drawForeground(fgImg!, size1, fgScale.value, offsetX, offsetY)
+    let bg = await drawBackground(bgImg, size1, cardType)
+    let f = await drawForeground(fgImg, size1, fgScale.value, offsetX.value, offsetY.value)
     clear(canvas1.value!, canvas2.value!)
     render(bg, f)
 }
 
-const render = (...args: HTMLCanvasElement[]) => {
+const render = async (...args: Array<HTMLCanvasElement | undefined>) => {
     let ctx1 = canvas1.value!.getContext('2d')
     for (const c of args) {
-        ctx1?.drawImage(c, 0, 0, size1.w, size1.h)
+        if (c !== undefined)
+            ctx1?.drawImage(c, 0, 0, size1.w, size1.h)
+    }
+    if (cardType) {
+        await cover(canvas1.value?.getContext('2d')!, cardType)
     }
     sync(canvas1.value!, canvas2.value!, size2)
 }
@@ -162,16 +176,23 @@ const outline = () => {
 }
 
 const fgMove = (direction: number) => {
-    if (direction === 0) offsetX--
-    else if (direction === 1) offsetY--
-    else if (direction === 2) offsetX++
-    else if (direction === 3) offsetY++
+    if (direction === 0) offsetX.value--
+    else if (direction === 1) offsetY.value--
+    else if (direction === 2) offsetX.value++
+    else if (direction === 3) offsetY.value++
     else if (direction === -1) {
-        offsetX = 0
-        offsetY = 0
+        offsetX.value = 0
+        offsetY.value = 0
     }
-    fgChanged()
 }
+
+watch(offsetX, (n, o) => {
+    fgChanged()
+})
+
+watch(offsetY, (n, o) => {
+    fgChanged()
+})
 
 window.addEventListener("keydown", e => {
     let k = e.key
@@ -189,19 +210,23 @@ window.addEventListener("keydown", e => {
     flex-direction: column;
     padding: 10px;
 }
+
 .card {
     text-align: center;
 }
+
 .canvas-box {
     display: flex;
     align-items: center;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+
     .box {
         p {
             text-align: center;
         }
+
         flex: 1;
         display: flex;
         flex-direction: column;
