@@ -1,10 +1,10 @@
-export class Tick{
-    /**
-     *
-     */
-    constructor() {
-        
+import { PartialBase } from "./PartialBase";
+
+export class Label extends PartialBase {
+    update(): void {
+
     }
-    update(){}
-    draw(){}
+    draw(ctx: CanvasRenderingContext2D): void {
+                
+    }
 }

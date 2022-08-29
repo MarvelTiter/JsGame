@@ -11,7 +11,11 @@ export class StartSence extends BaseSence {
     }
 
     setup() {
-        let rpm = new Dashboard(Vector2.new(100, 100), 50, -120, -40, this.game, this)
+        let rpm = new Dashboard(Vector2.new(200, 200), 100, this.game, this)
+        rpm.ConfigurePanel(p => {
+            p.startAngle = (Math.PI / 2 + Math.PI / 4)
+            p.endAngle = Math.PI / 4
+        })
         this.addElement(rpm)
     }
 }
