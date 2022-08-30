@@ -7,6 +7,7 @@ export abstract class PartialBase {
     minValue?: number
     pos!: Vector2
     radius!: number
+    color: string = "black"
     constructor(pos: Vector2, radius: number) {
         this.startAngle = 0
         this.endAngle = Math.PI * 2

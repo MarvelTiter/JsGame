@@ -31,7 +31,7 @@ export class Vector2 {
     }
 
     /**
-     *
+     * 向量 * 标量
      * @param value
      * @returns
      */
@@ -39,6 +39,17 @@ export class Vector2 {
         this.x = this.x * value
         this.y = this.y * value
         return this
+    }
+
+    /**
+     * 向量 * 标量， 返回新实例
+     * @param value
+     * @returns
+     */
+    multiTo(value: number): Vector2 {
+        const x = this.x * value
+        const y = this.y * value
+        return Vector2.new(x, y)
     }
 
     /**
@@ -51,6 +62,16 @@ export class Vector2 {
         return this
     }
     /**
+    * 向量相加，返回新实例
+    * @param {Vector2} vec
+    */
+    addTo(vec: Vector2): Vector2 {
+        const x = this.x + vec.x
+        const y = this.y + vec.y
+        return Vector2.new(x, y)
+    }
+
+    /**
      * 向量相减
      * @param vec
      * @returns
@@ -59,6 +80,16 @@ export class Vector2 {
         this.x = this.x - vec.x
         this.y = this.y - vec.y
         return this
+    }
+    /**
+     * 向量相减，返回新实例
+     * @param vec
+     * @returns
+     */
+    subTo(vec: Vector2): Vector2 {
+        const x = this.x - vec.x
+        const y = this.y - vec.y
+        return Vector2.new(x, y)
     }
     /**
      * 向量的长度
@@ -80,6 +111,17 @@ export class Vector2 {
     }
 
     /**
+     * 模向量，返回新实例
+     * @returns {Vector2}
+     */
+    normalizeTo(): Vector2 {
+        let length = this.length()
+        const x = this.x / length
+        const y = this.y / length
+        return Vector2.new(x, y)
+    }
+
+    /**
      * 法向量 / 切线
      * @returns {Vector2}
      */
@@ -97,6 +139,15 @@ export class Vector2 {
         let rotatedX = this.x * Math.cos(theta) - this.y * Math.sin(theta)
         let rotatedY = this.x * Math.sin(theta) + this.y * Math.cos(theta)
         return this.set(rotatedX, rotatedY)
+    }
+    /**
+     * 向量旋转，返回新实例
+     * @param {Number} theta
+     */
+    rotateTo(theta: number): Vector2 {
+        const rotatedX = this.x * Math.cos(theta) - this.y * Math.sin(theta)
+        const rotatedY = this.x * Math.sin(theta) + this.y * Math.cos(theta)
+        return Vector2.new(rotatedX, rotatedY)
     }
 
     rotateAbout(angle: number, p: Vector2): Vector2 {

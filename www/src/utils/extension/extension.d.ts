@@ -1,6 +1,8 @@
 declare global {
     interface Number {
         actualPixel(): number
+        angleToRadian(): number
+        radianToAngle(): number
     }
     interface String {
         isNumeric(): boolean
@@ -13,4 +15,4 @@ declare global {
         removeEnd(): string
     }
 }
-export {}
+export { }
