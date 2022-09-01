@@ -6,7 +6,7 @@ import { CanvasContext } from "../../gamebase/types/DefineType";
 import { Dashboard } from "./Dashboard";
 import { Clutchless } from "./pedal/Clutchless";
 
-const gear = [
+const ig = [
     3.385, //倒档 
     3.363, // 1档
     1.947, // 2档
@@ -15,8 +15,43 @@ const gear = [
     0.837, // 5档
     0.68, // 6档
 ]
-// 怠速转速
+/**
+ * 怠速转速
+ */
 const idleRpm: number = 0.5
+/**
+ * 最大转速
+ */
+const maxRpm: number = 8
+/**
+ * 车轮半径
+ */
+const Radius: number = 0.367
+/**
+ * 传动系机械效率
+ */
+const eta: number = 1
+/**
+ * 摩擦系数
+ */
+const friction: number = 0.013
+/**
+ * 重力加速度
+ */
+const g: number = 9.8
+/**
+ * 质量
+ */
+const m: number = 1300
+/**
+ * 风阻系数
+ */
+const cda: number = 0.277
+// https://blog.csdn.net/weixin_43795921/article/details/84957239
+
+const Tq = (n: number) => -19.313 + 295.27 * (n / 1000) - 165.44 * Math.pow(n / 1000, 2) + 40.874 * Math.pow(n / 1000, 3) - 3.8445 * Math.pow(n / 1000, 4)
+const Ua = (n: number, i: number) => 0.377 * Radius * n / ig[i] / ig[0]
+const Ft = (tq: number, i: number) => tq * ig[i] * ig[0] * eta / (1000 * Radius)
 
 export class Control extends GameObject {
 
@@ -25,6 +60,7 @@ export class Control extends GameObject {
     clutchless?: Clutchless
     rpm: number = idleRpm
     speed: number = 0
+    gear: number | undefined
     constructor(game: Game, sence: BaseSence) {
         super(game, sence)
         this.rpmDashboard = new Dashboard(Vector2.new(400, 400), 200, this.game, this.sence)
@@ -119,11 +155,9 @@ export class Control extends GameObject {
     }
 
     calcCurrentState(): void {
-        this.rpm += 0.01
-        if (this.rpm >= 8){
-            this.rpm -= 0.05
-        }
-        this.speed = this.rpm * 100 * 0.5
+        const t = Tq(3000)
+        const f = Ft(t, 6)
+        const fz = m * g * friction
     }
 
     override update(delta: number, timeScale: number, correction: number): void {
