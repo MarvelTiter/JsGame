@@ -43,6 +43,10 @@ const routes = [
     {
         path: '/mazda',
         component: () => import("@/jsGame/mazda/index.vue")
+    },
+    {
+        path: '/webrtc',
+        component: () => import("@/webRtc/index.vue")
     }
 ]
 const router = createRouter({
