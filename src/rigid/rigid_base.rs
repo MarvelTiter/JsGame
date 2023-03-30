@@ -2,11 +2,15 @@ use crate::data::vector::Vector2;
 use crate::gamebase::game_object::GameObjectBase;
 use wasm_bindgen::{prelude::*, JsObject, JsCast};
 
+pub trait GameObject {
+    
+}
+
 pub struct RigidBase {
     pub id: i32,
     pub force: Vector2,
     pub parts: Vec<RigidBase>,
-    pub parent: RigidBase,
+    pub parent: Box<dyn GameObject>,
     pub velocity: Vector2,
     pub offset: Vector2,
     pub motion: f64,
@@ -30,7 +34,7 @@ pub struct RigidBase {
     pub time_scale: f32,
     pub position_impulse: Vector2,
     pub area: f64,
-    pub target: GameObjectBase,
+    pub target: Box<dyn GameObject>,
 }
 
 // impl JsObject for RigidBase {}
